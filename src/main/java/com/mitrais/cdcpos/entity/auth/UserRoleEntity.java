@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -15,13 +16,13 @@ import javax.persistence.*;
 public class UserRoleEntity {
     @Id
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     @Id
     @Column(name = "role_id")
     private Integer roleId;
 
-    public UserRoleEntity(Long userId, Integer roleId) {
+    public UserRoleEntity(UUID userId, Integer roleId) {
         this.userId = userId;
         this.roleId = roleId;
     }
