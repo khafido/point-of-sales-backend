@@ -18,7 +18,7 @@ import java.util.UUID;
 public class InvoiceEntity {
     @Id
     @Column(name = "id")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;

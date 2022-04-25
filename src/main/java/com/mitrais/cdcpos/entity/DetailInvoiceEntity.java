@@ -19,7 +19,7 @@ import java.util.UUID;
 public class DetailInvoiceEntity {
     @Id
     @Column(name = "id")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id", referencedColumnName = "id")
