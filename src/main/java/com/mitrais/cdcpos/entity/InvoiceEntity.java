@@ -32,14 +32,17 @@ public class InvoiceEntity {
     private BigDecimal changeAmount;
 
     @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "voucher_id")
     private UUID voucherId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     private UUID cashierId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
     private UUID storeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
     private UUID customerId;
 }
