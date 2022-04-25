@@ -24,7 +24,8 @@ public class DetailInvoiceEntity {
     @JoinColumn(name = "invoice_id")
     private UUID invoiceId;
 
-    @Column(name = "item_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
     private UUID itemId;
 
     @Column(name = "item_price")
