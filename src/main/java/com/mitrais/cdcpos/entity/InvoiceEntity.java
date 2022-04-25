@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.entity;
 
+import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.UUID;
 public class InvoiceEntity {
     @Id
     @Column(name = "id")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;
@@ -32,17 +33,18 @@ public class InvoiceEntity {
     private BigDecimal changeAmount;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "voucher_id")
-    private UUID voucherId;
+    @JoinColumn(name = "voucher_id", referencedColumnName = "id")
+    private VoucherEntity voucher;
 
     @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cashier_id", referencedColumnName = "id")
     private UUID cashierId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private UUID storeId;
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
+    private StoreEntity store;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private UUID customerId;
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    private CustomerEntity customer;
 }
