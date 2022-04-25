@@ -1,14 +1,12 @@
 package com.mitrais.cdcpos.entity.item;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,13 +19,18 @@ import java.util.UUID;
 @Table(name = "incoming_item")
 public class IncomingItemEntity {
     @Id
+    @Column(name="id")
     private UUID transferId = UUID.randomUUID();
 
-    @Column(name = "item_id")
-    private String item_id;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private ItemEntity item;
 
-    @Column(name = "supplier_id")
-    private String supplier_id;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id")
+    private SupplierEntity supplier;
 
     @Column(name = "buy_qty")
     private Long buy_qty;

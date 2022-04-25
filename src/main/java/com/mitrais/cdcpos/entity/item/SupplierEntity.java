@@ -6,10 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +19,7 @@ import java.util.UUID;
 @Table(name = "suppliers")
 public class SupplierEntity {
     @Id
+    @Column(name="id")
     private UUID transferId = UUID.randomUUID();
 
     @Column(name = "name")
@@ -36,4 +36,7 @@ public class SupplierEntity {
 
     @Column(name = "address")
     private String address;
+
+    @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<IncomingItemEntity> incomingItems = new ArrayList<>();
 }

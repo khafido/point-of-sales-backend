@@ -1,13 +1,14 @@
 package com.mitrais.cdcpos.entity;
 
+import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -23,4 +24,7 @@ public class CategoryEntity {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ItemEntity> items = new ArrayList<>();
 }
