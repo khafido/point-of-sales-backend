@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.entity;
 
+import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +22,12 @@ public class DetailInvoiceEntity {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "invoice_id")
-    private UUID invoiceId;
+    @JoinColumn(name = "invoice_id", referencedColumnName = "id")
+    private InvoiceEntity invoice;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private UUID itemId;
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
+    private ItemEntity item;
 
     @Column(name = "item_price")
     private BigDecimal itemPrice;
