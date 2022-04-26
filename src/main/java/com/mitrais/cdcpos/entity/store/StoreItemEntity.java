@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.entity.store;
 
 
+import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "store_item")
-public class StoreItemEntity {
+public class StoreItemEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();

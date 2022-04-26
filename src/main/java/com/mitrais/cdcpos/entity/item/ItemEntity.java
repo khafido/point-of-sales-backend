@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.entity.item;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mitrais.cdcpos.entity.CategoryEntity;
+import com.mitrais.cdcpos.entity.EntityAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "item")
-public class ItemEntity {
+public class ItemEntity extends EntityAudit {
     @Id
     @Column(name="id")
     private UUID transferId = UUID.randomUUID();
