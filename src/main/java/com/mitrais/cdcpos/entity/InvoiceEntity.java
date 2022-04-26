@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.entity;
 
+import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "invoice")
-public class InvoiceEntity {
+public class InvoiceEntity extends EntityAudit<String> {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
@@ -36,9 +37,9 @@ public class InvoiceEntity {
     @JoinColumn(name = "voucher_id", referencedColumnName = "id")
     private VoucherEntity voucher;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cashier_id", referencedColumnName = "id")
-    private UUID cashierId;
+    private UserEntity cashierId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", referencedColumnName = "id")

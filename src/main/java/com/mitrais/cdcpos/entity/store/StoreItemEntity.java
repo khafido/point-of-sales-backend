@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.entity.store;
 
 
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,12 +23,12 @@ public class StoreItemEntity {
     private UUID id = UUID.randomUUID();
 
     @ManyToOne()
-    @Column(name = "store_id")
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
     private StoreEntity store;
 
     @ManyToOne()
-    @Column(name = "item_id")
-    private String item;
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
+    private ItemEntity item;
 
     @Column(name = "stock")
     private Integer stock;

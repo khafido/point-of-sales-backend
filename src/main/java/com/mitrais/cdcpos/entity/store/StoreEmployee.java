@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,10 +22,10 @@ public class StoreEmployee {
     private UUID id = UUID.randomUUID();
 
     @ManyToOne()
-    @Column(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
     @ManyToOne()
-    @Column(name = "store_id")
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
     private StoreEntity store;
 }

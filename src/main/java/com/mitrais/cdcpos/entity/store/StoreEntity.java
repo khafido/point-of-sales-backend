@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +23,6 @@ public class StoreEntity {
     private String location;
 
     @OneToOne()
-    @Column(name = "manager_id")
+    //@Column(name = "manager_id")
     private UserEntity manager;
 }
