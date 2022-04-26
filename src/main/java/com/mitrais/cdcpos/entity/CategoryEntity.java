@@ -17,8 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name = "category")
-public class CategoryEntity {
+@Table(name = "category", schema = "public")
+public class CategoryEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();

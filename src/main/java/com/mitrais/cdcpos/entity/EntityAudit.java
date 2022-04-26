@@ -15,23 +15,29 @@ import java.time.LocalDateTime;
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class EntityAudit<U> {
+public abstract class EntityAudit {
 
-    @CreatedBy
-    @Column(name = "created_by")
-    private U createdBy;
+//    @CreatedBy
+//    @Column(name = "created_by")
+//    private U createdBy;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @LastModifiedBy
-    @Column(name = "modified_by")
-    private U modifiedBy;
+//    @LastModifiedBy
+//    @Column(name = "modified_by")
+//    private U modifiedBy;
 
     @LastModifiedDate
     @Column(name = "last_modified_at", nullable = false)
     private LocalDateTime lastModifiedAt;
+
+//    @Column(name = "deleted_by")
+//    private U deletedBy;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
 
 }

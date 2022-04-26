@@ -16,8 +16,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "voucher")
-public class CustomerEntity {
+@Table(name = "voucher", schema = "public")
+public class CustomerEntity extends EntityAudit {
 
     @Id
     @Column(name = "id")

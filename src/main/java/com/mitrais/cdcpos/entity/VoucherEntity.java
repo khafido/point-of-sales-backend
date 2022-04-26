@@ -18,8 +18,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "voucher")
-public class VoucherEntity {
+@Table(name = "voucher", schema = "public")
+public class VoucherEntity extends EntityAudit {
 
     @Id
     @Column(name = "id")

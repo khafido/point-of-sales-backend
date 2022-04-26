@@ -15,8 +15,8 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "invoice")
-public class InvoiceEntity extends EntityAudit<String> {
+@Table(name = "invoice", schema = "public")
+public class InvoiceEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
@@ -37,7 +37,7 @@ public class InvoiceEntity extends EntityAudit<String> {
     @JoinColumn(name = "voucher_id", referencedColumnName = "id")
     private VoucherEntity voucher;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cashier_id", referencedColumnName = "id")
     private UserEntity cashierId;
 

@@ -15,8 +15,8 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "detail_invoice")
-public class DetailInvoiceEntity {
+@Table(name = "detail_invoice", schema = "public")
+public class DetailInvoiceEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();

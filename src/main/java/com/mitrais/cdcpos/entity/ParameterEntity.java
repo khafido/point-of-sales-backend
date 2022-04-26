@@ -17,8 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name = "parameter")
-public class ParameterEntity {
+@Table(name = "parameter", schema = "public")
+public class ParameterEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id =  UUID.randomUUID();
