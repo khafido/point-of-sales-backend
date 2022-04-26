@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name = "category")
-public class CategoryEntity {
+@Table(name = "category", schema = "public")
+public class CategoryEntity extends EntityAudit {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
