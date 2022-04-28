@@ -6,4 +6,5 @@ public enum ERole {
     ROLE_STOCKIST,
     ROLE_MANAGER,
     ROLE_OWNER,
+    ROLE_EMPLOYEE
 }
