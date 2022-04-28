@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Table(name = "category", schema = "public")
+@Table(name = "category", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class CategoryEntity extends EntityAudit {
     @Id
     @Column(name = "id")
@@ -26,6 +26,6 @@ public class CategoryEntity extends EntityAudit {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ItemEntity> items = new ArrayList<>();
+//    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<ItemEntity> items = new ArrayList<>();
 }
