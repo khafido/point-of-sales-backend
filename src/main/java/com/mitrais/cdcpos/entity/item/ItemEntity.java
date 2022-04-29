@@ -35,7 +35,7 @@ public class ItemEntity extends EntityAudit {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
     @Column(name = "packaging")
