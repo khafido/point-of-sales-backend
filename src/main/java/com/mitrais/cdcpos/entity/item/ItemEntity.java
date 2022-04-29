@@ -33,14 +33,10 @@ public class ItemEntity extends EntityAudit {
     @Column(name = "barcode")
     private String barcode;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     private CategoryEntity category;
 
     @Column(name = "packaging")
     private String packaging;
-
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<IncomingItemEntity> incomingItems = new ArrayList<>();
 }

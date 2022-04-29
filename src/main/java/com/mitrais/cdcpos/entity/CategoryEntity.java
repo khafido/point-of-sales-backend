@@ -25,7 +25,4 @@ public class CategoryEntity extends EntityAudit {
 
     @Column(name = "name")
     private String name;
-
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ItemEntity> items = new ArrayList<>();
 }

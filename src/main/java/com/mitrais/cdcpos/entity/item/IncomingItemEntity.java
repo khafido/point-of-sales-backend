@@ -23,14 +23,12 @@ public class IncomingItemEntity extends EntityAudit {
     @Column(name="id")
     private UUID transferId = UUID.randomUUID();
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private ItemEntity item;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "supplier_id")
+    @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private SupplierEntity supplier;
 
     @Column(name = "buy_qty")
