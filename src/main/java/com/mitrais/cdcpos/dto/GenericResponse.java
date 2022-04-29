@@ -21,6 +21,12 @@ public class GenericResponse {
         this.message = message;
     }
 
+    public GenericResponse(Object result, String message, Status status) {
+        this.result = result;
+        this.message = message;
+        this.status = status;
+    }
+
     public enum Status {
         SUCCESS,
         ERROR_INPUT,

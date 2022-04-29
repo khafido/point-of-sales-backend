@@ -16,8 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-@Table(name = "category", schema = "public")
+@Table(name = "category", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class CategoryEntity extends EntityAudit {
     @Id
     @Column(name = "id")
