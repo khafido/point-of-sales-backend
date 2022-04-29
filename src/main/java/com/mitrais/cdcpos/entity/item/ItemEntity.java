@@ -34,7 +34,7 @@ public class ItemEntity extends EntityAudit {
     private String barcode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private CategoryEntity category;
 
     @Column(name = "packaging")
