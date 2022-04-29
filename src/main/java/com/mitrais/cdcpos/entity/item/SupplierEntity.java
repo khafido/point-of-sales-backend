@@ -21,7 +21,7 @@ import java.util.UUID;
 public class SupplierEntity extends EntityAudit {
     @Id
     @Column(name="id")
-    private UUID transferId = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "name")
     private String name;
