@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.repository.StoreRepository;
@@ -39,5 +40,26 @@ public class StoreService {
 
     public Optional<StoreEntity> getById(UUID id){
         return storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
+    }
+
+    public StoreEntity create(StoreDto storeDto){
+        var newStore = new StoreEntity();
+        newStore.setName(storeDto.getName());
+        newStore.setLocation(storeDto.getLocation());
+        newStore.setManager(null);
+        return storeRepository.save(newStore);
+    }
+
+    public StoreEntity update(UUID id,StoreDto storeDto){
+        var store = getById(id);
+        if(store.isPresent()){
+            var updateStore = store.get();
+            updateStore.setName(storeDto.getName());
+            updateStore.setLocation(storeDto.getLocation());
+            updateStore.setManager(null);
+            return storeRepository.save(updateStore);
+        }else{
+            return null;
+        }
     }
 }

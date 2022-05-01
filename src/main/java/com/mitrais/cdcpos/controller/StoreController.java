@@ -3,6 +3,7 @@ package com.mitrais.cdcpos.controller;
 
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
+import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,10 +39,10 @@ public class StoreController {
         }
     }
 
-    @GetMapping("id/{uuid}")
+    @GetMapping("/id/{uuid}")
     public ResponseEntity<GenericResponse> getById(@PathVariable UUID id){
-        var store = storeService.getById(id);
         try{
+            var store = storeService.getById(id);
             if(store.isPresent()){
                 var genericResponse = new GenericResponse(store.get(), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
@@ -54,15 +55,31 @@ public class StoreController {
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-//
-//    @PostMapping()
-//    public ResponseEntity<GenericResponse> create(@RequestBody StoreDto req) {
-//        try {
-//            var newStore = storeService.create(req);
-//            return new GenericResponse(newStore, "New Store Created");
-//        } catch (Exception e) {
-//            return new GenericResponse(null, "Failed to Create New Store");
-//        }
-//    }
 
+    @PostMapping()
+    public ResponseEntity<GenericResponse> create(@RequestBody StoreDto req) {
+        try {
+            var newStore = storeService.create(req);
+            var genericResponse = new GenericResponse(newStore, "New Store Created", GenericResponse.Status.SUCCESS);
+        } catch (Exception e) {
+            var genericResponse = new GenericResponse(null, "Failed to Create New Store", GenericResponse.Status.ERROR_INTERNAL);
+        }
+    }
+
+    @PutMapping("/id/{uuid}")
+    public ResponseEntity<GenericResponse> update(@PathVariable UUID id, @RequestBody StoreDto storeDto){
+        try{
+            var store = storeService.update(id, storeDto);
+            if(store != null){
+                var genericResponse = new GenericResponse(store, "Successfully Update Store Data", GenericResponse.Status.SUCCESS);
+                return new ResponseEntity<>(genericResponse, HttpStatus.OK);
+            }else{
+                var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
+                return new ResponseEntity<>(genericResponse, HttpStatus.NOT_FOUND);
+            }
+        }catch(Exception e){
+            var genericResponse = new GenericResponse(null, "Failed To Get Store Data", GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
