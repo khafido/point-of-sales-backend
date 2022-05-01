@@ -1,14 +1,12 @@
 package com.mitrais.cdcpos.service;
 
-import com.mitrais.cdcpos.dto.PaginatedDto;
-import com.mitrais.cdcpos.dto.StoreDto;
+import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,26 +16,28 @@ import java.util.UUID;
 public class StoreService {
     private final StoreRepository storeRepository;
 
-    public List<StoreEntity> fetchAll() {
-        return new ArrayList<>(storeRepository.findAll());
+    public Page<StoreEntity> getAll(boolean paginated,int page, int size, String searchValue, String sortBy, String sortDirection) {
+        Sort sort;
+        Pageable paging;
+        Page<StoreEntity> result;
+
+        if ("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if(paginated) {
+            paging = PageRequest.of(page, size, sort);
+            result = storeRepository.search(searchValue, paging);
+        } else {
+            List<StoreEntity> storeEntities = storeRepository.search(searchValue, sort);
+            result = new PageImpl<>(storeEntities);
+        }
+        return result;
     }
 
-    public PaginatedDto<StoreEntity> fetchAllWithPagination(int pageOffset, int pageSize) {
-        var content = storeRepository.findAll(PageRequest.of(pageOffset, pageSize));
-        return new PaginatedDto<>(content.getContent(), pageOffset, content.getTotalPages());
+    public Optional<StoreEntity> getById(UUID id){
+        return storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
     }
-
-    public Optional<StoreEntity> fetchById(UUID id) {
-        return storeRepository.findById(id);
-    }
-
-    public StoreEntity create(StoreDto req) {
-        var newStore = new StoreEntity();
-        newStore.setName(req.getName());
-        newStore.setLocation(req.getLocation());
-        newStore.setManager(null);
-        return storeRepository.save(newStore);
-    }
-
-
 }
