@@ -31,7 +31,7 @@ public class StoreController {
         }
     }
 
-    @GetMapping("/id/{uuid}")
+    @GetMapping("/{id}")
     public ResponseEntity<GenericResponse> getById(@PathVariable UUID id) {
         try {
             var store = storeService.getById(id);
@@ -60,7 +60,7 @@ public class StoreController {
         }
     }
 
-    @PutMapping("/id/{uuid}")
+    @PutMapping("/{id}")
     public ResponseEntity<GenericResponse> update(@PathVariable UUID id, @RequestBody StoreDto storeDto) {
         try {
             var store = storeService.update(id, storeDto);
@@ -77,7 +77,7 @@ public class StoreController {
         }
     }
 
-    @DeleteMapping("/id/{uuid}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<GenericResponse> delete(@PathVariable UUID id) {
         try {
             var store = storeService.delete(id);
