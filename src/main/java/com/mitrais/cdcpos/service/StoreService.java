@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -58,6 +59,17 @@ public class StoreService {
             updateStore.setLocation(storeDto.getLocation());
             updateStore.setManager(null);
             return storeRepository.save(updateStore);
+        }else{
+            return null;
+        }
+    }
+
+    public StoreEntity delete(UUID id){
+        var store = getById(id);
+        if(store.isPresent()){
+            var deleteStore = store.get();
+            deleteStore.setDeletedAt(LocalDateTime.now());
+            return storeRepository.save(deleteStore);
         }else{
             return null;
         }
