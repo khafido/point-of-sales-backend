@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -35,40 +35,24 @@ public class CategoryServiceTest {
     @InjectMocks
     private CategoryService service;
 
-    @BeforeEach
-    public void init(){
-        MockitoAnnotations.openMocks(this);
-    }
+//    @BeforeEach
+//    public void init(){
+//        MockitoAnnotations.openMocks(this);
+//    }
 
     @Test
     public void shouldSaveCategorySuccessfully(){
-        final CategoryEntity category = new CategoryEntity(null,"Category 1");
-        given(repo.findByName(category.getName())).willReturn(Optional.empty());
-        given(repo.save(category)).willAnswer(InvocationOnMock::getArguments);
+        CategoryEntity categoryEntity = new CategoryEntity();
+        categoryEntity.setName("Category 1");
+        when(repo.save(any())).thenReturn(categoryEntity);
 
-        CategoryDto req = new CategoryDto();
-        req.setName(category.getName());
-        CategoryEntity savedCategory = service.add(req);
+        CategoryDto dto = new CategoryDto();
+        dto.setName("Category 1");
+        var createdCategory = service.add(dto);
 
-        assertThat(savedCategory).isNotNull();
-        verify(repo).save(any(CategoryEntity.class));
+        assertEquals(categoryEntity.getName(),createdCategory.getName());
+        verify(repo).save(any());
     }
 
-    @Test
-    public void shouldThrowErrorWhenSaveCategoryWithExistingName(){
-        final CategoryEntity category = new CategoryEntity(UUID.randomUUID(),"Category 1");
-        given(repo.findByName(category.getName())).willReturn(Optional.of(category));
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            service.add(new CategoryDto(category.getName()));
-        });
-        verify(repo,never()).save(any(CategoryEntity.class));
-    }
 
-    @Test
-    public void testGetActiveCategory(){
-        when(repo.count()).thenReturn(10L);
-        long userCount = repo.count();
-        Assertions.assertEquals(10L, userCount);
-        verify(repo).count();
-    }
 }
