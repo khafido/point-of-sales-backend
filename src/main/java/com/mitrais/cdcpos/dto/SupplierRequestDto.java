@@ -13,6 +13,6 @@ public class SupplierRequestDto {
     private String email;
     private String phone;
     private String address;
-    private String CPName;
+    private String cpname;
 
 }

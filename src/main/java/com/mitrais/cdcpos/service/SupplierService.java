@@ -53,13 +53,13 @@ public class SupplierService {
         entity.setPhone(request.getPhone());
         entity.setEmail(request.getEmail());
         entity.setAddress(request.getAddress());
-        entity.setCPName(request.getCPName());
+        entity.setCpname(request.getCpname());
 
         return supplierRepository.save(entity);
     }
 
-    public SupplierEntity updateSupplier (String id, SupplierRequestDto request) {
-        Optional<SupplierEntity> optional = supplierRepository.findById(UUID.fromString(id));
+    public SupplierEntity updateSupplier (UUID id, SupplierRequestDto request) {
+        Optional<SupplierEntity> optional = supplierRepository.findById(id);
 
         if(optional.isPresent()) {
             SupplierEntity entity = optional.get();
@@ -67,15 +67,15 @@ public class SupplierService {
             entity.setPhone(request.getPhone());
             entity.setEmail(request.getEmail());
             entity.setAddress(request.getAddress());
-            entity.setCPName(request.getCPName());
+            entity.setCpname(request.getCpname());
 
             return supplierRepository.save(entity);
         }
         return null;
     }
 
-    public SupplierEntity deleteSupplier (String id) {
-        Optional<SupplierEntity> optional = supplierRepository.findById(UUID.fromString(id));
+    public SupplierEntity deleteSupplier (UUID id) {
+        Optional<SupplierEntity> optional = supplierRepository.findById(id);
 
         if(optional.isPresent()) {
             SupplierEntity entity = optional.get();
