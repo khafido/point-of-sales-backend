@@ -17,7 +17,7 @@ public interface SupplierRepository extends JpaRepository<SupplierEntity, UUID> 
 
     @Query("SELECT s FROM SupplierEntity s WHERE s.deletedAt IS NULL AND (" +
             "s.name LIKE %:search% OR " +
-            "s.CPName LIKE %:search% OR " +
+            "s.cpname LIKE %:search% OR " +
             "s.phone LIKE %:search% OR " +
             "s.email LIKE %:search% OR " +
             "s.address LIKE %:search%)")
@@ -25,7 +25,7 @@ public interface SupplierRepository extends JpaRepository<SupplierEntity, UUID> 
 
     @Query("SELECT s FROM SupplierEntity s WHERE s.deletedAt IS NULL AND (" +
             "s.name LIKE %:search% OR " +
-            "s.CPName LIKE %:search% OR " +
+            "s.cpname LIKE %:search% OR " +
             "s.phone LIKE %:search% OR " +
             "s.email LIKE %:search% OR " +
             "s.address LIKE %:search%)")
