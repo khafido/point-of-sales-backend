@@ -13,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/supplier")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @AllArgsConstructor
 public class SupplierController {
 
@@ -27,7 +29,7 @@ public class SupplierController {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "") String searchValue,
-            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") String sortDirection
     ) {
         try {
@@ -60,7 +62,7 @@ public class SupplierController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GenericResponse> updateSupplier(
-            @PathVariable String id,
+            @PathVariable UUID id,
             @RequestBody SupplierRequestDto reqBody
     ) {
         try {
@@ -77,7 +79,7 @@ public class SupplierController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GenericResponse> deleteSupplier(
-            @PathVariable String id
+            @PathVariable UUID id
     ) {
         try {
             SupplierEntity result = supplierService.deleteSupplier(id);
