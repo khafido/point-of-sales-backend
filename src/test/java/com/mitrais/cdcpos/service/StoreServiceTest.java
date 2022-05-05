@@ -51,7 +51,7 @@ class StoreServiceWriteTest {
         UUID id = UUID.randomUUID();
         when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalResult);
 
-        assertSame(storeEntity,storeService.getById(id));
+        assertSame(storeEntity,storeService.getById(id).get());
         verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
     }
 
