@@ -24,6 +24,6 @@ public class StoreEntity extends EntityAudit {
     private String location;
 
     @OneToOne()
-    //@Column(name = "manager_id")
+    @JoinColumn(name = "id", referencedColumnName = "id")
     private UserEntity manager;
 }
