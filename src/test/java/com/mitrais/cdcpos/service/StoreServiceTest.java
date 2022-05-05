@@ -13,8 +13,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,7 +41,22 @@ class StoreServiceWriteTest {
     }
 
     @Test
-    public void shouldCreateStoreSuccessfully() {
+    public void getById(){
+        StoreEntity storeEntity = new StoreEntity();
+        storeEntity.setName("Store");
+        storeEntity.setLocation("Loc");
+        storeEntity.setManager(null);
+        Optional<StoreEntity> optionalResult = Optional.of(storeEntity);
+
+        UUID id = UUID.randomUUID();
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalResult);
+
+        assertSame(storeEntity,storeService.getById(id));
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+    }
+
+    @Test
+    public void create() {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setName("konbini");
         storeEntity.setLocation("japan");
@@ -63,7 +78,7 @@ class StoreServiceWriteTest {
     }
 
     @Test
-    public void shouldGetStorePaginatedSuccessfully() {
+    public void getStoreWithPagination() {
         var pagedStore = new PageImpl<>(storeList);
         when(storeRepository.search(anyString(), (Pageable) any())).thenReturn(pagedStore);
 
@@ -75,7 +90,7 @@ class StoreServiceWriteTest {
     }
 
     @Test
-    public void shouldGetStoreSuccessfully() {
+    public void getStoreWithoutPagination() {
         var pagedStore = new PageImpl<>(storeList);
         when(storeRepository.search(anyString(), (Sort) any())).thenReturn(storeList);
 
@@ -88,5 +103,53 @@ class StoreServiceWriteTest {
         verify(storeRepository, times(1)).search(anyString(), (Sort) any());
     }
 
+    @Test
+    public void update(){
+
+        StoreEntity oldStore = new StoreEntity();
+        oldStore.setLocation("Yogya");
+        oldStore.setManager(null);
+        oldStore.setName("Yogya Store");
+        Optional<StoreEntity> optionalOldStore = Optional.of(oldStore);
+
+        StoreEntity updatedStore = new StoreEntity();
+        updatedStore.setLocation("Jakarta");
+        updatedStore.setName("Jakarta Store");
+        updatedStore.setManager(null);
+
+        when(storeRepository.save((StoreEntity) any())).thenReturn(updatedStore);
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalOldStore);
+        UUID id = UUID.randomUUID();
+
+        StoreDto storeDto = new StoreDto();
+        storeDto.setLocation("Jakarta");
+        storeDto.setName("Jakarta Store");
+        assertSame(updatedStore, storeService.update(id, storeDto));
+        verify(storeRepository, times(1)).save((StoreEntity) any());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+    }
+
+    @Test
+    public void delete(){
+        StoreEntity store = new StoreEntity();
+        store.setLocation("Yogya");
+        store.setManager(null);
+        store.setName("Yogya Store");
+        Optional<StoreEntity> optionalStore = Optional.of(store);
+
+        StoreEntity deletedStore = new StoreEntity();
+        deletedStore.setLocation("Yogya");
+        deletedStore.setManager(null);
+        deletedStore.setName("Yogya Store");
+        deletedStore.setDeletedAt(LocalDateTime.now());
+
+        UUID id = UUID.randomUUID();
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalStore);
+        when(storeRepository.save((StoreEntity) any())).thenReturn(deletedStore);
+
+        assertSame(deletedStore, storeService.delete(id));
+        verify(storeRepository, times(1)).save((StoreEntity) any());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+    }
 }
 
