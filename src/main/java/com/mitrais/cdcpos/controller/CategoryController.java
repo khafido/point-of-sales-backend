@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "api/v1/category")
+@CrossOrigin(origins="*", maxAge=3600)
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
@@ -32,10 +33,10 @@ public class CategoryController {
         try{
             category = categoryService.add(req);
             return new ResponseEntity<>
-                    (new GenericResponse(category, "Category Created"), HttpStatus.CREATED);
+                    (new GenericResponse(category, "Category Created", GenericResponse.Status.CREATED), HttpStatus.CREATED);
         }catch (DataIntegrityViolationException e){
             return new ResponseEntity<>
-                    (new GenericResponse(req, "Category already exist"),HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(req, "Category already exist", GenericResponse.Status.ERROR_INPUT),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -79,10 +80,10 @@ public class CategoryController {
         try{
            category = categoryService.update(id, req);
             return new ResponseEntity<>
-                    (new GenericResponse(category, "Category updated"), HttpStatus.OK);
+                    (new GenericResponse(category, "Category updated", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }catch (DataIntegrityViolationException e){
             return new ResponseEntity<>
-                    (new GenericResponse(req, "Category already exist"),HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(req, "Category already exist", GenericResponse.Status.ERROR_INPUT),HttpStatus.BAD_REQUEST);
         }
     }
 
