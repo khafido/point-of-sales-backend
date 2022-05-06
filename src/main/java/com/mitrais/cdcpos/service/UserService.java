@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -47,6 +48,23 @@ public class UserService {
         return  userRepository.findByDeletedAtIsNull();
     }
 
+    public UserDto getActiveUserById(UUID id) {
+        UserEntity user = userRepository.findByIdAndDeletedAtIsNull(id);
+        UserDto result = new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getAddress(),
+                user.getGender(),
+                user.getPhoto(),
+                user.getBirthDate()
+        );
+        return result;
+    }
+
     public UserEntity addUser(UserDto req) {
         UserEntity user = new UserEntity();
 
@@ -63,9 +81,41 @@ public class UserService {
         user.setPassword(encoder.encode(req.getUsername()));
         user.setAddress(req.getAddress());
         user.setGender(req.getGender());
-        user.setPhoto(req.getPhoto());
 
+        if (req.getPhoto() != null) {
+            user.setPhoto(req.getPhoto());
+        }
         return userRepository.save(user);
+    }
+
+    public boolean updateUser(UUID id, UserDto req) {
+        UserEntity user = userRepository.findById(id).orElse(null);
+
+        if (user != null) {
+            user.setFirstName(req.getFirstName());
+            user.setLastName(req.getLastName());
+            user.setPhone(req.getPhone());
+            user.setBirthDate(req.getBirthDate());
+            user.setAddress(req.getAddress());
+            user.setGender(req.getGender());
+            if (req.getPhoto() != null) {
+                user.setPhoto(req.getPhoto());
+            }
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteUser(UUID id) {
+        UserEntity user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            user.setDeletedAt(LocalDateTime.now());
+            userRepository.save(user);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean isUsernameExist(String username) {

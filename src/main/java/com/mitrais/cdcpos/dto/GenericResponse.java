@@ -16,6 +16,10 @@ public class GenericResponse {
     @JsonFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     private LocalDateTime timestamp = LocalDateTime.now();
 
+    public GenericResponse(String message) {
+        this.message = message;
+    }
+
     public GenericResponse(Object result, String message) {
         this.result = result;
         this.message = message;

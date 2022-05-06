@@ -14,8 +14,11 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     UserEntity findByUsername(String username);
 
-    @Query("select u from UserEntity u where u.deletedAt is null")
+    @Query("select u from UserEntity u where u.deletedAt is null ORDER BY u.firstName, u.lastName ASC")
     List<UserEntity> findByDeletedAtIsNull();
+
+    @Query("select u from UserEntity u where u.id = ?1 and u.deletedAt is null")
+    UserEntity findByIdAndDeletedAtIsNull(UUID id);
 
     Boolean existsByUsername(String username);
 
