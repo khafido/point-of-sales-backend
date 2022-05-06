@@ -18,11 +18,11 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item")
+@Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames = "barcode"))
 public class ItemEntity extends EntityAudit {
     @Id
     @Column(name="id")
-    private UUID transferId = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "name")
     private String name;

@@ -31,6 +31,16 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
     }
 
+    public CategoryEntity getActiveDataById(UUID id){
+        return categoryRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+    }
+
+    public CategoryEntity getActiveDataByName(String name){
+        return categoryRepository.findByNameAndDeletedAtIsNull(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "name", name));
+    }
+
     public Page<CategoryEntity> getAll(Pageable pageable){
         return categoryRepository.findAll(pageable);
     }
