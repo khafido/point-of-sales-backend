@@ -31,6 +31,7 @@ public class GenericResponse {
         SUCCESS,
         ERROR_INPUT,
         ERROR_NOT_FOUND,
-        ERROR_INTERNAL
+        ERROR_INTERNAL,
+        CREATED,
     }
 }
