@@ -12,10 +12,7 @@ import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.support.PagedListHolder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.util.*;
 
@@ -46,26 +43,25 @@ public class CategoryServiceTest {
 
     @Test
     public void getCategoryNotpaged(){
-        Page<CategoryEntity> pageCategories = new PageImpl<>(categoryList);
-        when(repo.findAll(Pageable.unpaged())).thenReturn((pageCategories));
+        when(repo.findAllSearch((Sort) any(),anyString())).thenReturn(categoryList);
 
-        Page<CategoryEntity> result = service.getAll(Pageable.unpaged());
-        assertArrayEquals(categoryList.toArray(), result.getContent().toArray());
-        verify(repo).findAll(Pageable.unpaged());
+        Page<CategoryEntity> result = service.getAll(false, 0, 3,"cat","name", "asc");
+        for(int i=0; i<=2; i++){
+            assertSame(categoryList.get(i), result.getContent().get(i));
+        }
+
+        verify(repo).findAllSearch((Sort) any(), anyString());
     }
 
     @Test
     public void getCategoryPaged(){
-        Pageable paging = PageRequest.of(1,1);
-        PagedListHolder<CategoryEntity> pagedListCategory = new PagedListHolder<>(categoryList);
-        pagedListCategory.setPageSize(1);
-        pagedListCategory.setPage(1);
-        Page<CategoryEntity> pageCategory = new PageImpl<>(pagedListCategory.getPageList(),paging, 1);
-        when(repo.findAll(paging)).thenReturn(pageCategory);
+        Page<CategoryEntity> pagedCategory = new PageImpl<>(categoryList);
+        when(repo.findAllSearch((Pageable) any(),anyString())).thenReturn(pagedCategory);
 
-        Page<CategoryEntity> result = service.getAll(PageRequest.of(1,1));
-        assertEquals(categoryList.get(1), result.getContent().toArray()[0]);
-        verify(repo).findAll(paging);
+        var result = service.getAll(true, 0,3, "cat", "name", "asc");
+        assertSame(pagedCategory, result);
+
+        verify(repo).findAllSearch((Pageable) any(), anyString());
     }
 
     @Test

@@ -41,27 +41,24 @@ public class CategoryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<GenericResponse> getAll(@RequestParam(required = false) boolean active,
+    public ResponseEntity<GenericResponse> getAll(@RequestParam(defaultValue = "false") boolean isPaginated,
                                                   @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "3") int size){
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(defaultValue = "") String searchVal,
+                                                  @RequestParam(defaultValue = "name") String sortBy,
+                                                  @RequestParam(defaultValue = "ASC") String sortDirection){
         try{
-            List<CategoryEntity> categories = new ArrayList<>();
-            Pageable paging = PageRequest.of(page,size);
-            Page<CategoryEntity> pageTuts;
-            if(active != true)
-                // get all categories whether it's active or not
-                pageTuts = categoryService.getAll(paging);
-            else
-                // get all active categories
-                pageTuts = categoryService.getActiveCategory(paging);
-            categories = pageTuts.getContent();
-            PaginatedDto<CategoryEntity> paginated =
-                    new PaginatedDto<>(categories,pageTuts.getNumber(),pageTuts.getTotalPages());
-            return new ResponseEntity<>
-                    (new GenericResponse(paginated, "OK"), HttpStatus.OK);
+            Page<CategoryEntity> categories = categoryService.getAll(isPaginated,page,size,searchVal,sortBy,sortDirection);
+            PaginatedDto<CategoryEntity> result = new PaginatedDto<>(
+                    categories.getContent(),
+                    categories.getNumber(),
+                    categories.getTotalPages()
+            );
+            return new ResponseEntity<>(new GenericResponse(result, "Get category list success", GenericResponse.Status.SUCCESS)
+            ,HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>
-                    (new GenericResponse(null,"No category available"), HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(null,e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

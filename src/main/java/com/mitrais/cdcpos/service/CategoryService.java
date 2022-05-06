@@ -6,12 +6,12 @@ import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,8 +30,26 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
     }
 
-    public Page<CategoryEntity> getAll(Pageable pageable){
-        return categoryRepository.findAll(pageable);
+    public Page<CategoryEntity> getAll(boolean paginated, int page, int size,
+                                       String searchVal, String sortBy,String sortDirection){
+        Sort sort;
+        Pageable paging;
+        Page<CategoryEntity> result;
+
+        if("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if(paginated){
+            paging = PageRequest.of(page, size,sort);
+            result = categoryRepository.findAllSearch(paging, searchVal);
+        }else{
+            List<CategoryEntity> list = categoryRepository.findAllSearch(sort, searchVal);
+            result = new PageImpl<>(list);
+        }
+        return result;
     }
 
     public Page<CategoryEntity> getActiveCategory(Pageable pageable){
