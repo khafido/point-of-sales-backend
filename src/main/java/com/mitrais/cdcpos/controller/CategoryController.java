@@ -88,7 +88,12 @@ public class CategoryController {
     public ResponseEntity<GenericResponse> delete(@PathVariable("id") UUID id){
         var category = categoryService.delete(id);
         return new ResponseEntity<>
-                (new GenericResponse(category, "Category deleted"), HttpStatus.OK);
+                (new GenericResponse(category, "Category deleted", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    }
+
+    @GetMapping("/check-category/{category}")
+    public boolean checkCategory(@PathVariable("category") String category){
+        return categoryService.isCategoryExist(category);
     }
 
 }

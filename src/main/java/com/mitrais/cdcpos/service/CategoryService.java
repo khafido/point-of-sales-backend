@@ -69,4 +69,8 @@ public class CategoryService {
         category.setDeletedAt(LocalDateTime.now());
         return categoryRepository.save(category);
     }
+
+    public boolean isCategoryExist(String name){
+        return categoryRepository.existsByName(name);
+    }
 }
