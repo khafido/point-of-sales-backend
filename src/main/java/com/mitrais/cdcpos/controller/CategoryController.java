@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "api/v1/category")
+@CrossOrigin(origins="*", maxAge=3600)
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
@@ -32,35 +33,32 @@ public class CategoryController {
         try{
             category = categoryService.add(req);
             return new ResponseEntity<>
-                    (new GenericResponse(category, "Category Created"), HttpStatus.CREATED);
+                    (new GenericResponse(category, "Category Created", GenericResponse.Status.CREATED), HttpStatus.CREATED);
         }catch (DataIntegrityViolationException e){
             return new ResponseEntity<>
-                    (new GenericResponse(req, "Category already exist"),HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(req, "Category already exist", GenericResponse.Status.ERROR_INPUT),HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("")
-    public ResponseEntity<GenericResponse> getAll(@RequestParam(required = false) boolean active,
+    public ResponseEntity<GenericResponse> getAll(@RequestParam(defaultValue = "false") boolean isPaginated,
                                                   @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "3") int size){
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(defaultValue = "") String searchVal,
+                                                  @RequestParam(defaultValue = "name") String sortBy,
+                                                  @RequestParam(defaultValue = "ASC") String sortDirection){
         try{
-            List<CategoryEntity> categories = new ArrayList<>();
-            Pageable paging = PageRequest.of(page,size);
-            Page<CategoryEntity> pageTuts;
-            if(active != true)
-                // get all categories whether it's active or not
-                pageTuts = categoryService.getAll(paging);
-            else
-                // get all active categories
-                pageTuts = categoryService.getActiveCategory(paging);
-            categories = pageTuts.getContent();
-            PaginatedDto<CategoryEntity> paginated =
-                    new PaginatedDto<>(categories,pageTuts.getNumber(),pageTuts.getTotalPages());
-            return new ResponseEntity<>
-                    (new GenericResponse(paginated, "OK"), HttpStatus.OK);
+            Page<CategoryEntity> categories = categoryService.getAll(isPaginated,page,size,searchVal,sortBy,sortDirection);
+            PaginatedDto<CategoryEntity> result = new PaginatedDto<>(
+                    categories.getContent(),
+                    categories.getNumber(),
+                    categories.getTotalPages()
+            );
+            return new ResponseEntity<>(new GenericResponse(result, "Get category list success", GenericResponse.Status.SUCCESS)
+            ,HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>
-                    (new GenericResponse(null,"No category available"), HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(null,e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -79,10 +77,10 @@ public class CategoryController {
         try{
            category = categoryService.update(id, req);
             return new ResponseEntity<>
-                    (new GenericResponse(category, "Category updated"), HttpStatus.OK);
+                    (new GenericResponse(category, "Category updated", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }catch (DataIntegrityViolationException e){
             return new ResponseEntity<>
-                    (new GenericResponse(req, "Category already exist"),HttpStatus.INTERNAL_SERVER_ERROR);
+                    (new GenericResponse(req, "Category already exist", GenericResponse.Status.ERROR_INPUT),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -90,7 +88,12 @@ public class CategoryController {
     public ResponseEntity<GenericResponse> delete(@PathVariable("id") UUID id){
         var category = categoryService.delete(id);
         return new ResponseEntity<>
-                (new GenericResponse(category, "Category deleted"), HttpStatus.OK);
+                (new GenericResponse(category, "Category deleted", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    }
+
+    @GetMapping("/check-category/{category}")
+    public boolean checkCategory(@PathVariable("category") String category){
+        return categoryService.isCategoryExist(category);
     }
 
 }
