@@ -1,6 +1,6 @@
 package com.mitrais.cdcpos.service;
 
-import com.mitrais.cdcpos.dto.SupplierRequestDto;
+import com.mitrais.cdcpos.dto.SupplierDto;
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
@@ -46,20 +46,20 @@ public class SupplierService {
         return result;
     }
 
-    public SupplierEntity addSupplier (SupplierRequestDto request) {
+    public SupplierEntity addSupplier (SupplierDto request) {
 
         SupplierEntity entity = new SupplierEntity();
         entity.setName(request.getName());
         entity.setPhone(request.getPhone());
         entity.setEmail(request.getEmail());
         entity.setAddress(request.getAddress());
-        entity.setCPName(request.getCPName());
+        entity.setCpname(request.getCpname());
 
         return supplierRepository.save(entity);
     }
 
-    public SupplierEntity updateSupplier (String id, SupplierRequestDto request) {
-        Optional<SupplierEntity> optional = supplierRepository.findById(UUID.fromString(id));
+    public SupplierEntity updateSupplier (UUID id, SupplierDto request) {
+        Optional<SupplierEntity> optional = supplierRepository.findById(id);
 
         if(optional.isPresent()) {
             SupplierEntity entity = optional.get();
@@ -67,15 +67,15 @@ public class SupplierService {
             entity.setPhone(request.getPhone());
             entity.setEmail(request.getEmail());
             entity.setAddress(request.getAddress());
-            entity.setCPName(request.getCPName());
+            entity.setCpname(request.getCpname());
 
             return supplierRepository.save(entity);
         }
         return null;
     }
 
-    public SupplierEntity deleteSupplier (String id) {
-        Optional<SupplierEntity> optional = supplierRepository.findById(UUID.fromString(id));
+    public SupplierEntity deleteSupplier (UUID id) {
+        Optional<SupplierEntity> optional = supplierRepository.findById(id);
 
         if(optional.isPresent()) {
             SupplierEntity entity = optional.get();
