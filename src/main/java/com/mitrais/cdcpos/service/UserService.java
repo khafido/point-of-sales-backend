@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,24 +29,50 @@ public class UserService {
 
     Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
-    public UserEntity add(UserEntity user) {
-        return userRepository.save(user);
-    }
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public List<UserEntity> getAll() {
-        return userRepository.findAll();
+        return userRepository.findByDeletedAtIsNull();
     }
 
     public UserEntity getById(UUID id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findByIdAndDeletedAtIsNull(id);
     }
 
-    public List<UserEntity> getAllUserActive() {
-        return  userRepository.findByDeletedAtIsNull();
+    public Page<UserEntity> getAllUserActivePage(
+            boolean paginated,
+            int page,
+            int size,
+            String searchValue,
+            String sortBy,
+            String sortDirection
+    ) {
+        Sort sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
+
+        Pageable paging = null;
+        Page<UserEntity> result = null;
+
+        if (!sortBy.equalsIgnoreCase("default")) {
+            if("DESC".equalsIgnoreCase(sortDirection)) {
+                sort = Sort.by(sortBy).descending();
+            } else {
+                sort = Sort.by(sortBy).ascending();
+            }
+        }
+
+        if(paginated) {
+            paging = PageRequest.of(page, size, sort);
+//            paging = PageRequest.of(page, size);
+            result = userRepository.findAllSearch(paging, searchValue);
+        } else {
+            List<UserEntity> entityList = userRepository.findAllSearch(sort, searchValue);
+//            List<UserEntity> entityList = userRepository.findAllSearch(searchValue);
+            result = new PageImpl<>(entityList);
+        }
+
+        return result;
     }
 
     public UserDto getActiveUserById(UUID id) {

@@ -2,13 +2,16 @@ package com.mitrais.cdcpos.controller;
 
 
 import com.mitrais.cdcpos.dto.GenericResponse;
+import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.repository.UserRepository;
 import com.mitrais.cdcpos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +31,27 @@ public class UserController {
     UserRepository userRepository;
 
     @GetMapping("")
-    public List<UserEntity> getAllUserActive() {
-        return userService.getAllUserActive();
+    public ResponseEntity<GenericResponse> getAllUserActive(
+        @RequestParam(defaultValue = "false") Boolean isPaginated,
+        @RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "10") Integer size,
+        @RequestParam(defaultValue = "") String searchValue,
+        @RequestParam(defaultValue = "default") String sortBy,
+        @RequestParam(defaultValue = "ASC") String sortDirection
+    ) {
+        try {
+            Page<UserEntity> items = userService.getAllUserActivePage(isPaginated, page, size, searchValue, sortBy, sortDirection);
+
+            PaginatedDto<UserEntity> result = new PaginatedDto<>(
+                    items.getContent(),
+                    items.getNumber(),
+                    items.getTotalPages()
+            );
+            return new ResponseEntity<>(new GenericResponse(result, "Get User Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("{id}")
@@ -73,7 +95,6 @@ public class UserController {
         }
     }
 
-
     @GetMapping("/check-username/{username}/")
     public boolean checkUsername(@PathVariable("username") String username) {
         return userService.isUsernameExist(username);
@@ -89,20 +110,9 @@ public class UserController {
 //        return userService.generateRole();
 //    }
 //
-    @GetMapping("/generate")
-    public List<UserEntity> generateAllUsers() {
-        return userService.generateUsers();
-    }
-
-
-//
-//    @GetMapping("/all-username")
-//    public List<String> getUsername() {
-//        return userRepository.findAllUsername();
+//    @GetMapping("/generate")
+//    public List<UserEntity> generateAllUsers() {
+//        return userService.generateUsers();
 //    }
-//
-//    @GetMapping("/all-email")
-//    public List<String> getEmail() {
-//        return userRepository.findAllEmail();
-//    }
+
 }
