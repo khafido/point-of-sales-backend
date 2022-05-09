@@ -5,12 +5,11 @@ import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +42,26 @@ public class CategoryService {
 
     public Page<CategoryEntity> getAll(Pageable pageable){
         return categoryRepository.findAll(pageable);
+    public Page<CategoryEntity> getAll(boolean paginated, int page, int size,
+                                       String searchVal, String sortBy,String sortDirection){
+        Sort sort;
+        Pageable paging;
+        Page<CategoryEntity> result;
+
+        if("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if(paginated){
+            paging = PageRequest.of(page, size,sort);
+            result = categoryRepository.findAllSearch(paging, searchVal);
+        }else{
+            List<CategoryEntity> list = categoryRepository.findAllSearch(sort, searchVal);
+            result = new PageImpl<>(list);
+        }
+        return result;
     }
 
     public Page<CategoryEntity> getActiveCategory(Pageable pageable){
@@ -61,5 +80,9 @@ public class CategoryService {
         var category = getById(id);
         category.setDeletedAt(LocalDateTime.now());
         return categoryRepository.save(category);
+    }
+
+    public boolean isCategoryExist(String name){
+        return categoryRepository.existsByName(name);
     }
 }

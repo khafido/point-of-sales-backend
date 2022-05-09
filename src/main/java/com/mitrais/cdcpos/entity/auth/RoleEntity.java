@@ -19,6 +19,10 @@ public class RoleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    public RoleEntity(ERole name) {
+        this.name = name;
+    }
+
     @Enumerated(EnumType.STRING)
     private ERole name;
 }
