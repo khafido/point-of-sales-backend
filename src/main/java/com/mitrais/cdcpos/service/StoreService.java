@@ -1,7 +1,6 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.StoreDto;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;

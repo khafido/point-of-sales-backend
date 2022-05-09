@@ -1,7 +1,7 @@
 package com.mitrais.cdcpos.entity.item;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mitrais.cdcpos.entity.EntityAudit;
+import com.mitrais.cdcpos.entity.SupplierEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

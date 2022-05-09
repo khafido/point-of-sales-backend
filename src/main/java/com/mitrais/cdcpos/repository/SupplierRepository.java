@@ -1,6 +1,6 @@
 package com.mitrais.cdcpos.repository;
 
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.entity.SupplierEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

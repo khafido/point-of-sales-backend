@@ -3,16 +3,13 @@ package com.mitrais.cdcpos.controller;
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.SupplierRequestDto;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.entity.SupplierEntity;
 import com.mitrais.cdcpos.service.SupplierService;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/supplier")

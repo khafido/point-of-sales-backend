@@ -1,7 +1,7 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.SupplierRequestDto;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.entity.SupplierEntity;
 import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
