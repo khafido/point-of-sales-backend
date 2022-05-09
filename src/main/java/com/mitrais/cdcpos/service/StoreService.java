@@ -1,9 +1,12 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
 import com.mitrais.cdcpos.dto.StoreDto;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
+import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.repository.StoreRepository;
+import com.mitrais.cdcpos.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final UserRepository userRepository;
 
     public Page<StoreEntity> getAll(boolean paginated,int page, int size, String searchValue, String sortBy, String sortDirection) {
         Sort sort;
@@ -57,7 +61,6 @@ public class StoreService {
             var updateStore = store.get();
             updateStore.setName(storeDto.getName());
             updateStore.setLocation(storeDto.getLocation());
-            updateStore.setManager(null);
             return storeRepository.save(updateStore);
         }else{
             return null;
@@ -73,5 +76,29 @@ public class StoreService {
         }else{
             return null;
         }
+    }
+
+    public StoreEntity assignManager(StoreAssignManagerDto request) throws ManualValidationFailException {
+        var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
+        var optionalStore = storeRepository.findById(UUID.fromString(request.getStoreId()));
+
+        if(user!=null && optionalStore.isPresent()) {
+            boolean manager = false;
+            for(var role : user.getRoles()) {
+                if(role.getName().equals(ERole.ROLE_MANAGER)) {
+                    manager = true;
+                    break;
+                }
+            }
+
+            if(manager) {
+                var store = optionalStore.get();
+                store.setManager(user);
+                return storeRepository.save(store);
+            } else {
+                throw new ManualValidationFailException("User ID" + user.getId() + " is not a manager");
+            }
+        }
+        return null;
     }
 }

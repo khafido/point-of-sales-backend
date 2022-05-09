@@ -23,7 +23,7 @@ public class StoreEntity extends EntityAudit {
     @Column(name = "location")
     private String location;
 
-    @OneToOne()
-    @JoinColumn(name = "id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private UserEntity manager;
 }
