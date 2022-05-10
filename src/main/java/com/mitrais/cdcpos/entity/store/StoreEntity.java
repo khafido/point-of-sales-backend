@@ -23,7 +23,7 @@ public class StoreEntity extends EntityAudit {
 
     @Column(name = "location")
     private String location;
-    
+
     @OneToMany(mappedBy = "store")
     private List<StoreEmployee> employee;
 
