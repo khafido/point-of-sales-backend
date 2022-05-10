@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "roles")
 public class RoleEntity {
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +34,11 @@ public class RoleEntity {
     private List<UserEntity> users;
 
     public RoleEntity(ERole name) {
+        this.name = name;
+    }
+
+    public RoleEntity(int id, ERole name) {
+        this.id = id;
         this.name = name;
     }
 }
