@@ -99,4 +99,8 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
+    public boolean isBarcodeExist(String barcode) {
+        return itemRepository.existsByBarcodeAndDeletedAtIsNull(barcode);
+    }
+
 }

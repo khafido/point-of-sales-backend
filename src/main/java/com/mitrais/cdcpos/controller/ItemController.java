@@ -84,4 +84,9 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("check-barcode")
+    public boolean checkBarcode(@RequestParam(defaultValue = "") String barcode) {
+        return itemService.isBarcodeExist(barcode);
+    }
 }
