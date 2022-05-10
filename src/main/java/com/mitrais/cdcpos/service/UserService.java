@@ -1,9 +1,11 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -215,6 +218,22 @@ public class UserService {
     public UserEntity changePassword(String username, String newPassword) {
         UserEntity user = getByUsername(username);
         user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    public UserEntity addRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
+
+    public UserEntity removeRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().remove(role);
         return userRepository.save(user);
     }
 }
