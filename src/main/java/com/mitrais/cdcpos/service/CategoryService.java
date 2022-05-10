@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -36,12 +37,14 @@ public class CategoryService {
     }
 
     public CategoryEntity getActiveDataByName(String name){
-        return categoryRepository.findByNameAndDeletedAtIsNull(name)
+        return categoryRepository.findByNameIgnoreCaseAndDeletedAtIsNull(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "name", name));
     }
 
-    public Page<CategoryEntity> getAll(Pageable pageable){
-        return categoryRepository.findAll(pageable);
+    public Page<CategoryEntity> getActiveCategory(Pageable pageable){
+        return categoryRepository.findByDeletedAtIsNull(pageable);
+    }
+
     public Page<CategoryEntity> getAll(boolean paginated, int page, int size,
                                        String searchVal, String sortBy,String sortDirection){
         Sort sort;
@@ -63,11 +66,6 @@ public class CategoryService {
         }
         return result;
     }
-
-    public Page<CategoryEntity> getActiveCategory(Pageable pageable){
-        return categoryRepository.findByDeletedAtIsNull(pageable);
-    }
-
 
     public CategoryEntity update(UUID id, CategoryDto req){
         var category = getById(id);

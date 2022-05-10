@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,17 +38,31 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public PaginatedDto<ItemEntity> getAll(boolean isPaginated, int page, int size) {
+    public PaginatedDto<ItemEntity> getAll(
+            boolean isPaginated,
+            int page,
+            int size,
+            String searchValue,
+            String sortBy,
+            String sortDirection) {
+
+        Sort sort;
         Pageable paging;
 
+        if("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
         if (isPaginated) {
-            paging = PageRequest.of(page, size);
+            paging = PageRequest.of(page, size, sort);
         }
         else {
             paging = Pageable.unpaged();
         }
 
-        Page<ItemEntity> items = itemRepository.findByDeletedAtIsNull(paging);
+        Page<ItemEntity> items = itemRepository.findAllSearch(paging, searchValue);
         PaginatedDto<ItemEntity> result = new PaginatedDto<>(items.getContent(), items.getNumber(), items.getTotalPages());
 
         return result;
@@ -58,7 +74,7 @@ public class ItemService {
     }
 
     public ItemEntity getByName(String name){
-        return itemRepository.findByNameAndDeletedAtIsNull(name)
+        return itemRepository.findByNameIgnoreCaseAndDeletedAtIsNull(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Item", "name", name));
     }
 

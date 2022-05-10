@@ -1,4 +1,4 @@
-package com.mitrais.cdcpos.entity;
+package com.mitrais.cdcpos.entity.item;
 
 
 import com.mitrais.cdcpos.entity.EntityAudit;

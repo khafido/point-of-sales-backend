@@ -2,9 +2,8 @@ package com.mitrais.cdcpos.controller;
 
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
-import com.mitrais.cdcpos.entity.SupplierEntity;
-import com.mitrais.cdcpos.dto.SupplierDto;
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.dto.SupplierDto;
 import com.mitrais.cdcpos.service.SupplierService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;

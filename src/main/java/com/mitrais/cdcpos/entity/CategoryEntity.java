@@ -1,10 +1,6 @@
 package com.mitrais.cdcpos.entity;
 
-import com.mitrais.cdcpos.entity.item.ItemEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -14,6 +10,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "category", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class CategoryEntity extends EntityAudit {
     @Id

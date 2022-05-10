@@ -1,12 +1,10 @@
 package com.mitrais.cdcpos.entity.item;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.EntityAudit;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,10 +16,11 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames = "barcode"))
 public class ItemEntity extends EntityAudit {
     @Id
-    @Column(name="id")
+    @Column(name = "id")
     private UUID id = UUID.randomUUID();
 
     @Column(name = "name")
@@ -33,7 +32,7 @@ public class ItemEntity extends EntityAudit {
     @Column(name = "barcode")
     private String barcode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private CategoryEntity category;
 

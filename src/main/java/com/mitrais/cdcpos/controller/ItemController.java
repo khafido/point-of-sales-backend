@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,13 +32,16 @@ public class ItemController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<GenericResponse> getAll(@RequestParam(defaultValue = "false") boolean isPaginated,
                                                   @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "10") int size)
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  @RequestParam(defaultValue = "") String searchValue,
+                                                  @RequestParam(defaultValue = "name") String sortBy,
+                                                  @RequestParam(defaultValue = "ASC") String sortDirection)
     {
         try {
-            PaginatedDto<ItemEntity> result = itemService.getAll(isPaginated, page, size);
+            PaginatedDto<ItemEntity> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
             return new ResponseEntity<>(new GenericResponse(result, "Get All Items Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
