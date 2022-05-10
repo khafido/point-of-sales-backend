@@ -1,8 +1,14 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
 import com.mitrais.cdcpos.dto.StoreDto;
+import com.mitrais.cdcpos.entity.auth.ERole;
+import com.mitrais.cdcpos.entity.auth.RoleEntity;
+import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.repository.StoreRepository;
+import com.mitrais.cdcpos.repository.UserRepository;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +26,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class StoreServiceWriteTest {
+class StoreServiceTest {
     @Mock
     private StoreRepository storeRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private StoreService storeService;
@@ -150,6 +159,34 @@ class StoreServiceWriteTest {
         assertSame(deletedStore, storeService.delete(id));
         verify(storeRepository, times(1)).save((StoreEntity) any());
         verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+    }
+
+    @SneakyThrows
+    @Test
+    public void assignManager() {
+        RoleEntity role = new RoleEntity();
+        role.setName(ERole.ROLE_MANAGER);
+
+        UserEntity user = new UserEntity();
+        user.setRoles(Set.of(role));
+
+        StoreEntity store = new StoreEntity();
+        store.setManager(user);
+
+        when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(user);
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(store.getId())).thenReturn(Optional.of(store));
+        when(storeRepository.save(store)).thenReturn(store);
+
+        StoreAssignManagerDto request = new StoreAssignManagerDto();
+        request.setStoreId(store.getId().toString());
+        request.setUserId(user.getId().toString());
+
+        StoreEntity result = storeService.assignManager(request);
+
+        assertEquals(store, result);
+        verify(userRepository, times(1)).findByIdAndDeletedAtIsNull(user.getId());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(store.getId());
+        verify(storeRepository, times(1)).save(store);
     }
 }
 

@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.controller;
 
 
+import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.UserDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -41,9 +43,9 @@ public class UserController {
     ) {
         try {
             Page<UserEntity> items = userService.getAllUserActivePage(isPaginated, page, size, searchValue, sortBy, sortDirection);
-
-            PaginatedDto<UserEntity> result = new PaginatedDto<>(
-                    items.getContent(),
+            List<UserDto> itemsDto = items.getContent().stream().map(UserDto::toDto).collect(Collectors.toList());
+            PaginatedDto<UserDto> result = new PaginatedDto<>(
+                    itemsDto,
                     items.getNumber(),
                     items.getTotalPages()
             );
@@ -114,5 +116,20 @@ public class UserController {
 //    public List<UserEntity> generateAllUsers() {
 //        return userService.generateUsers();
 //    }
+
+
+    @PatchMapping("{id}/add-roles")
+    public ResponseEntity<GenericResponse> addRoles(@PathVariable("id") UUID id, @RequestBody AddRoleDto req){
+        var user = userService.addRoles(id, req);
+        return new ResponseEntity<>
+                (new GenericResponse(user, "Role "+ req.getRoles()+" added", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    }
+
+    @PatchMapping("{id}/remove-roles")
+    public ResponseEntity<GenericResponse> removeRoles(@PathVariable("id")UUID id, @RequestBody AddRoleDto req){
+        var user = userService.removeRoles(id,req);
+        return new ResponseEntity<>
+                (new GenericResponse(user,"Role "+ req.getRoles()+" removed", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    }
 
 }
