@@ -80,7 +80,7 @@ public class StoreService {
 
     public StoreEntity assignManager(StoreAssignManagerDto request) throws ManualValidationFailException {
         var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
-        var optionalStore = storeRepository.findById(UUID.fromString(request.getStoreId()));
+        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(UUID.fromString(request.getStoreId()));
 
         if(user!=null && optionalStore.isPresent()) {
             boolean manager = false;
