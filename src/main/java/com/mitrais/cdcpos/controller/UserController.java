@@ -73,8 +73,8 @@ public class UserController {
 
     @PutMapping("{id}")
     public ResponseEntity<GenericResponse> updateUser(@PathVariable("id") UUID id, @RequestBody @Valid UserDto req) {
-        boolean user = userService.updateUser(id, req);
-        if (user) {
+        UserEntity user = userService.updateUser(id, req);
+        if (user!=null) {
             return new ResponseEntity<>
                     (new GenericResponse(req, "User Updated!"), HttpStatus.OK);
         } else {
@@ -85,8 +85,8 @@ public class UserController {
 
     @PatchMapping("{id}")
     public ResponseEntity<GenericResponse> updateUserStatus(@PathVariable("id") UUID id) {
-        boolean user = userService.deleteUser(id);
-        if (user) {
+        UserEntity user = userService.deleteUser(id);
+        if (user!=null) {
             return new ResponseEntity<>
                     (new GenericResponse("User Deleted!"), HttpStatus.OK);
         } else {
