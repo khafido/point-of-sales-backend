@@ -16,11 +16,11 @@ import java.util.UUID;
 @Repository
 public interface StoreRepository extends JpaRepository<StoreEntity, UUID> {
     @Query("select s from StoreEntity s " +
-            "where (upper(s.name) like upper('%'||?1||'%') or upper(s.location) like upper('%'||?1||'%')) and s.deletedAt is null")
+            "where upper(s.name) like upper('%'||?1||'%') or upper(s.location) like upper('%'||?1||'%') and s.deletedAt is null")
     Page<StoreEntity> search(String searchValue, Pageable pageable);
 
     @Query("select s from StoreEntity s " +
-            "where (upper(s.name) like upper('%'||?1||'%') or upper(s.location) like upper('%'||?1||'%')) and s.deletedAt is null")
+            "where upper(s.name) like upper('%'||?1||'%') or upper(s.location) like upper('%'||?1||'%') and s.deletedAt is null")
     List<StoreEntity> search(String searchValue, Sort sort);
 
     Optional<StoreEntity> findByIdEqualsAndDeletedAtIsNull(UUID id);
