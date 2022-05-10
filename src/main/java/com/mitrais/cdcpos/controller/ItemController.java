@@ -6,6 +6,7 @@ import com.mitrais.cdcpos.dto.ItemRequestDto;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.service.ItemService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/item")
+@CrossOrigin(origins="*", maxAge=3600)
+@RequiredArgsConstructor
 public class ItemController {
     @Autowired
     ItemService itemService;
