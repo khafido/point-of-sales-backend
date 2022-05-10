@@ -33,7 +33,7 @@ public class RoleController {
         try {
             RoleEntity result = roleService.getRoleById(id);
             if (result != null) {
-                RoleDto resultDto = RoleDto.toDto(result);
+                RoleDto resultDto = RoleDto.toDtoWithUsers(result);
                 return new ResponseEntity<>(new GenericResponse(resultDto, "Get Role Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
             }
             return new ResponseEntity<>(new GenericResponse(null, "Role ID Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.BAD_REQUEST);

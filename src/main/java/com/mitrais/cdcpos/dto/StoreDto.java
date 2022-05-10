@@ -17,13 +17,13 @@ public class StoreDto {
     @NotEmpty
     private String location;
 
-    private String managerId;
+    private UserDto manager;
 
     public static StoreDto toDto(StoreEntity entity) {
         StoreDto dto = new StoreDto();
         dto.setName(entity.getName());
         dto.setLocation(entity.getLocation());
-        dto.setManagerId(entity.getManager().getId().toString());
+        dto.setManager(UserDto.toDto(entity.getManager()));
         return dto;
     }
 }

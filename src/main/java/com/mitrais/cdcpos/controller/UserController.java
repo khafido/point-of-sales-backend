@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -42,9 +43,9 @@ public class UserController {
     ) {
         try {
             Page<UserEntity> items = userService.getAllUserActivePage(isPaginated, page, size, searchValue, sortBy, sortDirection);
-
-            PaginatedDto<UserEntity> result = new PaginatedDto<>(
-                    items.getContent(),
+            List<UserDto> itemsDto = items.getContent().stream().map(UserDto::toDto).collect(Collectors.toList());
+            PaginatedDto<UserDto> result = new PaginatedDto<>(
+                    itemsDto,
                     items.getNumber(),
                     items.getTotalPages()
             );

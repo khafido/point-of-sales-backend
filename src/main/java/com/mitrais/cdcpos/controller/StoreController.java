@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -26,7 +27,8 @@ public class StoreController {
     public ResponseEntity<GenericResponse> getAll(@RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
         try {
             var result = storeService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
-            var paginatedDto = new PaginatedDto<>(result.getContent(), result.getNumber(), result.getTotalPages());
+            var resultDto = result.getContent().stream().map(StoreDto::toDto).collect(Collectors.toList());
+            var paginatedDto = new PaginatedDto<>(resultDto, result.getNumber(), result.getTotalPages());
             var genericResponse = new GenericResponse(paginatedDto, "Successfully Get Store Data", GenericResponse.Status.SUCCESS);
             return new ResponseEntity<>(genericResponse, HttpStatus.OK);
         } catch (Exception e) {
@@ -98,7 +100,7 @@ public class StoreController {
         }
     }
 
-    @PatchMapping("/assign-manager")
+    @PostMapping("/assign-manager")
     public ResponseEntity<GenericResponse> assignManager(@RequestBody @Valid StoreAssignManagerDto request) {
         try {
             var result = storeService.assignManager(request);

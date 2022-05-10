@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -25,6 +26,7 @@ public class UserDto {
     private String gender;
     private String photo;
     private LocalDate birthDate;
+    private List<RoleDto> roles;
 
     public static UserDto toDto (UserEntity entity) {
         return new UserDto(
@@ -37,7 +39,8 @@ public class UserDto {
                 entity.getAddress(),
                 entity.getGender(),
                 entity.getPhoto(),
-                entity.getBirthDate()
+                entity.getBirthDate(),
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList())
         );
     }
 
