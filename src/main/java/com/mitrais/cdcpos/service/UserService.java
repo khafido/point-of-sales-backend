@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.AddRoleDto;
+import com.mitrais.cdcpos.dto.RoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
@@ -18,6 +19,7 @@ import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -80,19 +82,7 @@ public class UserService {
 
     public UserDto getActiveUserById(UUID id) {
         UserEntity user = userRepository.findByIdAndDeletedAtIsNull(id);
-        UserDto result = new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getAddress(),
-                user.getGender(),
-                user.getPhoto(),
-                user.getBirthDate()
-        );
-        return result;
+        return UserDto.toDto(user);
     }
 
     public UserEntity addUser(UserDto req) {
