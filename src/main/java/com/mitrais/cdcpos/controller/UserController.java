@@ -111,10 +111,10 @@ public class UserController {
 //        return userService.generateRole();
 //    }
 //
-//    @GetMapping("/generate")
-//    public List<UserEntity> generateAllUsers() {
-//        return userService.generateUsers();
-//    }
+    @GetMapping("/generate")
+    public List<UserEntity> generateAllUsers() {
+        return userService.generateUsers();
+    }
 
 
     @PatchMapping("{id}/add-roles")
