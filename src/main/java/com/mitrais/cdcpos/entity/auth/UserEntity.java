@@ -75,9 +75,6 @@ public class UserEntity extends EntityAudit {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @OneToOne(mappedBy = "manager")
-    private StoreEntity store;
-
 //    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinTable(name = "user_roles",

@@ -1,16 +1,20 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -28,24 +32,50 @@ public class UserService {
 
     Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
-    public UserEntity add(UserEntity user) {
-        return userRepository.save(user);
-    }
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public List<UserEntity> getAll() {
-        return userRepository.findAll();
+        return userRepository.findByDeletedAtIsNull();
     }
 
     public UserEntity getById(UUID id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findByIdAndDeletedAtIsNull(id);
     }
 
-    public List<UserEntity> getAllUserActive() {
-        return  userRepository.findByDeletedAtIsNull();
+    public Page<UserEntity> getAllUserActivePage(
+            boolean paginated,
+            int page,
+            int size,
+            String searchValue,
+            String sortBy,
+            String sortDirection
+    ) {
+        Sort sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
+
+        Pageable paging = null;
+        Page<UserEntity> result = null;
+
+        if (!sortBy.equalsIgnoreCase("default")) {
+            if("DESC".equalsIgnoreCase(sortDirection)) {
+                sort = Sort.by(sortBy).descending();
+            } else {
+                sort = Sort.by(sortBy).ascending();
+            }
+        }
+
+        if(paginated) {
+            paging = PageRequest.of(page, size, sort);
+//            paging = PageRequest.of(page, size);
+            result = userRepository.findAllSearch(paging, searchValue);
+        } else {
+            List<UserEntity> entityList = userRepository.findAllSearch(sort, searchValue);
+//            List<UserEntity> entityList = userRepository.findAllSearch(searchValue);
+            result = new PageImpl<>(entityList);
+        }
+
+        return result;
     }
 
     public UserDto getActiveUserById(UUID id) {
@@ -188,6 +218,22 @@ public class UserService {
     public UserEntity changePassword(String username, String newPassword) {
         UserEntity user = getByUsername(username);
         user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    public UserEntity addRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
+
+    public UserEntity removeRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().remove(role);
         return userRepository.save(user);
     }
 }

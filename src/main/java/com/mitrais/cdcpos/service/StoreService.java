@@ -51,7 +51,6 @@ public class StoreService {
         var newStore = new StoreEntity();
         newStore.setName(storeDto.getName());
         newStore.setLocation(storeDto.getLocation());
-        newStore.setManager(null);
         return storeRepository.save(newStore);
     }
 

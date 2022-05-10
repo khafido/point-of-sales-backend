@@ -44,7 +44,6 @@ class StoreServiceTest {
             StoreEntity storeEntity = new StoreEntity();
             storeEntity.setName("Store ".concat(String.valueOf(i)));
             storeEntity.setLocation("yogya");
-            storeEntity.setManager(null);
             storeList.add(storeEntity);
         }
     }
@@ -54,7 +53,6 @@ class StoreServiceTest {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setName("Store");
         storeEntity.setLocation("Loc");
-        storeEntity.setManager(null);
         Optional<StoreEntity> optionalResult = Optional.of(storeEntity);
 
         UUID id = UUID.randomUUID();
@@ -69,7 +67,6 @@ class StoreServiceTest {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setName("konbini");
         storeEntity.setLocation("japan");
-        storeEntity.setManager(null);
 
         when(storeRepository.save(any())).thenReturn(storeEntity);
 
@@ -117,14 +114,12 @@ class StoreServiceTest {
 
         StoreEntity oldStore = new StoreEntity();
         oldStore.setLocation("Yogya");
-        oldStore.setManager(null);
         oldStore.setName("Yogya Store");
         Optional<StoreEntity> optionalOldStore = Optional.of(oldStore);
 
         StoreEntity updatedStore = new StoreEntity();
         updatedStore.setLocation("Jakarta");
         updatedStore.setName("Jakarta Store");
-        updatedStore.setManager(null);
 
         when(storeRepository.save((StoreEntity) any())).thenReturn(updatedStore);
         when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalOldStore);
@@ -142,13 +137,11 @@ class StoreServiceTest {
     public void delete(){
         StoreEntity store = new StoreEntity();
         store.setLocation("Yogya");
-        store.setManager(null);
         store.setName("Yogya Store");
         Optional<StoreEntity> optionalStore = Optional.of(store);
 
         StoreEntity deletedStore = new StoreEntity();
         deletedStore.setLocation("Yogya");
-        deletedStore.setManager(null);
         deletedStore.setName("Yogya Store");
         deletedStore.setDeletedAt(LocalDateTime.now());
 
