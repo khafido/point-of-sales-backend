@@ -88,8 +88,10 @@ public class UserService {
     public UserEntity addUser(UserDto req) {
         UserEntity user = new UserEntity();
 
+        RoleEntity role = new RoleEntity(1, ERole.ROLE_EMPLOYEE);
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(null));
+        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
+        roles.add(role);
 
         user.setRoles(roles);
         user.setUsername(req.getUsername());
@@ -108,7 +110,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean updateUser(UUID id, UserDto req) {
+    public UserEntity updateUser(UUID id, UserDto req) {
         UserEntity user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
@@ -121,20 +123,18 @@ public class UserService {
             if (req.getPhoto() != null) {
                 user.setPhoto(req.getPhoto());
             }
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         }
-        return false;
+        return null;
     }
 
-    public boolean deleteUser(UUID id) {
+    public UserEntity deleteUser(UUID id) {
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setDeletedAt(LocalDateTime.now());
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         } else {
-            return false;
+            return null;
         }
     }
 
