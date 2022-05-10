@@ -1,19 +1,25 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.AddRoleDto;
+import com.mitrais.cdcpos.dto.RoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -28,48 +34,64 @@ public class UserService {
 
     Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
-    public UserEntity add(UserEntity user) {
-        return userRepository.save(user);
-    }
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public List<UserEntity> getAll() {
-        return userRepository.findAll();
+        return userRepository.findByDeletedAtIsNull();
     }
 
     public UserEntity getById(UUID id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findByIdAndDeletedAtIsNull(id);
     }
 
-    public List<UserEntity> getAllUserActive() {
-        return  userRepository.findByDeletedAtIsNull();
+    public Page<UserEntity> getAllUserActivePage(
+            boolean paginated,
+            int page,
+            int size,
+            String searchValue,
+            String sortBy,
+            String sortDirection
+    ) {
+        Sort sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
+
+        Pageable paging = null;
+        Page<UserEntity> result = null;
+
+        if (!sortBy.equalsIgnoreCase("default")) {
+            if("DESC".equalsIgnoreCase(sortDirection)) {
+                sort = Sort.by(sortBy).descending();
+            } else {
+                sort = Sort.by(sortBy).ascending();
+            }
+        }
+
+        if(paginated) {
+            paging = PageRequest.of(page, size, sort);
+//            paging = PageRequest.of(page, size);
+            result = userRepository.findAllSearch(paging, searchValue);
+        } else {
+            List<UserEntity> entityList = userRepository.findAllSearch(sort, searchValue);
+//            List<UserEntity> entityList = userRepository.findAllSearch(searchValue);
+            result = new PageImpl<>(entityList);
+        }
+
+        return result;
     }
 
     public UserDto getActiveUserById(UUID id) {
         UserEntity user = userRepository.findByIdAndDeletedAtIsNull(id);
-        UserDto result = new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getAddress(),
-                user.getGender(),
-                user.getPhoto(),
-                user.getBirthDate()
-        );
-        return result;
+        return UserDto.toDto(user);
     }
 
     public UserEntity addUser(UserDto req) {
         UserEntity user = new UserEntity();
 
+        RoleEntity role = new RoleEntity(1, ERole.ROLE_EMPLOYEE);
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(null));
+        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
+        roles.add(role);
 
         user.setRoles(roles);
         user.setUsername(req.getUsername());
@@ -88,7 +110,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean updateUser(UUID id, UserDto req) {
+    public UserEntity updateUser(UUID id, UserDto req) {
         UserEntity user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
@@ -101,20 +123,18 @@ public class UserService {
             if (req.getPhoto() != null) {
                 user.setPhoto(req.getPhoto());
             }
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         }
-        return false;
+        return null;
     }
 
-    public boolean deleteUser(UUID id) {
+    public UserEntity deleteUser(UUID id) {
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setDeletedAt(LocalDateTime.now());
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -188,6 +208,22 @@ public class UserService {
     public UserEntity changePassword(String username, String newPassword) {
         UserEntity user = getByUsername(username);
         user.setPassword(encoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    public UserEntity addRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
+
+    public UserEntity removeRoles(UUID id, AddRoleDto req){
+        UserEntity user = getById(id);
+        RoleEntity role= roleRepository.findByName(req.getRoles())
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
+        user.getRoles().remove(role);
         return userRepository.save(user);
     }
 }
