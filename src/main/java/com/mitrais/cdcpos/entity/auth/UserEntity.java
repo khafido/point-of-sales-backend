@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.entity.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mitrais.cdcpos.entity.EntityAudit;
+import com.mitrais.cdcpos.entity.store.StoreEmployee;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -74,6 +75,12 @@ public class UserEntity extends EntityAudit {
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
+
+    @OneToMany(mappedBy = "user")
+    private List<StoreEmployee> store;
+
+    @OneToOne(mappedBy = "manager")
+    private StoreEntity storeManager;
 
 //    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
