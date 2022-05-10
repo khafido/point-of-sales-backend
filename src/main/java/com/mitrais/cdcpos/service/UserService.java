@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.AddRoleDto;
+import com.mitrais.cdcpos.dto.RoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
@@ -18,6 +19,7 @@ import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -80,26 +82,16 @@ public class UserService {
 
     public UserDto getActiveUserById(UUID id) {
         UserEntity user = userRepository.findByIdAndDeletedAtIsNull(id);
-        UserDto result = new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhone(),
-                user.getAddress(),
-                user.getGender(),
-                user.getPhoto(),
-                user.getBirthDate()
-        );
-        return result;
+        return UserDto.toDto(user);
     }
 
     public UserEntity addUser(UserDto req) {
         UserEntity user = new UserEntity();
 
+        RoleEntity role = new RoleEntity(1, ERole.ROLE_EMPLOYEE);
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(null));
+        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
+        roles.add(role);
 
         user.setRoles(roles);
         user.setUsername(req.getUsername());
@@ -118,7 +110,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean updateUser(UUID id, UserDto req) {
+    public UserEntity updateUser(UUID id, UserDto req) {
         UserEntity user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
@@ -131,20 +123,18 @@ public class UserService {
             if (req.getPhoto() != null) {
                 user.setPhoto(req.getPhoto());
             }
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         }
-        return false;
+        return null;
     }
 
-    public boolean deleteUser(UUID id) {
+    public UserEntity deleteUser(UUID id) {
         UserEntity user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setDeletedAt(LocalDateTime.now());
-            userRepository.save(user);
-            return true;
+            return userRepository.save(user);
         } else {
-            return false;
+            return null;
         }
     }
 
