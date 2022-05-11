@@ -49,6 +49,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Get All Items Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -60,6 +61,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Get Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -71,6 +73,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Update Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -82,6 +85,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Delete Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -26,7 +26,7 @@ public class ItemEntity extends EntityAudit {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition="TEXT")
     private String image;
 
     @Column(name = "barcode")
