@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.Store;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ public class StoreController {
             var genericResponse = new GenericResponse(paginatedDto, "Successfully Get Store Data", GenericResponse.Status.SUCCESS);
             return new ResponseEntity<>(genericResponse, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             var genericResponse = new GenericResponse(null, "Failed To Get Store Data", GenericResponse.Status.ERROR_INTERNAL);
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -70,8 +72,10 @@ public class StoreController {
     public ResponseEntity<GenericResponse> update(@PathVariable UUID id, @RequestBody StoreDto storeDto) {
         try {
             var store = storeService.update(id, storeDto);
+
             if (store != null) {
-                var genericResponse = new GenericResponse(store, "Successfully Update Store Data", GenericResponse.Status.SUCCESS);
+                var resultDto = StoreDto.toDto(store);
+                var genericResponse = new GenericResponse(resultDto, "Successfully Update Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
@@ -88,7 +92,8 @@ public class StoreController {
         try {
             var store = storeService.delete(id);
             if (store != null) {
-                var genericResponse = new GenericResponse(store, "Successfully Delete Store Data", GenericResponse.Status.SUCCESS);
+                var resultDto = StoreDto.toDto(store);
+                var genericResponse = new GenericResponse(resultDto, "Successfully Delete Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
