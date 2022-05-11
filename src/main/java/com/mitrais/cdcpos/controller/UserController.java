@@ -5,9 +5,7 @@ import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.UserDto;
-import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.repository.UserRepository;
 import com.mitrais.cdcpos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +41,7 @@ public class UserController {
     ) {
         try {
             Page<UserEntity> items = userService.getAllUserActivePage(isPaginated, page, size, searchValue, sortBy, sortDirection);
-            List<UserDto> itemsDto = items.getContent().stream().map(UserDto::toDto).collect(Collectors.toList());
+            List<UserDto> itemsDto = items.getContent().stream().map(UserDto::toDtoMain).collect(Collectors.toList());
             PaginatedDto<UserDto> result = new PaginatedDto<>(
                     itemsDto,
                     items.getNumber(),

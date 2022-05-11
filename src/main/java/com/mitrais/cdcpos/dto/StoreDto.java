@@ -5,11 +5,12 @@ import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.UUID;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StoreDto {
+
+    private String id;
 
     @NotEmpty
     private String name;
@@ -21,14 +22,16 @@ public class StoreDto {
 
     public static StoreDto toDto(StoreEntity entity) {
         StoreDto dto = new StoreDto();
+        dto.setId(entity.getId().toString());
         dto.setName(entity.getName());
         dto.setLocation(entity.getLocation());
-        dto.setManager(UserDto.toDto(entity.getManager()));
+        dto.setManager(entity.getManager()!=null? UserDto.toDtoMain(entity.getManager()) : null);
         return dto;
     }
 
     public static StoreDto toDtoWithoutManager(StoreEntity entity) {
         StoreDto dto = new StoreDto();
+        dto.setId(entity.getId().toString());
         dto.setName(entity.getName());
         dto.setLocation(entity.getLocation());
         return dto;
