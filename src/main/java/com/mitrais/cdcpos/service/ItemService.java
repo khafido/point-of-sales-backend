@@ -5,14 +5,13 @@ import com.mitrais.cdcpos.dto.ItemResponseDto;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
+import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
 import com.mitrais.cdcpos.repository.ItemRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -50,6 +49,7 @@ public class ItemService {
 
         Sort sort;
         Pageable paging;
+        Page<ItemEntity> items;
 
         if("DESC".equalsIgnoreCase(sortDirection)) {
             sort = Sort.by(sortBy).descending();
@@ -59,12 +59,12 @@ public class ItemService {
 
         if (isPaginated) {
             paging = PageRequest.of(page, size, sort);
+            items = itemRepository.findAllSearch(paging, searchValue);
         }
         else {
-            paging = Pageable.unpaged();
+            List<ItemEntity> itemEntityList = itemRepository.findAllSearch(sort, searchValue);
+            items = new PageImpl<>(itemEntityList);
         }
-
-        Page<ItemEntity> items = itemRepository.findAllSearch(paging, searchValue);
 
         List<ItemResponseDto> itemDtoList = items.stream()
                 .map(i -> new ItemResponseDto(i.getId(),
