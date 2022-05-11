@@ -26,4 +26,11 @@ public class StoreDto {
         dto.setManager(UserDto.toDto(entity.getManager()));
         return dto;
     }
+
+    public static StoreDto toDtoWithoutManager(StoreEntity entity) {
+        StoreDto dto = new StoreDto();
+        dto.setName(entity.getName());
+        dto.setLocation(entity.getLocation());
+        return dto;
+    }
 }

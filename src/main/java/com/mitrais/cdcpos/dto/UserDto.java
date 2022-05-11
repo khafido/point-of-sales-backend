@@ -27,6 +27,17 @@ public class UserDto {
     private String photo;
     private LocalDate birthDate;
     private List<RoleDto> roles;
+    private StoreDto managerAt;
+
+    public UserDto(UUID id, String username, String firstName, String lastName, String email, List<RoleDto> roles, StoreDto managerAt) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.roles = roles;
+        this.managerAt = managerAt;
+    }
 
     public static UserDto toDto (UserEntity entity) {
         return new UserDto(
@@ -40,8 +51,20 @@ public class UserDto {
                 entity.getGender(),
                 entity.getPhoto(),
                 entity.getBirthDate(),
-                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList())
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
+                StoreDto.toDtoWithoutManager(entity.getStoreManager())
         );
     }
 
+    public static UserDto toDtoCompact(UserEntity entity) {
+        return new UserDto(
+                entity.getId(),
+                entity.getUsername(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail(),
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
+                StoreDto.toDtoWithoutManager(entity.getStoreManager())
+        );
+    }
 }

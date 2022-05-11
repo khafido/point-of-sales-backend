@@ -26,7 +26,7 @@ public class RoleDto {
         return new RoleDto(
                 entity.getId(),
                 entity.getName().toString(),
-                entity.getUsers().stream().map(UserDto::toDto).collect(Collectors.toList())
+                entity.getUsers().stream().map(UserDto::toDtoCompact).collect(Collectors.toList())
         );
     }
 
