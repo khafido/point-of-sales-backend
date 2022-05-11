@@ -16,7 +16,9 @@ import java.util.UUID;
 
 @Repository
 public interface ItemRepository extends JpaRepository<ItemEntity, UUID> {
-    boolean existsByName(String name);
+    boolean existsByBarcode(String barcode);
+
+    boolean existsByBarcodeAndDeletedAtIsNull(String barcode);
 
     Page<ItemEntity> findByDeletedAtIsNull(Pageable pageable);
 

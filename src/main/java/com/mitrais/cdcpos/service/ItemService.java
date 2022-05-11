@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.ItemRequestDto;
+import com.mitrais.cdcpos.dto.ItemResponseDto;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService {
@@ -38,7 +40,7 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public PaginatedDto<ItemEntity> getAll(
+    public PaginatedDto<ItemResponseDto> getAll(
             boolean isPaginated,
             int page,
             int size,
@@ -63,7 +65,18 @@ public class ItemService {
         }
 
         Page<ItemEntity> items = itemRepository.findAllSearch(paging, searchValue);
-        PaginatedDto<ItemEntity> result = new PaginatedDto<>(items.getContent(), items.getNumber(), items.getTotalPages());
+
+        List<ItemResponseDto> itemDtoList = items.stream()
+                .map(i -> new ItemResponseDto(i.getId(),
+                                            i.getName(),
+                                            i.getImage(),
+                                            i.getBarcode(),
+                                            i.getCategory().getName(),
+                                            i.getPackaging(),
+                                            i.getDeletedAt()))
+                .collect(Collectors.toList());
+
+        PaginatedDto<ItemResponseDto> result = new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
 
         return result;
     }
@@ -97,6 +110,10 @@ public class ItemService {
         item.setDeletedAt(LocalDateTime.now());
 
         return itemRepository.save(item);
+    }
+
+    public boolean isBarcodeExist(String barcode) {
+        return itemRepository.existsByBarcodeAndDeletedAtIsNull(barcode);
     }
 
 }
