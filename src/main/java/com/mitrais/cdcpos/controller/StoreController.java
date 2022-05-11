@@ -32,6 +32,7 @@ public class StoreController {
             var genericResponse = new GenericResponse(paginatedDto, "Successfully Get Store Data", GenericResponse.Status.SUCCESS);
             return new ResponseEntity<>(genericResponse, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             var genericResponse = new GenericResponse(null, "Failed To Get Store Data", GenericResponse.Status.ERROR_INTERNAL);
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
