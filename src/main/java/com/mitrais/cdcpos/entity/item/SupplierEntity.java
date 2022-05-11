@@ -37,7 +37,4 @@ public class SupplierEntity extends EntityAudit {
 
     @Column(name = "address")
     private String address;
-
-    @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<IncomingItemEntity> incomingItems = new ArrayList<>();
 }

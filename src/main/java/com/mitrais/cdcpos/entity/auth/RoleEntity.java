@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "roles")
 public class RoleEntity {
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

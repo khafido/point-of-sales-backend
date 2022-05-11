@@ -61,6 +61,7 @@ public class StoreService {
             var updateStore = store.get();
             updateStore.setName(storeDto.getName());
             updateStore.setLocation(storeDto.getLocation());
+            updateStore.setManager(null);
             return storeRepository.save(updateStore);
         }else{
             return null;
