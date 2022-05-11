@@ -76,7 +76,7 @@ public class UserDto {
                 entity.getLastName(),
                 entity.getEmail(),
                 entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
-                StoreDto.toDtoWithoutManager(entity.getStoreManager())
+                entity.getStoreManager()!=null? StoreDto.toDtoWithoutManager(entity.getStoreManager()) : null
         );
     }
 }
