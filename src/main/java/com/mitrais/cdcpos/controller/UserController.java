@@ -5,9 +5,11 @@ import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.UserDto;
+import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import com.mitrais.cdcpos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,12 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> getAllUserActive(
@@ -64,6 +75,8 @@ public class UserController {
     @PostMapping("")
     public ResponseEntity<GenericResponse> addUser(@RequestBody @Valid UserDto req) {
         try{
+            req.setPassword(encoder.encode(req.getUsername()));
+
             UserEntity user = userService.addUser(req);
             return new ResponseEntity<>
                     (new GenericResponse(req, "User Created!"), HttpStatus.CREATED);

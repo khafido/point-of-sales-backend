@@ -28,6 +28,24 @@ public class UserDto {
     private LocalDate birthDate;
     private List<RoleDto> roles;
 
+    @JsonIgnore
+    private String password;
+
+
+    public UserDto(UUID id, String username, String firstName, String lastName, String email, String phone, String address, String gender, String photo, LocalDate birthDate, List<RoleDto> roles) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.gender = gender;
+        this.photo = photo;
+        this.birthDate = birthDate;
+        this.roles = roles;
+    }
+
     public static UserDto toDto (UserEntity entity) {
         return new UserDto(
                 entity.getId(),
