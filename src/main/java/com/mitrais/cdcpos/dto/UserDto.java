@@ -1,6 +1,5 @@
 package com.mitrais.cdcpos.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import lombok.*;
@@ -42,7 +41,6 @@ public class UserDto {
     @JsonIgnore
     private String password;
 
-
     public UserDto(UUID id, String username, String firstName, String lastName, String email, String phone, String address, String gender, String photo, LocalDate birthDate, List<RoleDto> roles) {
         this.id = id;
         this.username = username;
@@ -57,7 +55,7 @@ public class UserDto {
         this.roles = roles;
     }
 
-    public static UserDto toDto (UserEntity entity) {
+    public static UserDto toDtoMain(UserEntity entity) {
         return new UserDto(
                 entity.getId(),
                 entity.getUsername(),
@@ -69,12 +67,11 @@ public class UserDto {
                 entity.getGender(),
                 entity.getPhoto(),
                 entity.getBirthDate(),
-                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
-                StoreDto.toDtoWithoutManager(entity.getStoreManager())
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList())
         );
     }
 
-    public static UserDto toDtoCompact(UserEntity entity) {
+    public static UserDto toDtoStore(UserEntity entity) {
         return new UserDto(
                 entity.getId(),
                 entity.getUsername(),
