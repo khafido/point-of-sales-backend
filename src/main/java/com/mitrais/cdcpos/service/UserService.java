@@ -87,17 +87,20 @@ public class UserService {
 
         RoleEntity role = new RoleEntity(1, ERole.ROLE_EMPLOYEE);
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
-        roles.add(role);
+        try{
+            roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
+        } catch (NullPointerException e) {
+            roles.add(role);
+        }
 
         user.setRoles(roles);
         user.setUsername(req.getUsername());
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
         user.setEmail(req.getEmail());
+        user.setPassword(req.getPassword());
         user.setPhone(req.getPhone());
         user.setBirthDate(req.getBirthDate());
-        user.setPassword(encoder.encode(req.getUsername()));
         user.setAddress(req.getAddress());
         user.setGender(req.getGender());
 

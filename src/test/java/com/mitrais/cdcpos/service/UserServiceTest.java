@@ -120,18 +120,22 @@ class UserServiceTest {
 
     @Test
     void isUsernameExist() {
+        Mockito.when(userRepository.existsByUsername("unitTest")).thenReturn(false);
         boolean resultFalse = userService.isUsernameExist("unitTest");
         assertFalse(resultFalse);
 
+        Mockito.when(userRepository.existsByUsername("khafido")).thenReturn(true);
         boolean resultTrue = userService.isUsernameExist("khafido");
         assertTrue(resultTrue);
     }
 
     @Test
     void isEmailExist() {
+        Mockito.when(userRepository.existsByEmail("user@email.com")).thenReturn(false);
         boolean resultFalse = userService.isEmailExist("user@email.com");
         assertFalse(resultFalse);
 
+        Mockito.when(userRepository.existsByEmail("khafido@email.com")).thenReturn(true);
         boolean resultTrue = userService.isEmailExist("khafido@email.com");
         assertTrue(resultTrue);
     }
