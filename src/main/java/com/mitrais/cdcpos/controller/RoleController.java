@@ -24,8 +24,18 @@ public class RoleController {
     }
 
     @GetMapping("")
-    public List<RoleEntity> getAll(){
-        return roleService.getAll();
+    public ResponseEntity<GenericResponse> getAll(){
+        try{
+            List<RoleEntity> roleEntityList = roleService.getAll();
+            return new ResponseEntity<>
+                    (new GenericResponse(roleEntityList,"Get roles success",
+                            GenericResponse.Status.SUCCESS), HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity<>
+                    (new GenericResponse(null,e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
     }
 
     @GetMapping("/{id}")
