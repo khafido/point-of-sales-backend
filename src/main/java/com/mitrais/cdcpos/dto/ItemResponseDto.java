@@ -1,26 +1,28 @@
 package com.mitrais.cdcpos.dto;
 
-import com.mitrais.cdcpos.entity.CategoryEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto {
-    @NotEmpty(message = "Name cannot be empty")
+public class ItemResponseDto {
+    private UUID id;
+
     private String name;
 
-//    @NotEmpty(message = "Image cannot be empty")
     private String image;
 
     private String barcode;
 
-    @NotEmpty(message = "Category cannot be empty")
     private String category;
 
     private String packaging;
+
+    private LocalDateTime deletedAt;
 }

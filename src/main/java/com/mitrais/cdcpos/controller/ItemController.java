@@ -3,6 +3,7 @@ package com.mitrais.cdcpos.controller;
 
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.ItemRequestDto;
+import com.mitrais.cdcpos.dto.ItemResponseDto;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.service.ItemService;
@@ -44,10 +45,11 @@ public class ItemController {
                                                   @RequestParam(defaultValue = "ASC") String sortDirection)
     {
         try {
-            PaginatedDto<ItemEntity> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
+            PaginatedDto<ItemResponseDto> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
             return new ResponseEntity<>(new GenericResponse(result, "Get All Items Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -59,6 +61,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Get Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -70,6 +73,7 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Update Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -81,7 +85,13 @@ public class ItemController {
             return new ResponseEntity<>(new GenericResponse(result, "Delete Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("check-barcode")
+    public boolean checkBarcode(@RequestParam(defaultValue = "") String barcode) {
+        return itemService.isBarcodeExist(barcode);
     }
 }

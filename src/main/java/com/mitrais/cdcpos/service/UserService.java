@@ -1,7 +1,6 @@
 package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.AddRoleDto;
-import com.mitrais.cdcpos.dto.RoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
@@ -15,11 +14,9 @@ import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -82,7 +79,7 @@ public class UserService {
 
     public UserDto getActiveUserById(UUID id) {
         UserEntity user = userRepository.findByIdAndDeletedAtIsNull(id);
-        return UserDto.toDto(user);
+        return UserDto.toDtoMain(user);
     }
 
     public UserEntity addUser(UserDto req) {
@@ -90,17 +87,20 @@ public class UserService {
 
         RoleEntity role = new RoleEntity(1, ERole.ROLE_EMPLOYEE);
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
-        roles.add(role);
+        try{
+            roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(role));
+        } catch (NullPointerException e) {
+            roles.add(role);
+        }
 
         user.setRoles(roles);
         user.setUsername(req.getUsername());
         user.setFirstName(req.getFirstName());
         user.setLastName(req.getLastName());
         user.setEmail(req.getEmail());
+        user.setPassword(req.getPassword());
         user.setPhone(req.getPhone());
         user.setBirthDate(req.getBirthDate());
-        user.setPassword(encoder.encode(req.getUsername()));
         user.setAddress(req.getAddress());
         user.setGender(req.getGender());
 

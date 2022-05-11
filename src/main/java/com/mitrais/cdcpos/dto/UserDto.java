@@ -1,6 +1,5 @@
 package com.mitrais.cdcpos.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import lombok.*;
@@ -27,8 +26,36 @@ public class UserDto {
     private String photo;
     private LocalDate birthDate;
     private List<RoleDto> roles;
+    private StoreDto managerAt;
 
-    public static UserDto toDto (UserEntity entity) {
+    public UserDto(UUID id, String username, String firstName, String lastName, String email, List<RoleDto> roles, StoreDto managerAt) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.roles = roles;
+        this.managerAt = managerAt;
+    }
+
+    @JsonIgnore
+    private String password;
+
+    public UserDto(UUID id, String username, String firstName, String lastName, String email, String phone, String address, String gender, String photo, LocalDate birthDate, List<RoleDto> roles) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.gender = gender;
+        this.photo = photo;
+        this.birthDate = birthDate;
+        this.roles = roles;
+    }
+
+    public static UserDto toDtoMain(UserEntity entity) {
         return new UserDto(
                 entity.getId(),
                 entity.getUsername(),
@@ -44,4 +71,15 @@ public class UserDto {
         );
     }
 
+    public static UserDto toDtoStore(UserEntity entity) {
+        return new UserDto(
+                entity.getId(),
+                entity.getUsername(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail(),
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
+                entity.getStoreManager()!=null? StoreDto.toDtoWithoutManager(entity.getStoreManager()) : null
+        );
+    }
 }
