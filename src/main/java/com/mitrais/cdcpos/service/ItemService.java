@@ -42,7 +42,7 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public PaginatedDto<ItemResponseDto> getAll(
+    public Page<ItemEntity> getAllToPage(
             boolean isPaginated,
             int page,
             int size,
@@ -69,15 +69,29 @@ public class ItemService {
             items = new PageImpl<>(itemEntityList);
         }
 
+        return items;
+    }
+
+    public PaginatedDto<ItemResponseDto> getAll(
+            boolean isPaginated,
+            int page,
+            int size,
+            String searchValue,
+            String sortBy,
+            String sortDirection) {
+
+        Page<ItemEntity> items = getAllToPage(isPaginated, page, size ,searchValue, sortBy, sortDirection);
+
         List<ItemResponseDto> itemDtoList = items.stream()
                 .map(i -> new ItemResponseDto(i.getId(),
-                                            i.getName(),
-                                            i.getImage(),
-                                            i.getBarcode(),
-                                            i.getCategory().getName(),
-                                            i.getPackaging(),
-                                            i.getDeletedAt()))
+                        i.getName(),
+                        i.getImage(),
+                        i.getBarcode(),
+                        i.getCategory().getName(),
+                        i.getPackaging(),
+                        i.getDeletedAt()))
                 .collect(Collectors.toList());
+
 
         PaginatedDto<ItemResponseDto> result = new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
 
