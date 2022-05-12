@@ -140,11 +140,6 @@ public class UserController {
                 (new GenericResponse(user, "Role "+ req.getRoles()+" added", GenericResponse.Status.SUCCESS), HttpStatus.OK);
     }
 
-    @PatchMapping("{id}/remove-roles")
-    public ResponseEntity<GenericResponse> removeRoles(@PathVariable("id")UUID id, @RequestBody AddRoleDto req){
-        var user = userService.removeRoles(id,req);
-        return new ResponseEntity<>
-                (new GenericResponse(user,"Role "+ req.getRoles()+" removed", GenericResponse.Status.SUCCESS), HttpStatus.OK);
-    }
+
 
 }
