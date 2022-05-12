@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import lombok.*;
