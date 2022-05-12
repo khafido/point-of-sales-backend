@@ -18,21 +18,21 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT u FROM UserEntity u WHERE u.deletedAt IS NULL AND (" +
-            "u.username LIKE %:search% OR " +
-            "u.firstName LIKE %:search% OR " +
-            "u.lastName LIKE %:search% OR " +
-            "u.phone LIKE %:search% OR " +
-            "u.email LIKE %:search% OR " +
-            "u.address LIKE %:search%)")
+            "LOWER(u.username) LIKE %:search% OR " +
+            "LOWER(u.firstName) LIKE %:search% OR " +
+            "LOWER(u.lastName) LIKE %:search% OR " +
+            "LOWER(u.phone) LIKE %:search% OR " +
+            "LOWER(u.email) LIKE %:search% OR " +
+            "LOWER(u.address) LIKE %:search%)")
     Page<UserEntity> findAllSearch(Pageable pageable, @Param("search") String searchVal);
 
     @Query("SELECT u FROM UserEntity u WHERE u.deletedAt IS NULL AND (" +
-            "u.username LIKE %:search% OR " +
-            "u.firstName LIKE %:search% OR " +
-            "u.lastName LIKE %:search% OR " +
-            "u.phone LIKE %:search% OR " +
-            "u.email LIKE %:search% OR " +
-            "u.address LIKE %:search%)")
+            "LOWER(u.username) LIKE %:search% OR " +
+            "LOWER(u.firstName) LIKE %:search% OR " +
+            "LOWER(u.lastName) LIKE %:search% OR " +
+            "LOWER(u.phone) LIKE %:search% OR " +
+            "LOWER(u.email) LIKE %:search% OR " +
+            "LOWER(u.address) LIKE %:search%)")
     List<UserEntity> findAllSearch(Sort sort, @Param("search") String searchVal);
 
     UserEntity findByUsername(String username);
