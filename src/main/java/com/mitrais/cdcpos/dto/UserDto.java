@@ -38,6 +38,9 @@ public class UserDto {
         this.managerAt = managerAt;
     }
 
+    @JsonIgnore
+    private String password;
+
     public UserDto(UUID id, String username, String firstName, String lastName, String email, String phone, String address, String gender, String photo, LocalDate birthDate, List<RoleDto> roles) {
         this.id = id;
         this.username = username;
@@ -76,7 +79,7 @@ public class UserDto {
                 entity.getLastName(),
                 entity.getEmail(),
                 entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
-                StoreDto.toDtoWithoutManager(entity.getStoreManager())
+                entity.getStoreManager()!=null? StoreDto.toDtoWithoutManager(entity.getStoreManager()) : null
         );
     }
 }
