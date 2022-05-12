@@ -10,6 +10,7 @@ import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
 import com.mitrais.cdcpos.repository.ItemRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class ItemService {
     @Autowired
     private ItemRepository itemRepository;
