@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -32,9 +34,6 @@ public class UserService {
 
     Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public List<UserEntity> getAll() {
         return userRepository.findByDeletedAtIsNull();
@@ -215,8 +214,10 @@ public class UserService {
     public UserEntity addRoles(UUID id, AddRoleDto req){
         UserEntity user = getById(id);
         user.getRoles().clear();
-        Set<RoleEntity> roles = req.getRoles().stream().map(r -> roleRepository.findByName(r)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name", r))).collect(Collectors.toSet());
+        Set<RoleEntity> roles = req.getRoles().stream()
+                .map(r -> roleRepository.findByName(r)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name", r)))
+                .collect(Collectors.toSet());
 
         user.setRoles(roles);
         return userRepository.save(user);

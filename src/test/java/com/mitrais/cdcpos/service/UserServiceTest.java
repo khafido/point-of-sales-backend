@@ -37,8 +37,6 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository);
-
         userList = Arrays.asList(
           Mockito.mock(UserEntity.class),
           Mockito.mock(UserEntity.class)
@@ -145,28 +143,29 @@ class UserServiceTest {
     }
 
 
-//    @Test()
-//    @Disabled
-//    void addRole(){
-//        // Given
-//        RoleEntity role = new RoleEntity();
-//        role.setName(ERole.ROLE_ADMIN);
-//        UserEntity user = new UserEntity();
-//        user.setRoles(Set.of(role));
-//
-//        Mockito.when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(user);
-//        Mockito.when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role));
-//        Mockito.when(userRepository.save(Mockito.any(UserEntity.class))).thenReturn(user);
-//
-//        // When
-//        AddRoleDto req = new AddRoleDto();
-//        req.setRoles(role.getName());
-//        UserEntity result = userService.addRoles(user.getId(),req);
-//
-//        // Then
-//        assertEquals(user, result);
-//        Mockito.verify(userRepository).findByIdAndDeletedAtIsNull(user.getId());
-//        Mockito.verify(roleRepository).findByName(role.getName());
-//        Mockito.verify(userRepository).save(user);
-//    }
+    @Test()
+    void addRole(){
+        // Given
+        RoleEntity role = new RoleEntity();
+        role.setName(ERole.ROLE_ADMIN);
+        UserEntity user = new UserEntity();
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+
+        Mockito.when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(user);
+        Mockito.when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role));
+        Mockito.when(userRepository.save(Mockito.any(UserEntity.class))).thenReturn(user);
+
+        // When
+        AddRoleDto req = new AddRoleDto();
+        req.setRoles(Set.of(ERole.ROLE_ADMIN));
+        UserEntity result = userService.addRoles(user.getId(),req);
+
+        // Then
+        assertEquals(user, result);
+        Mockito.verify(userRepository).findByIdAndDeletedAtIsNull(user.getId());
+        Mockito.verify(roleRepository).findByName(role.getName());
+        Mockito.verify(userRepository).save(user);
+    }
 }
