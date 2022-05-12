@@ -1,12 +1,10 @@
 package com.mitrais.cdcpos.entity.item;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.EntityAudit;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,29 +16,26 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item")
+@ToString
+@Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames = "barcode"))
 public class ItemEntity extends EntityAudit {
     @Id
-    @Column(name="id")
-    private UUID transferId = UUID.randomUUID();
+    @Column(name = "id")
+    private UUID id = UUID.randomUUID();
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition="TEXT")
     private String image;
 
     @Column(name = "barcode")
     private String barcode;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
     private CategoryEntity category;
 
     @Column(name = "packaging")
     private String packaging;
-
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<IncomingItemEntity> incomingItems = new ArrayList<>();
 }

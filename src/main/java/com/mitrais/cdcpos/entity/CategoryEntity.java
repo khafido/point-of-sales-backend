@@ -1,17 +1,8 @@
 package com.mitrais.cdcpos.entity;
 
-import com.mitrais.cdcpos.entity.item.ItemEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +10,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Table(name = "category", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class CategoryEntity extends EntityAudit {
     @Id
@@ -27,7 +19,4 @@ public class CategoryEntity extends EntityAudit {
 
     @Column(name = "name")
     private String name;
-
-//    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private List<ItemEntity> items = new ArrayList<>();
 }

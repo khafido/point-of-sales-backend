@@ -1,6 +1,9 @@
 package com.mitrais.cdcpos.entity.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mitrais.cdcpos.entity.EntityAudit;
+import com.mitrais.cdcpos.entity.store.StoreEmployee;
+import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,11 +25,20 @@ import java.util.*;
         @UniqueConstraint(columnNames = "username"),
         @UniqueConstraint(columnNames = "email")
 })
-public class UserEntity {
+public class UserEntity extends EntityAudit {
     public UserEntity(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+
+    public UserEntity(String username, String firstName, String lastName, String email, String phone, LocalDate birthDate) {
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.birthDate = birthDate;
     }
 
     @Id
@@ -55,16 +67,20 @@ public class UserEntity {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "photo", columnDefinition="TEXT")
+    private String photo;
+
     @Column(name = "gender")
     private String gender;
 
-    @Column(name = "create_timestamp")
-    @CreationTimestamp
-    private LocalDateTime createTimestamp;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
-    @Column(name = "modify_timestamp")
-    @UpdateTimestamp
-    private LocalDateTime modifyTimestamp;
+    @OneToMany(mappedBy = "user")
+    private List<StoreEmployee> store;
+
+    @OneToOne(mappedBy = "manager")
+    private StoreEntity storeManager;
 
 //    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
@@ -72,4 +88,5 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<RoleEntity> roles = new HashSet<>();
+
 }

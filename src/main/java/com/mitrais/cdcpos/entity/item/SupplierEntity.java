@@ -27,7 +27,7 @@ public class SupplierEntity extends EntityAudit {
     private String name;
 
     @Column(name = "cp_name")
-    private String CPName;
+    private String cpname;
 
     @Column(name = "phone")
     private String phone;
@@ -37,7 +37,4 @@ public class SupplierEntity extends EntityAudit {
 
     @Column(name = "address")
     private String address;
-
-    @OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<IncomingItemEntity> incomingItems = new ArrayList<>();
 }
