@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -213,17 +214,12 @@ public class UserService {
 
     public UserEntity addRoles(UUID id, AddRoleDto req){
         UserEntity user = getById(id);
-        RoleEntity role= roleRepository.findByName(req.getRoles())
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
-        user.getRoles().add(role);
+        user.getRoles().clear();
+        Set<RoleEntity> roles = req.getRoles().stream().map(r -> roleRepository.findByName(r)
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name", r))).collect(Collectors.toSet());
+
+        user.setRoles(roles);
         return userRepository.save(user);
     }
 
-    public UserEntity removeRoles(UUID id, AddRoleDto req){
-        UserEntity user = getById(id);
-        RoleEntity role= roleRepository.findByName(req.getRoles())
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "Role Name",req.getRoles()));
-        user.getRoles().remove(role);
-        return userRepository.save(user);
-    }
 }

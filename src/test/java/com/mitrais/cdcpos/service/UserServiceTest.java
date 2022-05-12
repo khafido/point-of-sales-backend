@@ -1,12 +1,14 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.AddRoleDto;
 import com.mitrais.cdcpos.dto.UserDto;
+import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.repository.RoleRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +27,9 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private RoleRepository roleRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -32,7 +37,6 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userRepository = Mockito.mock(UserRepository.class);
         userService = new UserService(userRepository);
 
         userList = Arrays.asList(
@@ -139,4 +143,30 @@ class UserServiceTest {
         boolean resultTrue = userService.isEmailExist("khafido@email.com");
         assertTrue(resultTrue);
     }
+
+
+//    @Test()
+//    @Disabled
+//    void addRole(){
+//        // Given
+//        RoleEntity role = new RoleEntity();
+//        role.setName(ERole.ROLE_ADMIN);
+//        UserEntity user = new UserEntity();
+//        user.setRoles(Set.of(role));
+//
+//        Mockito.when(userRepository.findByIdAndDeletedAtIsNull(user.getId())).thenReturn(user);
+//        Mockito.when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role));
+//        Mockito.when(userRepository.save(Mockito.any(UserEntity.class))).thenReturn(user);
+//
+//        // When
+//        AddRoleDto req = new AddRoleDto();
+//        req.setRoles(role.getName());
+//        UserEntity result = userService.addRoles(user.getId(),req);
+//
+//        // Then
+//        assertEquals(user, result);
+//        Mockito.verify(userRepository).findByIdAndDeletedAtIsNull(user.getId());
+//        Mockito.verify(roleRepository).findByName(role.getName());
+//        Mockito.verify(userRepository).save(user);
+//    }
 }
