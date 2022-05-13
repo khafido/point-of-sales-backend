@@ -26,11 +26,11 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, UUID> 
     Optional<CategoryEntity> findByName(String name);
 
     @Query("select c from CategoryEntity c where c.deletedAt is null and " +
-            "c.name like %:search%")
+            "(lower(c.name) like lower(concat('%', :search, '%')))")
     Page<CategoryEntity> findAllSearch(Pageable pageable, @Param("search") String val);
 
     @Query("select c from CategoryEntity c where c.deletedAt is null and " +
-            "c.name like %:search%")
+            "(lower(c.name) like lower(concat('%', :search, '%')))")
     List<CategoryEntity> findAllSearch(Sort sort, @Param("search") String val);
 
 }
