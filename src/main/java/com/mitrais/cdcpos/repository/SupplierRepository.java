@@ -16,18 +16,18 @@ import java.util.UUID;
 public interface SupplierRepository extends JpaRepository<SupplierEntity, UUID> {
 
     @Query("SELECT s FROM SupplierEntity s WHERE s.deletedAt IS NULL AND (" +
-            "s.name LIKE %:search% OR " +
-            "s.cpname LIKE %:search% OR " +
-            "s.phone LIKE %:search% OR " +
-            "s.email LIKE %:search% OR " +
-            "s.address LIKE %:search%)")
+            "LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.cpname) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.address) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<SupplierEntity> findAllSearch(Pageable pageable, @Param("search") String searchVal);
 
     @Query("SELECT s FROM SupplierEntity s WHERE s.deletedAt IS NULL AND (" +
-            "s.name LIKE %:search% OR " +
-            "s.cpname LIKE %:search% OR " +
-            "s.phone LIKE %:search% OR " +
-            "s.email LIKE %:search% OR " +
-            "s.address LIKE %:search%)")
+            "LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.cpname) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(s.address) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<SupplierEntity> findAllSearch(Sort sort, @Param("search") String searchVal);
 }
