@@ -90,8 +90,13 @@ public class ItemController {
         }
     }
 
-    @GetMapping("check-barcode")
-    public boolean checkBarcode(@RequestParam(defaultValue = "") String barcode) {
-        return itemService.isBarcodeExist(barcode);
+    @GetMapping("check-barcode-add")
+    public boolean checkBarcodeOnAdd(@RequestParam(defaultValue = "") String barcode) {
+        return itemService.checkBarcodeOnAdd(barcode);
+    }
+
+    @GetMapping("check-barcode-update/{id}")
+    public boolean checkBarcodeOnEdit(@PathVariable("id") UUID id, @RequestParam(defaultValue = "") String barcode) {
+        return itemService.checkBarcodeOnUpdate(id, barcode);
     }
 }
