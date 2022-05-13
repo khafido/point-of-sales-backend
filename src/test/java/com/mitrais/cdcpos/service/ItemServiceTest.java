@@ -1,121 +1,165 @@
-//package com.mitrais.cdcpos.service;
-//
-//import com.mitrais.cdcpos.dto.ItemRequestDto;
-//import com.mitrais.cdcpos.dto.ItemResponseDto;
-//import com.mitrais.cdcpos.dto.PaginatedDto;
-//import com.mitrais.cdcpos.entity.item.ItemEntity;
-//import com.mitrais.cdcpos.repository.ItemRepository;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mockito;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.data.domain.*;
-//
-//import java.util.*;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//class ItemServiceTest {
-//
-//    private ItemRepository itemRepository;
-//    private ItemService itemService;
-//
-//    private List<ItemResponseDto> itemListDto = new ArrayList<>();
-//    private List<ItemEntity> itemListEntity = new ArrayList<>();
-//
-//    @BeforeEach
-//    void setUp() {
-//        itemRepository = Mockito.mock(ItemRepository.class);
-//        itemService = new ItemService(itemRepository);
-//
-//        itemListDto = Arrays.asList(
-//                Mockito.mock(ItemResponseDto.class),
-//                Mockito.mock(ItemResponseDto.class)
-//        );
-//
-//        itemListEntity = Arrays.asList(
-//                Mockito.mock(ItemEntity.class),
-//                Mockito.mock(ItemEntity.class)
-//        );
-//    }
-//
-//
-//    @Test
-//    void listItemUnpaged() {
-//        Sort sortAsc = Sort.by("name").ascending();
-//        Sort sortDesc = Sort.by("name").descending();
-//        Mockito.when(itemRepository.findAllSearch(sortAsc, "xyz")).thenReturn(itemListEntity);
-//        Mockito.when(itemRepository.findAllSearch(sortDesc, "xyz")).thenReturn(itemListEntity);
-//
-//        PaginatedDto<ItemResponseDto> resultAsc = itemService.getAll(false, 0, 0, "xyz", "name", "asc");
-//        PaginatedDto<ItemResponseDto> resultDesc = itemService.getAll(false, 0, 0, "xyz", "name", "desc");
-//
-//        assertArrayEquals(itemListDto.toArray(), resultAsc.getCurrentPageContent().toArray());
-//        assertArrayEquals(itemListDto.toArray(), resultDesc.getCurrentPageContent().toArray());
-//        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortAsc, "xyz");
-//        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortDesc, "xyz");
-//    }
-//
-//    @Test
-//    void listItemPaged() {
-//        Sort sortAsc = Sort.by("name").ascending();
-//        Sort sortDesc = Sort.by("name").descending();
-//        Pageable pagingAsc = PageRequest.of(0, 10, sortAsc);
-//        Pageable pagingDesc = PageRequest.of(0, 10, sortDesc);
-//        Page<ItemEntity> pageSuppliersAsc = new PageImpl<>(itemListEntity, pagingAsc, 2);
-//        Page<ItemEntity> pageSuppliersDesc = new PageImpl<>(itemListEntity, pagingDesc, 2);
-//
-//        Mockito.when(itemRepository.findAllSearch(pagingAsc, "xyz")).thenReturn(pageSuppliersAsc);
-//        Mockito.when(itemRepository.findAllSearch(pagingDesc, "xyz")).thenReturn(pageSuppliersDesc);
-//
-//        PaginatedDto<ItemResponseDto> resultAsc = itemService.getAll(true, 0, 10, "xyz", "name", "asc");
-//        PaginatedDto<ItemResponseDto> resultDesc = itemService.getAll(true, 0, 10, "xyz", "name", "desc");
-//
-//        assertArrayEquals(itemListDto.toArray(), resultAsc.getCurrentPageContent().toArray());
-//        assertArrayEquals(itemListDto.toArray(), resultDesc.getCurrentPageContent().toArray());
-//        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingAsc, "xyz");
-//        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingDesc, "xyz");
-//    }
-//
-//    @Test
-//    void addItem() {
-//        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
-//        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(0));
-//
-//        ItemEntity result = itemService.add(requestDto);
-//
-//        assertEquals(itemListEntity.get(0), result);
-//        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-//    }
-//
-//    @Test
-//    void updateItem() {
-//        UUID id = UUID.randomUUID();
-//        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
-//
-//        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.ofNullable(itemListEntity.get(0)));
-//        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(1));
-//
-//        ItemEntity result = itemService.update(id, requestDto);
-//
-//        assertEquals(itemListEntity.get(1), result);
-//        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-//        Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
-//    }
-//
-//    @Test
-//    void deleteSupplier() {
-//        UUID id = UUID.randomUUID();
-//        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.ofNullable(itemListEntity.get(0)));
-//        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(1));
-//
-//        ItemEntity result = itemService.delete(id);
-//
-//        assertEquals(itemListEntity.get(1), result);
-//        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-//        Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
-//    }
-//}
+package com.mitrais.cdcpos.service;
+
+import com.mitrais.cdcpos.dto.ItemRequestDto;
+import com.mitrais.cdcpos.dto.ItemResponseDto;
+import com.mitrais.cdcpos.dto.PaginatedDto;
+import com.mitrais.cdcpos.entity.CategoryEntity;
+import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.item.ItemEntity;
+import com.mitrais.cdcpos.exception.ResourceNotFoundException;
+import com.mitrais.cdcpos.repository.CategoryRepository;
+import com.mitrais.cdcpos.repository.ItemRepository;
+import com.mitrais.cdcpos.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class ItemServiceTest {
+    @Mock
+    private ItemRepository itemRepository;
+    private CategoryRepository categoryRepository;
+
+    @InjectMocks
+    private ItemService itemService;
+    private CategoryService categoryService;
+
+    private List<ItemResponseDto> itemListDto = new ArrayList<>();
+    private List<ItemEntity> itemListEntity = new ArrayList<>();
+    private List<CategoryEntity> categoryList = new ArrayList<>();
+
+
+    @BeforeEach
+    void setUp() {
+        itemRepository = Mockito.mock(ItemRepository.class, Mockito.RETURNS_DEEP_STUBS);
+        categoryRepository = Mockito.mock(CategoryRepository.class, Mockito.RETURNS_DEEP_STUBS);
+
+        categoryService = new CategoryService(categoryRepository);
+        itemService = new ItemService(itemRepository, categoryService);
+
+        CategoryEntity category1 = new CategoryEntity(UUID.randomUUID(), "Category 1");
+        CategoryEntity category2 = mock(CategoryEntity.class);
+        CategoryEntity category3 = mock(CategoryEntity.class);
+
+        categoryList = Arrays.asList(
+                category1,category2,category3
+        );
+
+        itemListDto = Arrays.asList(
+                Mockito.mock(ItemResponseDto.class),
+                Mockito.mock(ItemResponseDto.class)
+        );
+
+        itemListEntity = Arrays.asList(
+                Mockito.mock(ItemEntity.class),
+                Mockito.mock(ItemEntity.class)
+        );
+
+    }
+
+
+    @Test
+    void listItemUnpaged() {
+        Sort sortAsc = Sort.by("name").ascending();
+        Sort sortDesc = Sort.by("name").descending();
+
+        Mockito.when(itemRepository.findAllSearch(sortAsc, "")).thenReturn(itemListEntity);
+        Mockito.when(itemRepository.findAllSearch(sortDesc, "")).thenReturn(itemListEntity);
+
+        Page<ItemEntity> resultAsc = itemService.getAllToPage(false, 0, 10, "", "name", "ASC");
+        Page<ItemEntity> resultDesc = itemService.getAllToPage(false, 0, 10, "", "name", "DESC");
+
+        assertArrayEquals(itemListEntity.toArray(), resultAsc.getContent().toArray());
+        assertArrayEquals(itemListEntity.toArray(), resultDesc.getContent().toArray());
+        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortAsc, "");
+        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortDesc, "");
+    }
+
+    @Test
+    void listItemPaged() {
+        Sort sortAsc = Sort.by("name").ascending();
+        Sort sortDesc = Sort.by("name").descending();
+        Pageable pagingAsc = PageRequest.of(0, 10, sortAsc);
+        Pageable pagingDesc = PageRequest.of(0, 10, sortDesc);
+        Page<ItemEntity> pageItemAsc = new PageImpl<>(itemListEntity, pagingAsc, 2);
+        Page<ItemEntity> pageItemDesc = new PageImpl<>(itemListEntity, pagingDesc, 2);
+
+        Mockito.when(itemRepository.findAllSearch(pagingAsc, "xyz")).thenReturn(pageItemAsc);
+        Mockito.when(itemRepository.findAllSearch(pagingDesc, "xyz")).thenReturn(pageItemDesc);
+
+        Page<ItemEntity> resultAsc = itemService.getAllToPage(true, 0, 10, "xyz", "name", "asc");
+        Page<ItemEntity> resultDesc = itemService.getAllToPage(true, 0, 10, "xyz", "name", "desc");
+
+        assertArrayEquals(itemListEntity.toArray(), resultAsc.getContent().toArray());
+        assertArrayEquals(itemListEntity.toArray(), resultDesc.getContent().toArray());
+        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingAsc, "xyz");
+        Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingDesc, "xyz");
+    }
+
+    @Test
+    void addItem() {
+        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
+//        ItemRequestDto requestDto = new ItemRequestDto("item", "", "abc", "category", "packaging");
+//        Mockito.when(categoryService.getActiveDataByName(Mockito.anyString())).thenReturn(new CategoryEntity(UUID.randomUUID(), "Category 1"));
+        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(0));
+
+        try {
+            ItemEntity result = itemService.add(requestDto);
+            assertEquals(itemListEntity.get(0), result);
+            Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
+        }
+        catch(Exception e) {
+            System.out.println("Exception");
+            assertEquals("com.mitrais.cdcpos.exception.ResourceNotFoundException", e.getClass().getCanonicalName());
+        }
+
+    }
+
+    @Test
+    void updateItem() {
+        UUID id = UUID.randomUUID();
+        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
+
+        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.ofNullable(itemListEntity.get(0)));
+        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(1));
+
+        try {
+            ItemEntity result = itemService.update(id, requestDto);
+            assertEquals(itemListEntity.get(1), result);
+            Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
+        }
+        catch(Exception e) {
+            System.out.println("Exception");
+            assertEquals("com.mitrais.cdcpos.exception.ResourceNotFoundException", e.getClass().getCanonicalName());
+        }
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
+    }
+
+    @Test
+    void deleteItem() {
+        UUID id = UUID.randomUUID();
+        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.ofNullable(itemListEntity.get(0)));
+        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(1));
+
+        ItemEntity result = itemService.delete(id);
+
+        assertEquals(itemListEntity.get(1), result);
+        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
+        Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
+    }
+}
