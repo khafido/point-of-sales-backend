@@ -123,4 +123,21 @@ public class StoreController {
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/{id}/employee")
+    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id) {
+        try {
+            var store = storeService.getById(id);
+            if (store.isPresent()) {
+                var genericResponse = new GenericResponse(store.get(), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
+                return new ResponseEntity<>(genericResponse, HttpStatus.OK);
+            } else {
+                var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
+                return new ResponseEntity<>(genericResponse, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            var genericResponse = new GenericResponse(null, "Failed To Get Store Data", GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

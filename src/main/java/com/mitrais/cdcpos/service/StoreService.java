@@ -3,8 +3,11 @@ package com.mitrais.cdcpos.service;
 import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
 import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
+import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
+import com.mitrais.cdcpos.repository.StoreEmployeeRepository;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import java.util.UUID;
 public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+    private final StoreEmployeeRepository storeEmployeeRepository;
 
     public Page<StoreEntity> getAll(boolean paginated,int page, int size, String searchValue, String sortBy, String sortDirection) {
         Sort sort;
@@ -101,5 +105,15 @@ public class StoreService {
             }
         }
         return null;
+    }
+
+    //Make Pagable
+    public List<StoreEmployeeEntity> getStoreEmployee(UUID storeId) {
+        var store = this.getById(storeId);
+        if(store.isPresent()){
+           return storeEmployeeRepository.findByStore_IdEquals(storeId);
+        }else{
+            return null;
+        }
     }
 }
