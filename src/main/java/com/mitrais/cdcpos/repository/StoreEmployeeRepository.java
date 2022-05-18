@@ -1,6 +1,9 @@
 package com.mitrais.cdcpos.repository;
 
 import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -8,7 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface StoreEmployeeRepository extends JpaRepository<StoreEmployeeEntity, UUID> {
-    @Query("select s from StoreEmployeeEntity s where s.store.id = ?1")
-    List<StoreEmployeeEntity> findByStore_IdEquals(UUID id);
+    @Query("select s from StoreEmployeeEntity s left join s.user.roles roles " +
+            "where (s.deletedAt is null and s.store.id = ?1) and (upper(s.user.firstName) like upper('%'||?2||'%') or upper(s.user.lastName) like upper('%'||?2||'%') or upper(roles.name) like upper('%'||?2||'%'))")
+    Page<StoreEmployeeEntity> search(UUID id, String searchValue, Pageable pageable);
+
+    @Query("select s from StoreEmployeeEntity s left join s.user.roles roles " +
+            "where (s.deletedAt is null and s.store.id = ?1) and (upper(s.user.firstName) like upper('%'||?2||'%') or upper(s.user.lastName) like upper('%'||?2||'%') or upper(roles.name) like upper('%'||?2||'%'))")
+    List<StoreEmployeeEntity> search(UUID id, String searchValue, Sort sort);
 
 }

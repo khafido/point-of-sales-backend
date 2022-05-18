@@ -3,7 +3,6 @@ package com.mitrais.cdcpos.service;
 import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
 import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
-import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
@@ -26,7 +25,7 @@ public class StoreService {
     private final UserRepository userRepository;
     private final StoreEmployeeRepository storeEmployeeRepository;
 
-    public Page<StoreEntity> getAll(boolean paginated,int page, int size, String searchValue, String sortBy, String sortDirection) {
+    public Page<StoreEntity> getAll(boolean paginated, int page, int size, String searchValue, String sortBy, String sortDirection) {
         Sort sort;
         Pageable paging;
         Page<StoreEntity> result;
@@ -37,7 +36,7 @@ public class StoreService {
             sort = Sort.by(sortBy).ascending();
         }
 
-        if(paginated) {
+        if (paginated) {
             paging = PageRequest.of(page, size, sort);
             result = storeRepository.search(searchValue, paging);
         } else {
@@ -47,11 +46,11 @@ public class StoreService {
         return result;
     }
 
-    public Optional<StoreEntity> getById(UUID id){
+    public Optional<StoreEntity> getById(UUID id) {
         return storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
     }
 
-    public StoreEntity create(StoreDto storeDto){
+    public StoreEntity create(StoreDto storeDto) {
         var newStore = new StoreEntity();
         newStore.setName(storeDto.getName());
         newStore.setLocation(storeDto.getLocation());
@@ -59,26 +58,26 @@ public class StoreService {
         return storeRepository.save(newStore);
     }
 
-    public StoreEntity update(UUID id,StoreDto storeDto){
+    public StoreEntity update(UUID id, StoreDto storeDto) {
         var store = getById(id);
-        if(store.isPresent()){
+        if (store.isPresent()) {
             var updateStore = store.get();
             updateStore.setName(storeDto.getName());
             updateStore.setLocation(storeDto.getLocation());
             updateStore.setManager(null);
             return storeRepository.save(updateStore);
-        }else{
+        } else {
             return null;
         }
     }
 
-    public StoreEntity delete(UUID id){
+    public StoreEntity delete(UUID id) {
         var store = getById(id);
-        if(store.isPresent()){
+        if (store.isPresent()) {
             var deleteStore = store.get();
             deleteStore.setDeletedAt(LocalDateTime.now());
             return storeRepository.save(deleteStore);
-        }else{
+        } else {
             return null;
         }
     }
@@ -87,16 +86,16 @@ public class StoreService {
         var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
         var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(UUID.fromString(request.getStoreId()));
 
-        if(user!=null && optionalStore.isPresent()) {
+        if (user != null && optionalStore.isPresent()) {
             boolean manager = false;
-            for(var role : user.getRoles()) {
-                if(role.getName().equals(ERole.ROLE_MANAGER)) {
+            for (var role : user.getRoles()) {
+                if (role.getName().equals(ERole.ROLE_MANAGER)) {
                     manager = true;
                     break;
                 }
             }
 
-            if(manager) {
+            if (manager) {
                 var store = optionalStore.get();
                 store.setManager(user);
                 return storeRepository.save(store);
@@ -107,13 +106,28 @@ public class StoreService {
         return null;
     }
 
-    //Make Pagable
-    public List<StoreEmployeeEntity> getStoreEmployee(UUID storeId) {
-        var store = this.getById(storeId);
-        if(store.isPresent()){
-           return storeEmployeeRepository.findByStore_IdEquals(storeId);
-        }else{
+    public Page<StoreEmployeeEntity> getStoreEmployee(UUID storeId, boolean paginated, int page, int size, String searchValue, String sortBy, String sortDirection) {
+        Sort sort;
+        Pageable paging;
+        Page<StoreEmployeeEntity> result;
+
+        if(this.getById(storeId).isEmpty()){
             return null;
         }
+
+        if ("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if (paginated) {
+            paging = PageRequest.of(page, size, sort);
+            result = storeEmployeeRepository.search(storeId, searchValue, paging);
+        } else {
+            List<StoreEmployeeEntity> storeEntities = storeEmployeeRepository.search(storeId, searchValue, sort);
+            result = new PageImpl<>(storeEntities);
+        }
+        return result;
     }
 }

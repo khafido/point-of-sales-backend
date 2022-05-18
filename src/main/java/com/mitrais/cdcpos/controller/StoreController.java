@@ -8,7 +8,6 @@ import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.Store;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -109,7 +108,7 @@ public class StoreController {
     public ResponseEntity<GenericResponse> assignManager(@RequestBody @Valid StoreAssignManagerDto request) {
         try {
             var result = storeService.assignManager(request);
-            if(result!=null) {
+            if (result != null) {
                 var resultDto = StoreDto.toDto(result);
                 return new ResponseEntity<>(new GenericResponse(resultDto, "Assign Store Manager Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
             } else {
@@ -125,18 +124,19 @@ public class StoreController {
     }
 
     @GetMapping("/{id}/employee")
-    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id) {
+    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id, @RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
-                var genericResponse = new GenericResponse(store.get(), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
+                var result = storeService.getStoreEmployee(id, isPaginated, page, size, searchValue, sortBy, sortDirection);
+                var genericResponse = new GenericResponse(result, "Successfully get Store Employee Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
-                var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
+                var genericResponse = new GenericResponse(null, "Store doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
                 return new ResponseEntity<>(genericResponse, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            var genericResponse = new GenericResponse(null, "Failed To Get Store Data", GenericResponse.Status.ERROR_INTERNAL);
+            var genericResponse = new GenericResponse(null, "Failed To Get Store Employee Data", GenericResponse.Status.ERROR_INTERNAL);
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
