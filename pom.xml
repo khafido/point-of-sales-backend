@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mitrais</groupId>
-<!-- 	<artifactId>cdc-pos</artifactId> -->
-<!-- 	<version>0.0.1-SNAPSHOT</version> -->
+	<artifactId>cdc-pos</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<name>cdc-pos</name>
 	<description>CDC POS - Team 3</description>
 	<!--	<properties>-->
