@@ -3,12 +3,12 @@ package com.mitrais.cdcpos.controller;
 
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.PaginatedDto;
-import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
-import com.mitrais.cdcpos.dto.StoreDto;
+import com.mitrais.cdcpos.dto.store.StoreAddItemRequestDto;
+import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
+import com.mitrais.cdcpos.dto.store.StoreDto;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.Store;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -105,8 +105,24 @@ public class StoreController {
         }
     }
 
+    @PostMapping("/{id}/item")
+    public ResponseEntity<GenericResponse> addItemToStore(@PathVariable UUID id, @RequestBody @Valid StoreAddItemRequestDto request) {
+        try {
+            var result = storeService.addItemToStore(id ,request);
+            if(result!=null) {
+                var resultDto = StoreDto.toDto(result.getStore());
+                return new ResponseEntity<>(new GenericResponse(resultDto, "Add Item to Store Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/assign-manager")
-    public ResponseEntity<GenericResponse> assignManager(@RequestBody @Valid StoreAssignManagerDto request) {
+    public ResponseEntity<GenericResponse> assignManager(@RequestBody @Valid StoreAssignManagerRequestDto request) {
         try {
             var result = storeService.assignManager(request);
             if(result!=null) {

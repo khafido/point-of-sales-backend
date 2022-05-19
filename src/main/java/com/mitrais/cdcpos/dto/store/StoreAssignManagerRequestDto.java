@@ -1,12 +1,11 @@
-package com.mitrais.cdcpos.dto;
+package com.mitrais.cdcpos.dto.store;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.UUID;
 
 @Data
-public class StoreAssignManagerDto {
+public class StoreAssignManagerRequestDto {
 
     @NotEmpty
     private String storeId;
