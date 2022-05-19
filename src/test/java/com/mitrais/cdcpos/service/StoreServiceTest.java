@@ -178,10 +178,9 @@ class StoreServiceTest {
         when(storeRepository.save(store)).thenReturn(store);
 
         StoreAssignManagerRequestDto request = new StoreAssignManagerRequestDto();
-        request.setStoreId(store.getId().toString());
         request.setUserId(user.getId().toString());
 
-        StoreEntity result = storeService.assignManager(request);
+        StoreEntity result = storeService.assignManager(store.getId(), request);
 
         assertEquals(store, result);
         verify(userRepository, times(1)).findByIdAndDeletedAtIsNull(user.getId());

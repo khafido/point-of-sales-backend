@@ -121,10 +121,10 @@ public class StoreController {
         }
     }
 
-    @PostMapping("/assign-manager")
-    public ResponseEntity<GenericResponse> assignManager(@RequestBody @Valid StoreAssignManagerRequestDto request) {
+    @PostMapping("/{id}/assign-manager")
+    public ResponseEntity<GenericResponse> assignManager(@PathVariable UUID id, @RequestBody @Valid StoreAssignManagerRequestDto request) {
         try {
-            var result = storeService.assignManager(request);
+            var result = storeService.assignManager(id, request);
             if(result!=null) {
                 var resultDto = StoreDto.toDto(result);
                 return new ResponseEntity<>(new GenericResponse(resultDto, "Assign Store Manager Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);

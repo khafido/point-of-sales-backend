@@ -8,8 +8,5 @@ import javax.validation.constraints.NotEmpty;
 public class StoreAssignManagerRequestDto {
 
     @NotEmpty
-    private String storeId;
-
-    @NotEmpty
     private String userId;
 }
