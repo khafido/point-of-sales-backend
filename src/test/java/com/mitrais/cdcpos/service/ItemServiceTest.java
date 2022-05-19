@@ -108,7 +108,6 @@ class ItemServiceTest {
 
     @Test
     void addItem() {
-
         CategoryEntity category1 = new CategoryEntity(UUID.randomUUID(), "Category 1");
 
         ItemRequestDto requestDto = new ItemRequestDto("item", "", "abc", "Category 1", "packaging");
@@ -134,7 +133,6 @@ class ItemServiceTest {
         ItemEntity result = itemService.update(id, requestDto);
         assertEquals(itemListEntity.get(0), result);
         Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-
         Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
     }
 
