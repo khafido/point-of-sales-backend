@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -16,8 +13,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-@Table(name = "parameter", schema = "public")
+@Table(name = "parameter", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class ParameterEntity extends EntityAudit {
     @Id
     @Column(name = "id")
@@ -27,5 +23,5 @@ public class ParameterEntity extends EntityAudit {
     private String name;
 
     @Column(name = "value")
-    private String value;
+    private int value;
 }
