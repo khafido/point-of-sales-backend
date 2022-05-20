@@ -3,22 +3,24 @@ package com.mitrais.cdcpos.service;
 import com.mitrais.cdcpos.dto.store.StoreAddItemRequestDto;
 import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
 import com.mitrais.cdcpos.dto.store.StoreDto;
+import com.mitrais.cdcpos.dto.store.StoreListOfItemsResponseDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
+import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
-import com.mitrais.cdcpos.repository.ItemRepository;
-import com.mitrais.cdcpos.repository.StoreItemRepository;
-import com.mitrais.cdcpos.repository.StoreRepository;
-import com.mitrais.cdcpos.repository.UserRepository;
+import com.mitrais.cdcpos.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,8 @@ public class StoreService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final StoreItemRepository storeItemRepository;
+    private final ParameterRepository parameterRepository;
+    private final IncomingItemRepository incomingItemRepository;
 
     public Page<StoreEntity> getAll(boolean paginated,int page, int size, String searchValue, String sortBy, String sortDirection) {
         Sort sort;
@@ -132,5 +136,54 @@ public class StoreService {
             return storeItemRepository.save(storeItem);
         }
         return null;
+    }
+
+    public Page<StoreListOfItemsResponseDto> storeListOfItems(UUID id, Boolean paginated, Integer page, Integer size, String searchValue, String sortBy, String sortDirection) {
+        Sort sort;
+        Pageable paging;
+        Page<StoreItemEntity> storeItemEntities;
+
+        if ("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+        var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
+
+        if(paginated) {
+            paging = PageRequest.of(page, size, sort);
+            storeItemEntities = storeItemRepository.findByStoreIdWithSearch(paging, id, searchValue);
+
+            Page<StoreListOfItemsResponseDto> result = storeItemEntities.map(entity ->
+                    convertAndCalculateStoreItem(entity, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue())));
+            return result;
+        } else {
+            List<StoreItemEntity> storeEntities = storeItemRepository.findByStoreIdWithSearch(sort, id, searchValue);
+            List<StoreListOfItemsResponseDto> result = storeEntities.stream().map(entity ->
+                    convertAndCalculateStoreItem(entity, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()))
+            ).collect(Collectors.toList());
+            return new PageImpl<>(result);
+        }
+        
+    }
+
+    private StoreListOfItemsResponseDto convertAndCalculateStoreItem(StoreItemEntity entity, int taxPercent, int profitPercent) {
+        List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1),entity.getStore().getId(), entity.getItem().getId());
+
+        BigDecimal bySystemPrice;
+        // bySystemPrice Formula: f(buyPrice + (profit% * buyPrice)) + (f() * tax%)
+        if(latestIncomingItem.size()>0) {
+            BigDecimal buyPrice = latestIncomingItem.get(0).getBuyPrice();
+            BigDecimal profitValue = buyPrice.multiply(new BigDecimal(taxPercent/100));
+            BigDecimal buyPlusProfit = buyPrice.add(profitValue);
+            bySystemPrice = buyPlusProfit.add(buyPlusProfit.multiply(new BigDecimal(profitPercent/100)));
+        } else {
+            bySystemPrice = new BigDecimal(0);
+        }
+
+        StoreListOfItemsResponseDto dto = StoreListOfItemsResponseDto.toDto(entity, bySystemPrice);
+        return dto;
     }
 }

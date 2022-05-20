@@ -1,17 +1,34 @@
 package com.mitrais.cdcpos.repository;
+import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface StoreItemRepository extends JpaRepository<StoreItemEntity, UUID> {
 
-    @Query(value = "SELECT id, created_at, deleted_at, last_modified_at, stock, item_id, store_id FROM public.store_item " +
-            "WHERE store_id = :storeId AND item_id = :itemId", nativeQuery = true)
+    @Query(value = "SELECT si FROM StoreItemEntity si " +
+            "WHERE si.store.id = :storeId AND si.store.id = :itemId")
     Optional<StoreItemEntity> findByStoreIdAndItemId(@Param("storeId") UUID storeId, @Param("itemId") UUID itemId);
+
+    @Query(value = "SELECT si FROM StoreItemEntity si " +
+            "WHERE si.store.id = :storeId AND (" +
+            "LOWER(si.priceMode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(si.item.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<StoreItemEntity> findByStoreIdWithSearch(Pageable pageable, @Param("storeId") UUID storeId, @Param("search") String searchVal);
+
+    @Query(value = "SELECT si FROM StoreItemEntity si " +
+            "WHERE si.store.id = :storeId AND (" +
+            "LOWER(si.priceMode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(si.item.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+    List<StoreItemEntity> findByStoreIdWithSearch(Sort sort, @Param("storeId") UUID storeId, @Param("search") String searchVal);
 }
