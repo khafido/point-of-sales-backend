@@ -2,18 +2,15 @@ package com.mitrais.cdcpos.entity.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mitrais.cdcpos.entity.EntityAudit;
-import com.mitrais.cdcpos.entity.store.StoreEmployee;
+import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -77,7 +74,7 @@ public class UserEntity extends EntityAudit {
     private LocalDate birthDate;
 
     @OneToMany(mappedBy = "user")
-    private List<StoreEmployee> store;
+    private List<StoreEmployeeEntity> store;
 
     @OneToOne(mappedBy = "manager")
     private StoreEntity storeManager;

@@ -25,7 +25,7 @@ public class StoreEntity extends EntityAudit {
     private String location;
 
     @OneToMany(mappedBy = "store")
-    private List<StoreEmployee> employee;
+    private List<StoreEmployeeEntity> employee;
 
     @OneToOne
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
