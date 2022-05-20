@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,22 +25,25 @@ import java.util.UUID;
 public class IncomingItemEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name="id")
-    private UUID transferId = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", referencedColumnName = "id")
-    private StoreItemEntity item;
+    @JoinColumn(name = "store_item_id", referencedColumnName = "id")
+    private StoreItemEntity storeItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private SupplierEntity supplier;
 
     @Column(name = "buy_qty")
-    private Long buy_qty;
+    private Long buyQty;
+
+    @Column(name = "buy_price")
+    private BigDecimal buyPrice;
 
     @Column(name = "buy_date")
-    private LocalDateTime buy_date;
+    private LocalDateTime buyDate;
 
     @Column(name = "expiry_date")
-    private LocalDate expiry_date;
+    private LocalDate expiryDate;
 }

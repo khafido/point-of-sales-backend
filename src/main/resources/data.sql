@@ -1,6 +1,6 @@
 insert into parameter (created_at,deleted_at,last_modified_at, name, value, id) values
- (now(), null, now(),'tax', 10, gen_random_uuid()),
- (now(), null, now(),'profit', 12, gen_random_uuid());
+ (now(), null, now(),'tax_percentage', '10', gen_random_uuid()),
+ (now(), null, now(),'profit_percentage', '12', gen_random_uuid());
 
 insert into roles values
     (1, 'ROLE_ADMIN'),

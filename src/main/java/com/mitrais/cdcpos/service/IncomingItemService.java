@@ -4,6 +4,7 @@ import com.mitrais.cdcpos.dto.IncomingItemDto;
 import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.IncomingItemRepository;
+import com.mitrais.cdcpos.repository.StoreItemRepository;
 import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,21 @@ import java.time.LocalDateTime;
 public class IncomingItemService {
     private final IncomingItemRepository incomingItemRepository;
     private final SupplierRepository supplierRepository;
-    // store item entity repo
+    private final StoreItemRepository storeItemRepository;
 
     public IncomingItemEntity add(IncomingItemDto req){
         var incomingItem = new IncomingItemEntity();
+        var store = storeItemRepository.findById(req.getItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Store Item", "id", req.getItemId()));
+        
         var supplier= supplierRepository.findByIdAndDeletedAtIsNull(req.getSupplierId())
                 .orElseThrow(()-> new ResourceNotFoundException("Supplier", "id", req.getSupplierId()));
+        
         incomingItem.setSupplier(supplier);
-        incomingItem.setBuy_qty(req.getQty());
-        incomingItem.setBuy_date(req.getBuyDate());
-        incomingItem.setExpiry_date(req.getExpiryDate());
+        incomingItem.setBuyPrice(req.getBuyPrice());
+        incomingItem.setBuyQty(req.getQty());
+        incomingItem.setBuyDate(req.getBuyDate());
+        incomingItem.setExpiryDate(req.getExpiryDate());
         return incomingItemRepository.save(incomingItem);
     }
 

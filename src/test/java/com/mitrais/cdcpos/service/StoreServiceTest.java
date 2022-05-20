@@ -1,7 +1,7 @@
 package com.mitrais.cdcpos.service;
 
-import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
-import com.mitrais.cdcpos.dto.StoreDto;
+import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
+import com.mitrais.cdcpos.dto.store.StoreDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
@@ -177,11 +177,10 @@ class StoreServiceTest {
         when(storeRepository.findByIdEqualsAndDeletedAtIsNull(store.getId())).thenReturn(Optional.of(store));
         when(storeRepository.save(store)).thenReturn(store);
 
-        StoreAssignManagerDto request = new StoreAssignManagerDto();
-        request.setStoreId(store.getId().toString());
+        StoreAssignManagerRequestDto request = new StoreAssignManagerRequestDto();
         request.setUserId(user.getId().toString());
 
-        StoreEntity result = storeService.assignManager(request);
+        StoreEntity result = storeService.assignManager(store.getId(), request);
 
         assertEquals(store, result);
         verify(userRepository, times(1)).findByIdAndDeletedAtIsNull(user.getId());

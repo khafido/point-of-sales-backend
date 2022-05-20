@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -12,9 +14,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IncomingItemDto {
+    @NotEmpty
     UUID itemId;
+    @NotEmpty
     UUID supplierId;
+    @NotEmpty
+    BigDecimal buyPrice;
+    @NotEmpty
     long qty;
+    @NotEmpty
     LocalDateTime buyDate;
+    @NotEmpty
     LocalDate expiryDate;
 }
