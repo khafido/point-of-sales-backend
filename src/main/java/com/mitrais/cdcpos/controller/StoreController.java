@@ -1,13 +1,12 @@
 package com.mitrais.cdcpos.controller;
 
 
-import com.mitrais.cdcpos.dto.GenericResponse;
-import com.mitrais.cdcpos.dto.PaginatedDto;
-import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
-import com.mitrais.cdcpos.dto.StoreDto;
+import com.mitrais.cdcpos.dto.*;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +42,7 @@ public class StoreController {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
-                var genericResponse = new GenericResponse(store.get(), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
+                var genericResponse = new GenericResponse(StoreDto.toDto(store.get()), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
@@ -129,7 +128,9 @@ public class StoreController {
             var store = storeService.getById(id);
             if (store.isPresent()) {
                 var result = storeService.getStoreEmployee(id, isPaginated, page, size, searchValue, sortBy, sortDirection);
-                var genericResponse = new GenericResponse(result, "Successfully get Store Employee Data", GenericResponse.Status.SUCCESS);
+                var resultDto = result.getContent().stream().map(StoreEmployeeDto::toDtoWithUser).collect(Collectors.toList());
+                var paginatedDto = new PaginatedDto<>(resultDto, result.getNumber(), result.getTotalPages());
+                var genericResponse = new GenericResponse(paginatedDto, "Successfully get Store Employee Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
@@ -140,4 +141,24 @@ public class StoreController {
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping("/add-employee")
+    public ResponseEntity<GenericResponse> addEmployee(@RequestBody @Valid AddEmployeeDto request) {
+        try {
+            var result = storeService.addEmployee(request);
+            if (result != null) {
+                var resultDto = StoreEmployeeDto.toDto(result);
+                return new ResponseEntity<>(new GenericResponse(resultDto, "Add Store Employee Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new GenericResponse(null, "Store/User Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        } catch (ManualValidationFailException e) {
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INPUT);
+            return new ResponseEntity<>(genericResponse, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

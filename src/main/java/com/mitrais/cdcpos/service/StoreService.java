@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.service;
 
+import com.mitrais.cdcpos.dto.AddEmployeeDto;
 import com.mitrais.cdcpos.dto.StoreAssignManagerDto;
 import com.mitrais.cdcpos.dto.StoreDto;
 import com.mitrais.cdcpos.entity.auth.ERole;
@@ -129,5 +130,36 @@ public class StoreService {
             result = new PageImpl<>(storeEntities);
         }
         return result;
+    }
+
+    public StoreEmployeeEntity addEmployee(AddEmployeeDto request) throws ManualValidationFailException {
+        var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
+        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(UUID.fromString(request.getStoreId()));
+
+        if (user != null && optionalStore.isPresent()) {
+            var isWorkingAtStore = storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(UUID.fromString(request.getUserId()), UUID.fromString(request.getStoreId()));
+            if(isWorkingAtStore) {
+                throw new ManualValidationFailException(user.getFirstName() + " Is Already Working In A Store");
+//                return null;
+            }
+
+            boolean validRole = false;
+            for (var role : user.getRoles()) {
+                if (role.getName().equals(ERole.ROLE_CASHIER) || role.getName().equals(ERole.ROLE_STOCKIST)) {
+                    validRole = true;
+                    break;
+                }
+            }
+
+            if (validRole) {
+                var storeEmployee = new StoreEmployeeEntity();
+                storeEmployee.setStore(optionalStore.get());
+                storeEmployee.setUser(user);
+                return storeEmployeeRepository.save(storeEmployee);
+            } else {
+                throw new ManualValidationFailException(user.getFirstName() + " Is Neither A Cashier Nor Stockist");
+            }
+        }
+        return null;
     }
 }

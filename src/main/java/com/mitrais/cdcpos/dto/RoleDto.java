@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,8 @@ public class RoleDto {
         return new RoleDto(
                 entity.getId(),
                 entity.getName().toString(),
+                entity.getName().equals(ERole.ROLE_CASHIER) || entity.getName().equals(ERole.ROLE_STOCKIST) ?
+                entity.getUsers().stream().map(UserDto::toDtoEmployee).collect(Collectors.toList()) :
                 entity.getUsers().stream().map(UserDto::toDtoStore).collect(Collectors.toList())
         );
     }

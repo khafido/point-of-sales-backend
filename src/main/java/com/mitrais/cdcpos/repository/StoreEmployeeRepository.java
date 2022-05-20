@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface StoreEmployeeRepository extends JpaRepository<StoreEmployeeEntity, UUID> {
+
     @Query("select s from StoreEmployeeEntity s left join s.user.roles roles " +
             "where (s.deletedAt is null and s.store.id = ?1) and (upper(s.user.firstName) like upper('%'||?2||'%') or upper(s.user.lastName) like upper('%'||?2||'%') or upper(roles.name) like upper('%'||?2||'%'))")
     Page<StoreEmployeeEntity> search(UUID id, String searchValue, Pageable pageable);
@@ -18,5 +19,8 @@ public interface StoreEmployeeRepository extends JpaRepository<StoreEmployeeEnti
     @Query("select s from StoreEmployeeEntity s left join s.user.roles roles " +
             "where (s.deletedAt is null and s.store.id = ?1) and (upper(s.user.firstName) like upper('%'||?2||'%') or upper(s.user.lastName) like upper('%'||?2||'%') or upper(roles.name) like upper('%'||?2||'%'))")
     List<StoreEmployeeEntity> search(UUID id, String searchValue, Sort sort);
+
+    boolean existsByUser_IdEqualsAndStore_IdEquals(UUID id, UUID id1);
+
 
 }
