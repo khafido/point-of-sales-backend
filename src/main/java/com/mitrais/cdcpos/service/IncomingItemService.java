@@ -20,17 +20,21 @@ public class IncomingItemService {
 
     public IncomingItemEntity add(IncomingItemDto req){
         var incomingItem = new IncomingItemEntity();
-        var store = storeItemRepository.findById(req.getItemId())
-                .orElseThrow(() -> new ResourceNotFoundException("Store Item", "id", req.getItemId()));
+        var storeItem = storeItemRepository.findById(req.getStoreItemId())
+                .orElseThrow(() -> new ResourceNotFoundException("Store Item", "id", req.getStoreItemId()));
         
         var supplier= supplierRepository.findByIdAndDeletedAtIsNull(req.getSupplierId())
                 .orElseThrow(()-> new ResourceNotFoundException("Supplier", "id", req.getSupplierId()));
         
         incomingItem.setSupplier(supplier);
+        incomingItem.setStoreItem(storeItem);
         incomingItem.setBuyPrice(req.getBuyPrice());
         incomingItem.setBuyQty(req.getQty());
         incomingItem.setBuyDate(req.getBuyDate());
         incomingItem.setExpiryDate(req.getExpiryDate());
+        // TODO add stock on storeitem
+        storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
+        storeItemRepository.save(storeItem);
         return incomingItemRepository.save(incomingItem);
     }
 

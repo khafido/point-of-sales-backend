@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class IncomingItemDto {
     @NotEmpty
-    UUID itemId;
+    UUID storeItemId;
     @NotEmpty
     UUID supplierId;
     @NotEmpty

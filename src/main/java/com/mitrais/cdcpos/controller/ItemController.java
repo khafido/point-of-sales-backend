@@ -107,7 +107,7 @@ public class ItemController {
     /*
     * Add incoming item
     * */
-    @PostMapping("/stock")
+    @PostMapping("stock")
     public ResponseEntity<GenericResponse> addIncomingItem(@RequestBody IncomingItemDto req){
         try{
             var incomingItem = incomingItemService.add(req);

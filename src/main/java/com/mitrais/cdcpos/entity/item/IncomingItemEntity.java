@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.entity.item;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
@@ -29,10 +30,12 @@ public class IncomingItemEntity extends EntityAudit implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_item_id", referencedColumnName = "id")
+    @JsonIgnore
     private StoreItemEntity storeItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supplier_id", referencedColumnName = "id")
+    @JsonIgnore
     private SupplierEntity supplier;
 
     @Column(name = "buy_qty")

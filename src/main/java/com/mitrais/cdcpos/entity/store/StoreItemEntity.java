@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "store_item")
-public class StoreItemEntity extends EntityAudit {
+public class StoreItemEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();

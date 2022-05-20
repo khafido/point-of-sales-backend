@@ -31,8 +31,8 @@ public class ParameterServiceTest {
     private List<ParameterEntity> parameterList;
     @BeforeEach
     public void init(){
-        ParameterEntity parameter1 = new ParameterEntity(UUID.randomUUID(), "tax", 10);
-        ParameterEntity parameter2 = new ParameterEntity(UUID.randomUUID(), "profit", 5);
+        ParameterEntity parameter1 = new ParameterEntity(UUID.randomUUID(), "tax", "10");
+        ParameterEntity parameter2 = new ParameterEntity(UUID.randomUUID(), "profit", "5");
 
         parameterList = new ArrayList<>(Arrays.asList(parameter1, parameter2));
     }
@@ -45,7 +45,7 @@ public class ParameterServiceTest {
         // When
         ParameterDto dto = new ParameterDto();
         dto.setName("tax");
-        dto.setValue(10);
+        dto.setValue("10");
         ParameterEntity savedParameter = parameterService.add(dto);
         // Then
         assertNotNull(savedParameter.getCreatedAt());
@@ -91,7 +91,7 @@ public class ParameterServiceTest {
 
         ParameterDto dto = new ParameterDto();
         dto.setName("tax");
-        dto.setValue(66);
+        dto.setValue("66");
         ParameterEntity result = parameterService.update(parameterList.get(0).getId(), dto);
 
         assertEquals(parameterList.get(0).getValue(), result.getValue());
