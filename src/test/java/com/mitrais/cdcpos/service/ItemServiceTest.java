@@ -32,10 +32,14 @@ import static org.mockito.Mockito.mock;
 class ItemServiceTest {
     @Mock
     private ItemRepository itemRepository;
+
+    @Mock
     private CategoryRepository categoryRepository;
 
     @InjectMocks
     private ItemService itemService;
+
+    @InjectMocks
     private CategoryService categoryService;
 
     private List<ItemResponseDto> itemListDto = new ArrayList<>();
@@ -50,14 +54,6 @@ class ItemServiceTest {
 
         categoryService = new CategoryService(categoryRepository);
         itemService = new ItemService(itemRepository, categoryService);
-
-        CategoryEntity category1 = new CategoryEntity(UUID.randomUUID(), "Category 1");
-        CategoryEntity category2 = mock(CategoryEntity.class);
-        CategoryEntity category3 = mock(CategoryEntity.class);
-
-        categoryList = Arrays.asList(
-                category1,category2,category3
-        );
 
         itemListDto = Arrays.asList(
                 Mockito.mock(ItemResponseDto.class),
@@ -112,41 +108,31 @@ class ItemServiceTest {
 
     @Test
     void addItem() {
-        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
-//        ItemRequestDto requestDto = new ItemRequestDto("item", "", "abc", "category", "packaging");
-//        Mockito.when(categoryService.getActiveDataByName(Mockito.anyString())).thenReturn(new CategoryEntity(UUID.randomUUID(), "Category 1"));
+        CategoryEntity category1 = new CategoryEntity(UUID.randomUUID(), "Category 1");
+
+        ItemRequestDto requestDto = new ItemRequestDto("item", "", "abc", "Category 1", "packaging");
+        Mockito.when(categoryRepository.findByNameIgnoreCaseAndDeletedAtIsNull(requestDto.getCategory())).thenReturn(Optional.of(category1));
         Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(0));
 
-        try {
-            ItemEntity result = itemService.add(requestDto);
-            assertEquals(itemListEntity.get(0), result);
-            Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-        }
-        catch(Exception e) {
-            System.out.println("Exception");
-            assertEquals("com.mitrais.cdcpos.exception.ResourceNotFoundException", e.getClass().getCanonicalName());
-        }
-
+        ItemEntity result = itemService.add(requestDto);
+        assertEquals(itemListEntity.get(0), result);
+        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
     }
 
     @Test
     void updateItem() {
+        CategoryEntity category1 = new CategoryEntity(UUID.randomUUID(), "Category 1");
+
         UUID id = UUID.randomUUID();
-        ItemRequestDto requestDto = Mockito.mock(ItemRequestDto.class);
+        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.of(itemListEntity.get(0)));
 
-        Mockito.when(itemRepository.findByIdAndDeletedAtIsNull(id)).thenReturn(Optional.ofNullable(itemListEntity.get(0)));
-        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(1));
+        ItemRequestDto requestDto = new ItemRequestDto("item", "", "abc", "Category 1", "packaging");
+        Mockito.when(categoryRepository.findByNameIgnoreCaseAndDeletedAtIsNull(requestDto.getCategory())).thenReturn(Optional.of(category1));
+        Mockito.when(itemRepository.save(Mockito.any(ItemEntity.class))).thenReturn(itemListEntity.get(0));
 
-        try {
-            ItemEntity result = itemService.update(id, requestDto);
-            assertEquals(itemListEntity.get(1), result);
-            Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
-        }
-        catch(Exception e) {
-            System.out.println("Exception");
-            assertEquals("com.mitrais.cdcpos.exception.ResourceNotFoundException", e.getClass().getCanonicalName());
-        }
-
+        ItemEntity result = itemService.update(id, requestDto);
+        assertEquals(itemListEntity.get(0), result);
+        Mockito.verify(itemRepository, Mockito.times(1)).save(Mockito.any(ItemEntity.class));
         Mockito.verify(itemRepository, Mockito.times(1)).findByIdAndDeletedAtIsNull(id);
     }
 

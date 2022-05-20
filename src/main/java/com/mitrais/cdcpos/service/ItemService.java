@@ -129,8 +129,20 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public boolean isBarcodeExist(String barcode) {
-        return itemRepository.existsByBarcodeAndDeletedAtIsNull(barcode);
+    public boolean checkBarcodeOnAdd(String barcode) {
+//        System.out.println("barcode = " + barcode);
+        return itemRepository.existsByBarcode(barcode);
+    }
+
+    public boolean checkBarcodeOnUpdate(UUID id, String barcode) {
+        ItemEntity item = getById(id);
+//        System.out.println("item barcode = " + item.getBarcode() + ", barcode = " + barcode);
+        if (!barcode.equals(item.getBarcode())) {
+            return itemRepository.existsByBarcode(barcode);
+        }
+        else {
+            return false;
+        }
     }
 
 }

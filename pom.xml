@@ -13,10 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cdc-pos</name>
 	<description>CDC POS - Team 3</description>
-<!--	<properties>-->
-<!--&lt;!&ndash;		<java.version>11</java.version>&ndash;&gt;-->
-<!--		<java.runtime.version>11</java.runtime.version>-->
-<!--	</properties>-->
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
