@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -33,4 +34,16 @@ public class StoreItemEntity extends EntityAudit {
 
     @Column(name = "stock")
     private Integer stock;
+
+    @Column(name = "fixed_price")
+    private BigDecimal fixedPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "price_mode")
+    private PriceMode priceMode;
+
+    public enum PriceMode {
+        FIXED,
+        BY_SYSTEM
+    }
 }

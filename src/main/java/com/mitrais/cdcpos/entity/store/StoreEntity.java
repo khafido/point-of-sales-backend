@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.entity.store;
 
 import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.*;
 import javax.persistence.*;
 import java.util.List;
@@ -30,5 +31,10 @@ public class StoreEntity extends EntityAudit {
     @OneToOne
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private UserEntity manager;
+
+    @OneToMany(mappedBy = "store")
+    private List<StoreItemEntity> storeItems;
+
+
 
 }

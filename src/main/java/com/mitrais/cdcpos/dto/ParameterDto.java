@@ -13,6 +13,6 @@ public class ParameterDto {
     @NotEmpty
     String name;
     @NotEmpty
-    int value;
+    String value;
 
 }

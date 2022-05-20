@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mitrais.cdcpos.dto.store.StoreDto;
 import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import lombok.Data;
