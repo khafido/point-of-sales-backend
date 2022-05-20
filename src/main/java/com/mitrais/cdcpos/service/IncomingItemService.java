@@ -32,7 +32,7 @@ public class IncomingItemService {
         incomingItem.setBuyQty(req.getQty());
         incomingItem.setBuyDate(req.getBuyDate());
         incomingItem.setExpiryDate(req.getExpiryDate());
-        // TODO add stock on storeitem
+        // TODO create dto for return method (IncomingItemEntity too big)
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
         return incomingItemRepository.save(incomingItem);

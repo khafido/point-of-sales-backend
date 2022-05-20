@@ -30,7 +30,6 @@ public class IncomingItemEntity extends EntityAudit implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_item_id", referencedColumnName = "id")
-    @JsonIgnore
     private StoreItemEntity storeItem;
 
     @ManyToOne(fetch = FetchType.LAZY)

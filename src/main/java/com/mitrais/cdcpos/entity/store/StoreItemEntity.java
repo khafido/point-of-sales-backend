@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.entity.store;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
@@ -20,16 +21,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "store_item")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class StoreItemEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
 
-    @ManyToOne()
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "store_id", referencedColumnName = "id")
     private StoreEntity store;
 
-    @ManyToOne()
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "item_id", referencedColumnName = "id")
     private ItemEntity item;
 
