@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -30,4 +31,6 @@ public interface SupplierRepository extends JpaRepository<SupplierEntity, UUID> 
             "LOWER(s.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(s.address) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<SupplierEntity> findAllSearch(Sort sort, @Param("search") String searchVal);
+
+    Optional<SupplierEntity> findByIdAndDeletedAtIsNull(UUID id);
 }

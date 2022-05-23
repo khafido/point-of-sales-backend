@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.entity.store.StoreItemEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @Table(name = "item", uniqueConstraints = @UniqueConstraint(columnNames = "barcode"))
-public class ItemEntity extends EntityAudit {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class ItemEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
@@ -41,5 +43,6 @@ public class ItemEntity extends EntityAudit {
     private String packaging;
 
     @OneToMany(mappedBy = "item")
+    @JsonIgnore
     private List<StoreItemEntity> storeItems;
 }
