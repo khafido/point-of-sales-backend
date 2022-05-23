@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -129,14 +130,16 @@ public class ItemController {
 
     @GetMapping("stock")
     public ResponseEntity<GenericResponse> getAllIncomingItem(@RequestParam(defaultValue = "false") boolean isPaginated,
-                                                  @RequestParam(defaultValue = "0") int page,
-                                                  @RequestParam(defaultValue = "10") int size,
-                                                  @RequestParam(defaultValue = "") String search,
-                                                  @RequestParam(defaultValue = "name") String sortBy,
-                                                  @RequestParam(defaultValue = "ASC") String sortDirection){
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(defaultValue = "") String search,
+                                                              @RequestParam(defaultValue = "storeItem.item.name") String sortBy,
+                                                              @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                              @RequestParam(required = false) LocalDateTime start,
+                                                              @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") LocalDateTime end){
 
         try{
-            Page<IncomingItemResponseDto> incomingItem = incomingItemService.getAll(isPaginated,page, size,search,sortBy,sortDirection);
+            Page<IncomingItemResponseDto> incomingItem = incomingItemService.getAll(isPaginated,page, size,search,sortBy,sortDirection,start,end);
             PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
                     incomingItem.getContent(),
                     incomingItem.getNumber(),

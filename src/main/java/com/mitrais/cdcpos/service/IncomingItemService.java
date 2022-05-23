@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.repository.IncomingItemRepository;
 import com.mitrais.cdcpos.repository.StoreItemRepository;
 import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,8 @@ public class IncomingItemService {
     }
 
     public Page<IncomingItemResponseDto> getAll(boolean paginated, int page, int size,
-                                                String search, String sortBy, String sortDirection){
+                                                String search, String sortBy, String sortDirection,
+                                                LocalDateTime start, LocalDateTime end){
         Sort sort;
         Pageable paging;
         Page<IncomingItemEntity> incomingItemEntities;
@@ -56,12 +58,12 @@ public class IncomingItemService {
 
         if(paginated){
             paging = PageRequest.of(page, size,sort);
-            incomingItemEntities = incomingItemRepository.findAllSearch(paging, search);
-            Page<IncomingItemResponseDto> result = incomingItemEntities.map(e -> IncomingItemResponseDto.toDto(e));
+            incomingItemEntities = incomingItemRepository.findAllSearch(paging, search, start,end);
+            var result = incomingItemEntities.map(e -> IncomingItemResponseDto.toDto(e));
             return result;
         }else{
-            List<IncomingItemEntity> list = incomingItemRepository.findAllSearch(sort,search);
-            List<IncomingItemResponseDto> result = list.stream().map(e -> IncomingItemResponseDto.toDto(e)).collect(Collectors.toList());
+            var list = incomingItemRepository.findAllSearch(sort,search,start,end);
+            var result = list.stream().map(e -> IncomingItemResponseDto.toDto(e)).collect(Collectors.toList());
             return new PageImpl<>(result);
         }
 
