@@ -31,8 +31,9 @@ public class ParameterServiceTest {
     private List<ParameterEntity> parameterList;
     @BeforeEach
     public void init(){
-        ParameterEntity parameter1 = new ParameterEntity(UUID.randomUUID(), "tax", "10");
-        ParameterEntity parameter2 = new ParameterEntity(UUID.randomUUID(), "profit", "5");
+        ParameterEntity parameter1 = new ParameterEntity(UUID.randomUUID(), "tax_percentage", "10");
+        ParameterEntity parameter2 = new ParameterEntity(UUID.randomUUID(), "profit_percentage", "5");
+
 
         parameterList = new ArrayList<>(Arrays.asList(parameter1, parameter2));
     }
@@ -44,7 +45,7 @@ public class ParameterServiceTest {
         when(parameterRepository.save(any(ParameterEntity.class))).thenReturn(parameter);
         // When
         ParameterDto dto = new ParameterDto();
-        dto.setName("tax");
+        dto.setName("tax_percentage");
         dto.setValue("10");
         ParameterEntity savedParameter = parameterService.add(dto);
         // Then
@@ -90,7 +91,7 @@ public class ParameterServiceTest {
         when(parameterRepository.save(any(ParameterEntity.class))).thenReturn(parameterList.get(0));
 
         ParameterDto dto = new ParameterDto();
-        dto.setName("tax");
+        dto.setName("tax_percentage");
         dto.setValue("66");
         ParameterEntity result = parameterService.update(parameterList.get(0).getId(), dto);
 

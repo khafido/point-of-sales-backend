@@ -51,7 +51,7 @@ public class UserService {
             String sortBy,
             String sortDirection
     ) {
-        searchValue = searchValue.toLowerCase();
+//        searchValue = searchValue.toLowerCase();
         Sort sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
 
         Pageable paging = null;
