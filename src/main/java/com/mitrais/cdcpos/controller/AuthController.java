@@ -1,5 +1,6 @@
 package com.mitrais.cdcpos.controller;
 
+import com.mitrais.cdcpos.dto.ChangePasswordDto;
 import com.mitrais.cdcpos.dto.GenericResponse;
 import com.mitrais.cdcpos.dto.JwtDto;
 import com.mitrais.cdcpos.dto.LoginDto;
@@ -31,6 +32,17 @@ public class AuthController {
         } catch (Exception e){
             return new ResponseEntity<>
                     (new GenericResponse(loginRequest, "Login Failed!"),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<GenericResponse> changePassword(@Valid @RequestBody ChangePasswordDto req) {
+        try {
+            ResponseEntity<GenericResponse> status = authService.changePassword(req);
+            return status;
+        } catch (Exception e){
+            return new ResponseEntity<>
+                    (new GenericResponse("Change Password Failed!"),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

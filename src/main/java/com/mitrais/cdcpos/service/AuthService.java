@@ -1,9 +1,6 @@
 package com.mitrais.cdcpos.service;
 
-import com.mitrais.cdcpos.dto.GenericResponse;
-import com.mitrais.cdcpos.dto.JwtDto;
-import com.mitrais.cdcpos.dto.LoginDto;
-import com.mitrais.cdcpos.dto.SignUpDto;
+import com.mitrais.cdcpos.dto.*;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
@@ -13,6 +10,7 @@ import com.mitrais.cdcpos.repository.UserRepository;
 import com.mitrais.cdcpos.repository.UserRoleRepository;
 import com.mitrais.cdcpos.security.jwt.JwtUtils;
 import com.mitrais.cdcpos.security.services.UserDetailsImpl;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,11 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
+import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,40 +48,59 @@ public class AuthService {
     @Autowired
     JwtUtils jwtUtils;
 
-    Logger logger = Logger.getLogger(AuthService.class.getName());
+    Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public JwtDto login(LoginDto loginRequest) {
-//        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    public String getLoggedUsername() {
+        String username = "hippos";
+        try {
+            UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            username = user.getUsername();
+        } catch (ClassCastException err) {
+            logger.error("No Authorization / User does not exist!");
+        }
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
-
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(item -> item.getAuthority())
-                    .collect(Collectors.toList());
-
-            return new JwtDto(jwt,
-                    userDetails.getId(),
-                    userDetails.getUsername(),
-                    userDetails.getEmail(),
-                    roles);
-//        } catch (Exception e) {
-//            logger.info("Login Failed");
-//        }
-//        return null;
+        return username;
     }
 
-    public ResponseEntity<GenericResponse> register (SignUpDto signUpRequest){
-        if(userRepository.existsByUsername(signUpRequest.getUsername())) {
+    public JwtDto login(LoginDto loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return new JwtDto(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles);
+    }
+
+    public ResponseEntity<GenericResponse> changePassword(ChangePasswordDto req) {
+        UserEntity user = userRepository.findByUsername(getLoggedUsername());
+
+        if (encoder.matches(req.getOldPassword(), user.getPassword())) {
+            user.setPassword(encoder.encode(req.getNewPassword()));
+            userRepository.save(user);
+            return ResponseEntity.ok(new GenericResponse("Password changed successfully"));
+        } else {
+            return ResponseEntity.badRequest().body(new GenericResponse("Old Password is wrong"));
+        }
+    }
+
+    public ResponseEntity<GenericResponse> register(SignUpDto signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new GenericResponse("Error: Username is already taken!"));
         }
 
-        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body(new GenericResponse("Error: Email is already in use!"));
@@ -107,7 +122,7 @@ public class AuthService {
         // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         // roles.add(userRole);
 
-        strRoles.forEach(role ->{
+        strRoles.forEach(role -> {
             switch (role.toLowerCase()) {
                 case "admin":
                     RoleEntity adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
@@ -137,7 +152,7 @@ public class AuthService {
             }
         });
 
-        if(roles.isEmpty()){
+        if (roles.isEmpty()) {
             RoleEntity employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
                     .orElseThrow(() -> new RuntimeException("Error: Role is empty."));
             roles.add(employeeRole);
@@ -147,7 +162,7 @@ public class AuthService {
 //        userService.addUser(user);
 
         List<UserRoleEntity> userRoleEntity = new ArrayList<>();
-            roles.forEach(r ->{
+        roles.forEach(r -> {
             userRoleEntity.add(new UserRoleEntity(user.getId(), r.getId()));
         });
 
