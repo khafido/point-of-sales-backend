@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -36,6 +37,10 @@ public class IncomingItemService {
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
         return incomingItemRepository.save(incomingItem);
+    }
+
+    public List<IncomingItemEntity> getAll(){
+        return incomingItemRepository.findAll();
     }
 
 

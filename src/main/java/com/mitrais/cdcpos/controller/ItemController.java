@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.controller;
 
 
 import com.mitrais.cdcpos.dto.*;
+import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.service.IncomingItemService;
 import com.mitrais.cdcpos.service.ItemService;
@@ -112,8 +113,9 @@ public class ItemController {
         try{
             var incomingItem = incomingItemService.add(req);
             if(incomingItem!=null){
+                IncomingItemResponseDto res = IncomingItemResponseDto.toDto(incomingItem);
                 return new ResponseEntity<>
-                        (new GenericResponse(incomingItem, "Add incoming item success", GenericResponse.Status.CREATED), HttpStatus.CREATED);
+                        (new GenericResponse(res, "Add incoming item success", GenericResponse.Status.CREATED), HttpStatus.CREATED);
             }else{
                 return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
             }
@@ -122,6 +124,13 @@ public class ItemController {
             var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("stock")
+    public ResponseEntity<GenericResponse> getAll(){
+        List<IncomingItemEntity> items = incomingItemService.getAll();
+        return new ResponseEntity<>
+                (new GenericResponse(items, "success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
     }
 
 }
