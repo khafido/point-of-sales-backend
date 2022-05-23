@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.entity.item;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.EntityAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +20,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "suppliers")
-public class SupplierEntity extends EntityAudit {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class SupplierEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name="id")
     private UUID id = UUID.randomUUID();

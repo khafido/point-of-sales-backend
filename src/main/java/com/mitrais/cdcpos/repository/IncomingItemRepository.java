@@ -19,4 +19,5 @@ public interface IncomingItemRepository extends JpaRepository<IncomingItemEntity
     List<IncomingItemEntity> latestIncomingByStoreIdAndItemId(Pageable page, @Param("storeId") UUID storeId, @Param("itemId") UUID itemId);
 
 
+
 }

@@ -8,7 +8,9 @@ import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
+import com.mitrais.cdcpos.repository.IncomingItemRepository;
 import com.mitrais.cdcpos.repository.ItemRepository;
+import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,5 +146,4 @@ public class ItemService {
             return false;
         }
     }
-
 }

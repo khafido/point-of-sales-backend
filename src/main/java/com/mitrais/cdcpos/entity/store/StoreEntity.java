@@ -1,10 +1,13 @@
 package com.mitrais.cdcpos.entity.store;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import lombok.*;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "store")
-public class StoreEntity extends EntityAudit {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class StoreEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name = "id")
     private UUID id = UUID.randomUUID();
@@ -33,6 +37,7 @@ public class StoreEntity extends EntityAudit {
     private UserEntity manager;
 
     @OneToMany(mappedBy = "store")
+    @JsonIgnore
     private List<StoreItemEntity> storeItems;
 
 

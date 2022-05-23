@@ -1,11 +1,10 @@
 package com.mitrais.cdcpos.controller;
 
 
-import com.mitrais.cdcpos.dto.GenericResponse;
-import com.mitrais.cdcpos.dto.ItemRequestDto;
-import com.mitrais.cdcpos.dto.ItemResponseDto;
-import com.mitrais.cdcpos.dto.PaginatedDto;
+import com.mitrais.cdcpos.dto.*;
+import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
+import com.mitrais.cdcpos.service.IncomingItemService;
 import com.mitrais.cdcpos.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import java.util.UUID;
 public class ItemController {
     @Autowired
     ItemService itemService;
+    @Autowired
+    IncomingItemService incomingItemService;
 
     @PostMapping("")
     public ResponseEntity<GenericResponse> add(@RequestBody ItemRequestDto req) {
@@ -103,4 +104,33 @@ public class ItemController {
     public boolean checkBarcodeOnEdit(@PathVariable("id") UUID id, @RequestParam(defaultValue = "") String barcode) {
         return itemService.checkBarcodeOnUpdate(id, barcode);
     }
+
+    /*
+    * Add incoming item
+    * */
+    @PostMapping("stock")
+    public ResponseEntity<GenericResponse> addIncomingItem(@RequestBody IncomingItemDto req){
+        try{
+            var incomingItem = incomingItemService.add(req);
+            if(incomingItem!=null){
+                IncomingItemResponseDto res = IncomingItemResponseDto.toDto(incomingItem);
+                return new ResponseEntity<>
+                        (new GenericResponse(res, "Add incoming item success", GenericResponse.Status.CREATED), HttpStatus.CREATED);
+            }else{
+                return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("stock")
+    public ResponseEntity<GenericResponse> getAll(){
+        List<IncomingItemEntity> items = incomingItemService.getAll();
+        return new ResponseEntity<>
+                (new GenericResponse(items, "success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    }
+
 }
