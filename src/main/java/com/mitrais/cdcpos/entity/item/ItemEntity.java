@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.EntityAudit;
+import com.mitrais.cdcpos.entity.store.StoreItemEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -38,4 +39,7 @@ public class ItemEntity extends EntityAudit {
 
     @Column(name = "packaging")
     private String packaging;
+
+    @OneToMany(mappedBy = "item")
+    private List<StoreItemEntity> storeItems;
 }

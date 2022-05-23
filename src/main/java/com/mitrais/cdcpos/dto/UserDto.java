@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mitrais.cdcpos.dto.store.StoreDto;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class UserDto {
     private String photo;
     private LocalDate birthDate;
     private List<RoleDto> roles;
+    private List<StoreEmployeeDto> workAt;
     private StoreDto managerAt;
 
     public UserDto(UUID id, String username, String firstName, String lastName, String email, List<RoleDto> roles, StoreDto managerAt) {
@@ -37,6 +39,16 @@ public class UserDto {
         this.email = email;
         this.roles = roles;
         this.managerAt = managerAt;
+    }
+
+    public UserDto(UUID id, String username, String firstName, String lastName, String email, List<RoleDto> roles, List<StoreEmployeeDto> workAt) {
+        this.id = id;
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.roles = roles;
+        this.workAt = workAt;
     }
 
     @JsonIgnore
@@ -69,6 +81,18 @@ public class UserDto {
                 entity.getPhoto(),
                 entity.getBirthDate(),
                 entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList())
+        );
+    }
+
+    public static UserDto toDtoEmployee(UserEntity entity) {
+        return new UserDto(
+                entity.getId(),
+                entity.getUsername(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail(),
+                entity.getRoles().stream().map(RoleDto::toDto).collect(Collectors.toList()),
+                entity.getStore().size() > 0 ? entity.getStore().stream().map(StoreEmployeeDto::toDto).collect(Collectors.toList()) : null
         );
     }
 

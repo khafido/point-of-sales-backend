@@ -23,5 +23,5 @@ public class ParameterEntity extends EntityAudit {
     private String name;
 
     @Column(name = "value")
-    private int value;
+    private String value;
 }

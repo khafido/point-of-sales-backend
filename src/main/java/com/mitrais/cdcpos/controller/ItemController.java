@@ -29,7 +29,8 @@ public class ItemController {
     public ResponseEntity<GenericResponse> add(@RequestBody ItemRequestDto req) {
         try {
             ItemEntity result = itemService.add(req);
-            return new ResponseEntity<>(new GenericResponse(result, "Add Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            ItemResponseDto resultDto = ItemResponseDto.toDto(result);
+            return new ResponseEntity<>(new GenericResponse(resultDto, "Add Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
             return new ResponseEntity<>(new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -58,7 +59,8 @@ public class ItemController {
     public ResponseEntity<GenericResponse> getById(@PathVariable("id") UUID id) {
         try {
             ItemEntity result = itemService.getById(id);
-            return new ResponseEntity<>(new GenericResponse(result, "Get Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            ItemResponseDto resultDto = ItemResponseDto.toDto(result);
+            return new ResponseEntity<>(new GenericResponse(resultDto, "Get Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -70,7 +72,8 @@ public class ItemController {
     public ResponseEntity<GenericResponse> update(@PathVariable("id") UUID id, @RequestBody ItemRequestDto req){
         try {
             ItemEntity result = itemService.update(id, req);
-            return new ResponseEntity<>(new GenericResponse(result, "Update Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            ItemResponseDto resultDto = ItemResponseDto.toDto(result);
+            return new ResponseEntity<>(new GenericResponse(resultDto, "Update Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -82,7 +85,8 @@ public class ItemController {
     public ResponseEntity<GenericResponse> delete(@PathVariable("id") UUID id) {
         try {
             ItemEntity result = itemService.delete(id);
-            return new ResponseEntity<>(new GenericResponse(result, "Delete Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            ItemResponseDto resultDto = ItemResponseDto.toDto(result);
+            return new ResponseEntity<>(new GenericResponse(resultDto, "Delete Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
             e.printStackTrace();
