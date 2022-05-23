@@ -10,6 +10,24 @@ insert into roles values
     (5, 'ROLE_CASHIER'),
     (6, 'ROLE_EMPLOYEE');
 
+
+insert into category values
+    ('be3698af-2db7-48b1-93d7-f6730b7d8a8a', now(), null, now(), 'makanan'),
+    ('5c0fbeb7-2b1b-433f-8823-473768231e4d', now(), null, now(), 'minuman');
+
+insert into item values
+    ('f33836af-ef69-489a-845e-5043c8fae64e', now(), null, now(), 'makanan1', 'image1', 'makanan 1', 'string', 'be3698af-2db7-48b1-93d7-f6730b7d8a8a'),
+    ('9c407bd4-bc94-4608-97fb-72bb6ce0d897', now(), null, now(), 'makanan2', 'image2', 'makanan 2', 'string', 'be3698af-2db7-48b1-93d7-f6730b7d8a8a'),
+    ('a2dcdddc-a906-469a-8847-504171e1f171', now(), null, now(), 'minuman1', 'image3', 'minuman 1', 'string', '5c0fbeb7-2b1b-433f-8823-473768231e4d');
+
+insert into suppliers values
+    ('e0f271a7-5a48-43c9-8531-0fd035029f89', now(), null, now(), 'address 1', 'makanan supp', 'makanan@gmail.com', 'supplier makanan', '03819203'),
+    ('1990d052-9c52-42eb-85b7-7652ad7a3f4a', now(), null, now(), 'minuman 1', 'minuman supp', 'minuman@gmail.com', 'supplier minuman', '213123123');
+
+insert into store values
+    ('21433690-da31-4332-a6f6-8022b509ab78', now(), null, now(), 'loc 1', 'Store 1', null),
+    ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', null);
+
 --Generate User (Password: hippos)
 INSERT INTO users
 (id, address, birth_date, email, first_name, last_name, gender, password, phone, username, created_at, last_modified_at, deleted_at)
@@ -64,3 +82,4 @@ VALUES
 (6, '2b7a30f6-3e4b-4fe4-a65d-06e9e91736f2'::uuid),
 (6, '72397d5c-7e9d-4588-8589-74a7e15c0417'::uuid),
 (6, 'bcacc9f0-f255-453d-8bf7-bfd18e2941d0'::uuid);
+

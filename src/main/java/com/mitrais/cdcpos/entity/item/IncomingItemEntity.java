@@ -1,5 +1,7 @@
 package com.mitrais.cdcpos.entity.item;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mitrais.cdcpos.entity.EntityAudit;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +22,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "incoming_item")
-public class IncomingItemEntity extends EntityAudit {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class IncomingItemEntity extends EntityAudit implements Serializable {
     @Id
     @Column(name="id")
     private UUID id = UUID.randomUUID();

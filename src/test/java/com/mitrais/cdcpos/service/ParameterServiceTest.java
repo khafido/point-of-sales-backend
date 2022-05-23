@@ -34,6 +34,7 @@ public class ParameterServiceTest {
         ParameterEntity parameter1 = new ParameterEntity(UUID.randomUUID(), "tax_percentage", "10");
         ParameterEntity parameter2 = new ParameterEntity(UUID.randomUUID(), "profit_percentage", "5");
 
+
         parameterList = new ArrayList<>(Arrays.asList(parameter1, parameter2));
     }
 
