@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -140,6 +141,8 @@ public class StoreService {
                 storeItem.setStore(store);
                 storeItem.setItem(item);
                 storeItem.setStock(0);
+                storeItem.setFixedPrice(new BigDecimal(0));
+                storeItem.setPriceMode(StoreItemEntity.PriceMode.BY_SYSTEM);
             }
             return storeItemRepository.save(storeItem);
         }
@@ -150,6 +153,11 @@ public class StoreService {
         Sort sort;
         Pageable paging;
         Page<StoreItemEntity> storeItemEntities;
+
+        String[] itemColumns = {"name", "category", "packaging"};
+        if(Arrays.stream(itemColumns).anyMatch(sortBy::equalsIgnoreCase)) {
+            sortBy = "item.".concat(sortBy);
+        }
 
         if ("DESC".equalsIgnoreCase(sortDirection)) {
             sort = Sort.by(sortBy).descending();
