@@ -1,5 +1,7 @@
 package com.mitrais.cdcpos.repository;
 
+import com.mitrais.cdcpos.dto.IncomingItemDto;
+import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
 import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,17 +21,13 @@ public interface IncomingItemRepository extends JpaRepository<IncomingItemEntity
     @Query("SELECT i FROM IncomingItemEntity i WHERE i.storeItem.store.id = :storeId AND i.storeItem.item.id = :itemId ORDER BY i.buyDate DESC")
     List<IncomingItemEntity> latestIncomingByStoreIdAndItemId(Pageable page, @Param("storeId") UUID storeId, @Param("itemId") UUID itemId);
 
-    @Query("select i.storeItem.item.name, " +
-            "i.supplier.name, i.buyQty, i.buyPrice, i.buyDate, i.expiryDate " +
-            "from IncomingItemEntity i where i.deletedAt is null and " +
-            "(lower(i.storeItem.item.name) like lower(concat(('%', :search, '%'))) or" +
-            "(lower(i.supplier.name) like lower(concat(('%', :search, '%')))")
+    @Query("select i from IncomingItemEntity i where i.deletedAt is null and " +
+            "(lower(i.storeItem.item.name) like lower(concat('%', :search, '%'))) or " +
+            "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
     Page<IncomingItemEntity> findAllSearch(Pageable pageable, @Param("search") String search);
 
-    @Query("select i.storeItem.item.name, " +
-            "i.supplier.name, i.buyQty, i.buyPrice, i.buyDate, i.expiryDate " +
-            "from IncomingItemEntity i where i.deletedAt is null and " +
-            "(lower(i.storeItem.item.name) like lower(concat(('%', :search, '%'))) or" +
-            "(lower(i.supplier.name) like lower(concat(('%', :search, '%')))")
-    List<IncomingItemEntity> findAllSearch(Sort sort, @Param("search") String search);
+    @Query("select i from IncomingItemEntity i where i.deletedAt is null and " +
+            "(lower(i.storeItem.item.name) like lower(concat('%', :search, '%'))) or " +
+            "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
+    List<IncomingItemEntity> findAllSearch(@Param("search") String search);
 }
