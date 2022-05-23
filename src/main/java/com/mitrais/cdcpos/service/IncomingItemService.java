@@ -60,7 +60,7 @@ public class IncomingItemService {
             Page<IncomingItemResponseDto> result = incomingItemEntities.map(e -> IncomingItemResponseDto.toDto(e));
             return result;
         }else{
-            List<IncomingItemEntity> list = incomingItemRepository.findAllSearch(search);
+            List<IncomingItemEntity> list = incomingItemRepository.findAllSearch(sort,search);
             List<IncomingItemResponseDto> result = list.stream().map(e -> IncomingItemResponseDto.toDto(e)).collect(Collectors.toList());
             return new PageImpl<>(result);
         }

@@ -29,5 +29,5 @@ public interface IncomingItemRepository extends JpaRepository<IncomingItemEntity
     @Query("select i from IncomingItemEntity i where i.deletedAt is null and " +
             "(lower(i.storeItem.item.name) like lower(concat('%', :search, '%'))) or " +
             "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
-    List<IncomingItemEntity> findAllSearch(@Param("search") String search);
+    List<IncomingItemEntity> findAllSearch(Sort sort,@Param("search") String search);
 }
