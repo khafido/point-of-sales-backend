@@ -2,14 +2,10 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.ItemRequestDto;
 import com.mitrais.cdcpos.dto.ItemResponseDto;
-import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
-import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
-import com.mitrais.cdcpos.exception.ResourceNotFoundException;
 import com.mitrais.cdcpos.repository.CategoryRepository;
 import com.mitrais.cdcpos.repository.ItemRepository;
-import com.mitrais.cdcpos.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 
 import java.util.*;

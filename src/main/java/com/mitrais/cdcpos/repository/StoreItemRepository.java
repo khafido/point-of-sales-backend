@@ -17,7 +17,7 @@ import java.util.UUID;
 public interface StoreItemRepository extends JpaRepository<StoreItemEntity, UUID> {
 
     @Query(value = "SELECT si FROM StoreItemEntity si " +
-            "WHERE si.store.id = :storeId AND si.store.id = :itemId")
+            "WHERE si.store.id = :storeId AND si.item.id = :itemId")
     Optional<StoreItemEntity> findByStoreIdAndItemId(@Param("storeId") UUID storeId, @Param("itemId") UUID itemId);
 
     @Query(value = "SELECT si FROM StoreItemEntity si " +
