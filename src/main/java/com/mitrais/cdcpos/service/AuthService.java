@@ -82,10 +82,12 @@ public class AuthService {
         UUID storeIdEmployee = null;
         UUID storeIdManager = null;
 
+        if (roles.contains(ERole.ROLE_CASHIER.toString()) || roles.contains(ERole.ROLE_STOCKIST.toString())) {
+            storeIdEmployee = storeEmployeeRepository.findByUser_Id(userDetails.getId()).getStore().getId();
+        }
+
         if (roles.contains(ERole.ROLE_MANAGER.toString())) {
             storeIdManager = storeRepository.findByManager_Id(userDetails.getId()).getId();
-        } else if (roles.contains(ERole.ROLE_CASHIER.toString()) || roles.contains(ERole.ROLE_STOCKIST.toString())) {
-            storeIdEmployee = storeEmployeeRepository.findByUser_Id(userDetails.getId()).getStore().getId();
         }
 
         return new JwtDto(jwt, user, storeIdEmployee, storeIdManager, roles);

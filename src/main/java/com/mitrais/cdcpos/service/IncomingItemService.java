@@ -12,6 +12,7 @@ import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ public class IncomingItemService {
         incomingItem.setSupplier(supplier);
         incomingItem.setBuyQty(req.getQty());
         incomingItem.setBuyPrice(req.getBuyPrice());
+        incomingItem.setPricePerItem(req.getBuyPrice().divide(BigDecimal.valueOf(req.getQty())));
         incomingItem.setBuyDate(req.getBuyDate());
         incomingItem.setExpiryDate(req.getExpiryDate());
 
