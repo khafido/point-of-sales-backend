@@ -23,6 +23,7 @@ public class IncomingItemService {
     private final SupplierRepository supplierRepository;
     private final StoreItemRepository storeItemRepository;
 
+
     public IncomingItemEntity add(IncomingItemDto req){
         var incomingItem = new IncomingItemEntity();
         var storeItem = storeItemRepository.findById(req.getStoreItemId())
@@ -37,7 +38,6 @@ public class IncomingItemService {
         incomingItem.setBuyQty(req.getQty());
         incomingItem.setBuyDate(req.getBuyDate());
         incomingItem.setExpiryDate(req.getExpiryDate());
-        // TODO create dto for return method (IncomingItemEntity too big)
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
         return incomingItemRepository.save(incomingItem);
@@ -59,11 +59,11 @@ public class IncomingItemService {
         if(paginated){
             paging = PageRequest.of(page, size,sort);
             incomingItemEntities = incomingItemRepository.findAllSearch(paging, search, start,end);
-            var result = incomingItemEntities.map(e -> IncomingItemResponseDto.toDto(e));
+            var result = incomingItemEntities.map(IncomingItemResponseDto::toDto);
             return result;
         }else{
             var list = incomingItemRepository.findAllSearch(sort,search,start,end);
-            var result = list.stream().map(e -> IncomingItemResponseDto.toDto(e)).collect(Collectors.toList());
+            var result = list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
             return new PageImpl<>(result);
         }
 
