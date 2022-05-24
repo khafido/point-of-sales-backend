@@ -169,10 +169,10 @@ public class StoreService {
 
         if(paginated){
             paging = PageRequest.of(page,size,sort);
-            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id,search,start,end);
+            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id,search);
             return storeExpiredItems.map(IncomingItemResponseDto::toDto);
         }else{
-            var list = incomingItemRepository.findAllExpired(sort,id,search,start,end);
+            var list = incomingItemRepository.findAllExpired(sort,id,search);
             var result =  list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
             return new PageImpl<>(result);
         }
