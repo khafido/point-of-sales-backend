@@ -82,4 +82,3 @@ VALUES
 (6, '2b7a30f6-3e4b-4fe4-a65d-06e9e91736f2'::uuid),
 (6, '72397d5c-7e9d-4588-8589-74a7e15c0417'::uuid),
 (6, 'bcacc9f0-f255-453d-8bf7-bfd18e2941d0'::uuid);
-

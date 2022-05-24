@@ -27,15 +27,16 @@ public class IncomingItemService {
         var supplier= supplierRepository.findByIdAndDeletedAtIsNull(req.getSupplierId())
                 .orElseThrow(()-> new ResourceNotFoundException("Supplier", "id", req.getSupplierId()));
         
-        incomingItem.setSupplier(supplier);
-        incomingItem.setStoreItem(storeItem);
-        incomingItem.setBuyPrice(req.getBuyPrice());
-        incomingItem.setBuyQty(req.getQty());
-        incomingItem.setBuyDate(req.getBuyDate());
-        incomingItem.setExpiryDate(req.getExpiryDate());
-        // TODO create dto for return method (IncomingItemEntity too big)
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
+
+        incomingItem.setStoreItem(storeItem);
+        incomingItem.setSupplier(supplier);
+        incomingItem.setBuyQty(req.getQty());
+        incomingItem.setBuyPrice(req.getBuyPrice());
+        incomingItem.setBuyDate(req.getBuyDate());
+        incomingItem.setExpiryDate(req.getExpiryDate());
+
         return incomingItemRepository.save(incomingItem);
     }
 
