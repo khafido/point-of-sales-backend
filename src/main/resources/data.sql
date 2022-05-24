@@ -25,11 +25,19 @@ insert into suppliers values
     ('1990d052-9c52-42eb-85b7-7652ad7a3f4a', now(), null, now(), 'minuman 1', 'minuman supp', 'minuman@gmail.com', 'supplier minuman', '213123123');
 
 insert into store values
-    ('21433690-da31-4332-a6f6-8022b509ab78', now(), null, now(), 'loc 1', 'Store 1', null),
-    ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', null);
+    ('21433690-da31-4332-a6f6-8022b509ab78', now(), null, now(), 'loc 1', 'Store 1', '51f1e18c-e020-405c-9fc4-f8647aef3c99'),
+    ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', 'c52db44f-38b1-4aa6-97d9-1afa19b6d99b');
+
+INSERT INTO public.store_item (id,created_at,deleted_at,last_modified_at,fixed_price,price_mode,stock,item_id,store_id) VALUES
+	 ('490c44e3-0a48-4281-9810-e83df76b0476',now(),NULL,now(),0.00,'BY_SYSTEM',0,'f33836af-ef69-489a-845e-5043c8fae64e','21433690-da31-4332-a6f6-8022b509ab78'),
+	 ('ab2f493c-e6e4-4788-bcd1-662c709f6e09',now(),NULL,now(),0.00,'BY_SYSTEM',0,'a2dcdddc-a906-469a-8847-504171e1f171','21433690-da31-4332-a6f6-8022b509ab78');
+
+INSERT INTO public.store_employee (id,created_at,deleted_at,last_modified_at,store_id,user_id) VALUES
+	 ('4ae2d837-1d5a-420d-ae35-3bdc99268cae','2022-05-24 10:45:43.486',NULL,'2022-05-24 10:45:43.486','21433690-da31-4332-a6f6-8022b509ab78','f6c5476f-3fc2-425f-b2db-2ab8737e226a'),
+	 ('74e6437f-bbfd-4b39-9c80-5298930803ba','2022-05-24 10:46:01.393',NULL,'2022-05-24 10:46:01.393','21433690-da31-4332-a6f6-8022b509ab78','138f1b7a-816f-408f-a967-e4565631a55b');
 
 --Generate User (Password: hippos)
-INSERT INTO users
+INSERT INTO public.users
 (id, address, birth_date, email, first_name, last_name, gender, password, phone, username, created_at, last_modified_at, deleted_at)
 VALUES
 ('559bd388-954f-4869-9eda-b185da5092c2'::uuid, 'Jl. Sidobali No. Admin', '2022-04-19', 'admina@email.com', 'Admin', 'A', 'Female', '$2a$10$8ERgXm8KdBhF4Tt0DwUQxe//4zsSpCwCvN2rrHv1O7gIri9.XD7v.', '08583247866', 'admina', now(), now(), null),

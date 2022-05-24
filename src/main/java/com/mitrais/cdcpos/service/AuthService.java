@@ -5,9 +5,7 @@ import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.auth.UserRoleEntity;
-import com.mitrais.cdcpos.repository.RoleRepository;
-import com.mitrais.cdcpos.repository.UserRepository;
-import com.mitrais.cdcpos.repository.UserRoleRepository;
+import com.mitrais.cdcpos.repository.*;
 import com.mitrais.cdcpos.security.jwt.JwtUtils;
 import com.mitrais.cdcpos.security.services.UserDetailsImpl;
 import org.slf4j.LoggerFactory;
@@ -38,6 +36,12 @@ public class AuthService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    StoreEmployeeRepository storeEmployeeRepository;
+
+    @Autowired
+    StoreRepository storeRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -74,11 +78,23 @@ public class AuthService {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return new JwtDto(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles);
+        UserDto user = userService.getActiveUserById(userDetails.getId());
+        UUID storeIdEmployee = null;
+        UUID storeIdManager = null;
+
+        if (roles.contains(ERole.ROLE_MANAGER.toString())) {
+            storeIdManager = storeRepository.findByManager_Id(userDetails.getId()).getId();
+        } else if (roles.contains(ERole.ROLE_CASHIER.toString()) || roles.contains(ERole.ROLE_STOCKIST.toString())) {
+            storeIdEmployee = storeEmployeeRepository.findByUser_Id(userDetails.getId()).getStore().getId();
+        }
+
+        return new JwtDto(jwt, user, storeIdEmployee, storeIdManager, roles);
+
+//        return new JwtDto(jwt,
+//                userDetails.getId(),
+//                userDetails.getUsername(),
+//                userDetails.getEmail(),
+//                roles);
     }
 
     public ResponseEntity<GenericResponse> changePassword(ChangePasswordDto req) {
