@@ -8,11 +8,13 @@ import com.mitrais.cdcpos.service.IncomingItemService;
 import com.mitrais.cdcpos.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -127,10 +129,29 @@ public class ItemController {
     }
 
     @GetMapping("stock")
-    public ResponseEntity<GenericResponse> getAll(){
-        List<IncomingItemEntity> items = incomingItemService.getAll();
-        return new ResponseEntity<>
-                (new GenericResponse(items, "success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    public ResponseEntity<GenericResponse> getAllIncomingItem(@RequestParam(defaultValue = "false") boolean isPaginated,
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(defaultValue = "") String search,
+                                                              @RequestParam(defaultValue = "storeItem.item.name") String sortBy,
+                                                              @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                              @RequestParam(required = false) LocalDateTime start,
+                                                              @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") LocalDateTime end){
+
+        try{
+            Page<IncomingItemResponseDto> incomingItem = incomingItemService.getAll(isPaginated,page, size,search,sortBy,sortDirection,start,end);
+            PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
+                    incomingItem.getContent(),
+                    incomingItem.getNumber(),
+                    incomingItem.getTotalPages()
+            );
+            return new ResponseEntity<>
+                    (new GenericResponse(result, "Get incoming item success", GenericResponse.Status.SUCCESS),
+                            HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>
+                    (new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
