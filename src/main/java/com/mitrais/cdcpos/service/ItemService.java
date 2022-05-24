@@ -76,24 +76,24 @@ public class ItemService {
             int size,
             String searchValue,
             String sortBy,
-            String sortDirection) {
+            String sortDirection,
+            boolean fullInformation) {
 
         Page<ItemEntity> items = getAllToPage(isPaginated, page, size ,searchValue, sortBy, sortDirection);
 
-        List<ItemResponseDto> itemDtoList = items.stream()
-                .map(i -> new ItemResponseDto(i.getId(),
-                        i.getName(),
-                        i.getImage(),
-                        i.getBarcode(),
-                        i.getCategory().getName(),
-                        i.getPackaging(),
-                        i.getDeletedAt()))
-                .collect(Collectors.toList());
+        List<ItemResponseDto> itemDtoList;
 
+        if(fullInformation) {
+            itemDtoList = items.stream()
+                    .map(ItemResponseDto::toDto)
+                    .collect(Collectors.toList());
+        } else {
+            itemDtoList = items.stream()
+                    .map(ItemResponseDto::toDtoLite)
+                    .collect(Collectors.toList());
+        }
 
-        PaginatedDto<ItemResponseDto> result = new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
-
-        return result;
+        return new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
     }
 
     public ItemEntity getById(UUID id){
