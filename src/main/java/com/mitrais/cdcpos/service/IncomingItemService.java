@@ -12,7 +12,11 @@ import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +52,12 @@ public class IncomingItemService {
         Sort sort;
         Pageable paging;
         Page<IncomingItemEntity> incomingItemEntities;
+
+        if(sortBy.equalsIgnoreCase("supplier")){
+            sortBy = sortBy.concat(".name");
+        }else{
+            sortBy = "storeItem.item.name";
+        }
 
         if("DESC".equalsIgnoreCase(sortDirection)) {
             sort = Sort.by(sortBy).descending();

@@ -133,7 +133,7 @@ public class ItemController {
                                                               @RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "10") int size,
                                                               @RequestParam(defaultValue = "") String search,
-                                                              @RequestParam(defaultValue = "storeItem.item.name") String sortBy,
+                                                              @RequestParam(defaultValue = "item") String sortBy,
                                                               @RequestParam(defaultValue = "ASC") String sortDirection,
                                                               @RequestParam(required = false) LocalDateTime start,
                                                               @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") LocalDateTime end){

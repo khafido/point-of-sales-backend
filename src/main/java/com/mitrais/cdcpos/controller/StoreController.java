@@ -10,11 +10,13 @@ import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import com.mitrais.cdcpos.dto.*;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -145,6 +147,30 @@ public class StoreController {
             return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("{id}/expired-item")
+    public ResponseEntity<GenericResponse> storeListOfExpiredItem(@PathVariable("id") UUID id,
+                                                                  @RequestParam(defaultValue = "false") boolean isPaginated,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "10") int size,
+                                                                  @RequestParam(defaultValue = "") String search,
+                                                                  @RequestParam(defaultValue = "item") String sortBy,
+                                                                  @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                                  @RequestParam(required = false) LocalDateTime start,
+                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") LocalDateTime end){
+        try{
+            Page<IncomingItemResponseDto> expiredItem = storeService.storeListOfExpiredItems(id,isPaginated,page,size,search,sortBy,sortDirection,start,end);
+            PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
+                    expiredItem.getContent(),
+                    expiredItem.getNumber(),
+                    expiredItem.getTotalPages()
+            );
+            return new ResponseEntity<>(new GenericResponse(result, "Get expired item success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(new GenericResponse(null, e.getMessage(),GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @PatchMapping("/{id}/item/{itemId}")
     public ResponseEntity<GenericResponse> updateStoreItemPrice(

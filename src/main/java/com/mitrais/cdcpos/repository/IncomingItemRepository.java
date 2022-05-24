@@ -34,4 +34,18 @@ public interface IncomingItemRepository extends JpaRepository<IncomingItemEntity
             "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
     List<IncomingItemEntity> findAllSearch(Sort sort,@Param("search") String search,
                                            @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("select i from IncomingItemEntity i where i.storeItem.store.id = :storeId and " +
+            "i.expiryDate <= current_date and i.createdAt between :start and :end and " +
+            "(lower(i.storeItem.item.name) like lower(concat('%', :search, '%'))) or " +
+            "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
+    Page<IncomingItemEntity> findAllExpired(Pageable pageable, @Param("storeId") UUID storeId,@Param("search") String search,
+                                            @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("select i from IncomingItemEntity i where i.storeItem.store.id = :storeId and " +
+            "i.expiryDate <= current_date and i.createdAt between :start and :end and " +
+            "(lower(i.storeItem.item.name) like lower(concat('%', :search, '%'))) or " +
+            "(lower(i.supplier.name) like lower(concat('%', :search, '%')))")
+    List<IncomingItemEntity> findAllExpired(Sort sort, @Param("storeId") UUID storeId,@Param("search") String search,
+                                            @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

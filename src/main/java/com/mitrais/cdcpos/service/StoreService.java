@@ -1,6 +1,7 @@
 package com.mitrais.cdcpos.service;
 
 
+import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
 import com.mitrais.cdcpos.dto.store.*;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -147,6 +145,38 @@ public class StoreService {
             return convertAndCalculateStoreItem(storeItem, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()));
         }
         return null;
+    }
+
+    public Page<IncomingItemResponseDto> storeListOfExpiredItems(UUID id, boolean paginated, int page, int size,
+                                                                 String search, String sortBy, String sortDirection,
+                                                                 LocalDateTime start, LocalDateTime end){
+
+        Sort sort;
+        Pageable paging;
+        Page<IncomingItemEntity> storeExpiredItems;
+
+        if(sortBy.equalsIgnoreCase("supplier")){
+            sortBy = sortBy.concat(".name");
+        }else{
+            sortBy = "storeItem.item.name";
+        }
+
+        if("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if(paginated){
+            paging = PageRequest.of(page,size,sort);
+            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id, search, start, end);
+            return storeExpiredItems.map(IncomingItemResponseDto::toDto);
+        }else{
+            var list = incomingItemRepository.findAllExpired(sort,id, search, start,end);
+            var result =  list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
+            return new PageImpl<>(result);
+        }
+
     }
 
     public Page<StoreListOfItemsResponseDto> storeListOfItems(UUID id, Boolean paginated, Integer page, Integer size, String searchValue, String sortBy, String sortDirection) {
