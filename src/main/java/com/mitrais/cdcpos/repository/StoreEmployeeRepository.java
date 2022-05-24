@@ -24,5 +24,8 @@ public interface StoreEmployeeRepository extends JpaRepository<StoreEmployeeEnti
 
     boolean existsByUser_IdEqualsAndStore_IdEquals(UUID id, UUID id1);
 
+    @Query("select s from StoreEmployeeEntity s where s.user.id = ?1")
+    StoreEmployeeEntity findByUser_Id(UUID id);
+
 
 }
