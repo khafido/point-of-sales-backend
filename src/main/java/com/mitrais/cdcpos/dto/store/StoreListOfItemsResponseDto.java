@@ -17,13 +17,15 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class StoreListOfItemsResponseDto extends ItemResponseDto {
 
+    private UUID storeItemId;
     private Integer stock;
     private BigDecimal fixedPrice;
     private BigDecimal bySystemPrice;
     private String priceMode;
 
-    public StoreListOfItemsResponseDto(UUID id, String name, String image, String barcode, String category, String packaging, LocalDateTime deletedAt, Integer stock, BigDecimal fixedPrice, BigDecimal bySystemPrice, String priceMode) {
+    public StoreListOfItemsResponseDto(UUID id, String name, String image, String barcode, String category, String packaging, LocalDateTime deletedAt, UUID storeItemId,Integer stock, BigDecimal fixedPrice, BigDecimal bySystemPrice, String priceMode) {
         super(id, name, image, barcode, category, packaging, deletedAt);
+        this.storeItemId = storeItemId;
         this.stock = stock;
         this.fixedPrice = fixedPrice;
         this.bySystemPrice = bySystemPrice;
@@ -39,6 +41,7 @@ public class StoreListOfItemsResponseDto extends ItemResponseDto {
                 entity.getItem().getCategory().getName(),
                 entity.getItem().getPackaging(),
                 null, //deletedAt
+                entity.getId(),
                 entity.getStock(),
                 entity.getFixedPrice(),
                 bySystemPrice,
