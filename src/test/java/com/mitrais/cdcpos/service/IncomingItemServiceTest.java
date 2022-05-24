@@ -85,7 +85,7 @@ public class IncomingItemServiceTest {
 //                false,0,3,"","storeItem.item.name", "asc", LocalDateTime.now().minusYears(10),LocalDateTime.now());
 //        List<IncomingItemResponseDto> items = listItem.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
 //        for(int i=0; i<=2;i++){
-//            assertSame(listItem.get(i).getBuyDate(),result.getContent().get(i).getBuyDate());
+//            assertSame(items.get(i),result.getContent().get(i).getBuyDate());
 //        }
 //
 //        verify(incomingItemRepository).findAllSearch((Sort) any(),anyString(),
