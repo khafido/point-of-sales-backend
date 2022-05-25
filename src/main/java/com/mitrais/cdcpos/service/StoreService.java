@@ -19,6 +19,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -188,12 +189,13 @@ public class StoreService {
         List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), entity.getStore().getId(), entity.getItem().getId());
 
         BigDecimal bySystemPrice;
-        // bySystemPrice Formula: f(buyPrice + (profit% * buyPrice)) + (f() * tax%)
+        // bySystemPrice Formula: f(pricePerItem + (profit% * pricePerItem)) + (f() * tax%)
         if (latestIncomingItem.size() > 0) {
-            BigDecimal buyPrice = latestIncomingItem.get(0).getBuyPrice();
-            BigDecimal profitValue = buyPrice.multiply(new BigDecimal(taxPercent / 100));
-            BigDecimal buyPlusProfit = buyPrice.add(profitValue);
-            bySystemPrice = buyPlusProfit.add(buyPlusProfit.multiply(new BigDecimal(profitPercent / 100)));
+            BigDecimal pricePerItem = latestIncomingItem.get(0).getPricePerItem();
+            BigDecimal profitValue = pricePerItem.multiply(new BigDecimal((double) taxPercent / 100));
+            BigDecimal buyPlusProfit = pricePerItem.add(profitValue);
+            bySystemPrice = buyPlusProfit.add(buyPlusProfit.multiply(new BigDecimal((double) profitPercent / 100)));
+            bySystemPrice = bySystemPrice.setScale(3, RoundingMode.HALF_UP);
         } else {
             bySystemPrice = new BigDecimal(0);
         }
