@@ -114,7 +114,7 @@ public class StoreController {
     public ResponseEntity<GenericResponse> addItemToStore(@PathVariable UUID id, @RequestBody @Valid StoreAddItemRequestDto request) {
         try {
             var result = storeService.addItemToStore(id ,request);
-            if(result!=null) {
+            if(result.size()>0) {
                 return new ResponseEntity<>(new GenericResponse(result, "Add Item to Store Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);

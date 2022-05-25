@@ -42,6 +42,9 @@ public class IncomingItemEntity extends EntityAudit implements Serializable {
     @Column(name = "buy_price")
     private BigDecimal buyPrice;
 
+    @Column(name = "price_per_item")
+    private BigDecimal pricePerItem;
+
     @Column(name = "buy_date")
     private LocalDateTime buyDate;
 

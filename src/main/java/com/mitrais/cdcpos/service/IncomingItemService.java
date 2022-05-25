@@ -12,6 +12,8 @@ import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,15 +33,18 @@ public class IncomingItemService {
         var supplier= supplierRepository.findByIdAndDeletedAtIsNull(req.getSupplierId())
                 .orElseThrow(()-> new ResourceNotFoundException("Supplier", "id", req.getSupplierId()));
         
-        incomingItem.setSupplier(supplier);
-        incomingItem.setStoreItem(storeItem);
-        incomingItem.setBuyPrice(req.getBuyPrice());
-        incomingItem.setBuyQty(req.getQty());
-        incomingItem.setBuyDate(req.getBuyDate());
-        incomingItem.setExpiryDate(req.getExpiryDate());
-        // TODO create dto for return method (IncomingItemEntity too big)
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
+
+        incomingItem.setStoreItem(storeItem);
+        incomingItem.setSupplier(supplier);
+        incomingItem.setBuyQty(req.getQty());
+        incomingItem.setBuyPrice(req.getBuyPrice());
+        MathContext mc = new MathContext(String.valueOf(req.getBuyPrice()).length()-1);
+        incomingItem.setPricePerItem(req.getBuyPrice().divide(BigDecimal.valueOf(req.getQty()), mc));
+        incomingItem.setBuyDate(req.getBuyDate());
+        incomingItem.setExpiryDate(req.getExpiryDate());
+
         return incomingItemRepository.save(incomingItem);
     }
 
