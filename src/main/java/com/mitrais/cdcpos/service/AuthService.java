@@ -111,81 +111,79 @@ public class AuthService {
         }
     }
 
-    public ResponseEntity<GenericResponse> register(SignUpDto signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GenericResponse("Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GenericResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        UserEntity user = new UserEntity(signUpRequest.getUsername(),
-                encoder.encode(signUpRequest.getUsername()),
-                signUpRequest.getEmail());
-        user.setBirthDate(signUpRequest.getBirthDate());
-        user.setFirstName(signUpRequest.getFirstName());
-        user.setLastName(signUpRequest.getLastName());
-        user.setAddress(signUpRequest.getAddress());
-
-        Set<String> strRoles = signUpRequest.getRole();
-        Set<RoleEntity> roles = new HashSet<>();
-
-        // RoleEntity userRole = roleRepository.findByName(ERole.STAFF)
-        // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        // roles.add(userRole);
-
-        strRoles.forEach(role -> {
-            switch (role.toLowerCase()) {
-                case "admin":
-                    RoleEntity adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(adminRole);
-                    break;
-                case "cashier":
-                    RoleEntity cashierRole = roleRepository.findByName(ERole.ROLE_CASHIER)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(cashierRole);
-                    break;
-                case "stockist":
-                    RoleEntity stockistRole = roleRepository.findByName(ERole.ROLE_STOCKIST)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(stockistRole);
-                    break;
-                case "manager":
-                    RoleEntity managerRole = roleRepository.findByName(ERole.ROLE_MANAGER)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(managerRole);
-                    break;
-                case "owner":
-                    RoleEntity ownerRole = roleRepository.findByName(ERole.ROLE_OWNER)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(ownerRole);
-                    break;
-            }
-        });
-
-        if (roles.isEmpty()) {
-            RoleEntity employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
-                    .orElseThrow(() -> new RuntimeException("Error: Role is empty."));
-            roles.add(employeeRole);
-        }
-
-        user.setRoles(roles);
-//        userService.addUser(user);
-
-        List<UserRoleEntity> userRoleEntity = new ArrayList<>();
-        roles.forEach(r -> {
-            userRoleEntity.add(new UserRoleEntity(user.getId(), r.getId()));
-        });
-
-        userRoleRepository.saveAll(userRoleEntity);
-
-        return ResponseEntity.ok(new GenericResponse("Sign Up Successfully!"));
-    }
+//    public ResponseEntity<GenericResponse> register(SignUpDto signUpRequest) {
+//        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new GenericResponse("Error: Username is already taken!"));
+//        }
+//
+//        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new GenericResponse("Error: Email is already in use!"));
+//        }
+//
+//        // Create new user's account
+//        UserEntity user = new UserEntity(signUpRequest.getUsername(),
+//                encoder.encode(signUpRequest.getUsername()),
+//                signUpRequest.getEmail());
+//        user.setBirthDate(signUpRequest.getBirthDate());
+//        user.setFirstName(signUpRequest.getFirstName());
+//        user.setLastName(signUpRequest.getLastName());
+//        user.setAddress(signUpRequest.getAddress());
+//
+//        Set<String> strRoles = signUpRequest.getRole();
+//        Set<RoleEntity> roles = new HashSet<>();
+//
+//        // RoleEntity userRole = roleRepository.findByName(ERole.STAFF)
+//        // .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//        // roles.add(userRole);
+//
+//        strRoles.forEach(role -> {
+//            switch (role.toLowerCase()) {
+//                case "admin":
+//                    RoleEntity adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                    roles.add(adminRole);
+//                    break;
+//                case "cashier":
+//                    RoleEntity cashierRole = roleRepository.findByName(ERole.ROLE_CASHIER)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                    roles.add(cashierRole);
+//                    break;
+//                case "stockist":
+//                    RoleEntity stockistRole = roleRepository.findByName(ERole.ROLE_STOCKIST)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                    roles.add(stockistRole);
+//                    break;
+//                case "manager":
+//                    RoleEntity managerRole = roleRepository.findByName(ERole.ROLE_MANAGER)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                    roles.add(managerRole);
+//                    break;
+//                case "owner":
+//                    RoleEntity ownerRole = roleRepository.findByName(ERole.ROLE_OWNER)
+//                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                    roles.add(ownerRole);
+//                    break;
+//            }
+//        });
+//
+//        if (roles.isEmpty()) {
+//            RoleEntity employeeRole = roleRepository.findByName(ERole.ROLE_EMPLOYEE)
+//                    .orElseThrow(() -> new RuntimeException("Error: Role is empty."));
+//            roles.add(employeeRole);
+//        }
+//
+//        user.setRoles(roles);
+//
+//        List<UserRoleEntity> userRoleEntity = new ArrayList<>();
+//        roles.forEach(r -> {
+//            userRoleEntity.add(new UserRoleEntity(user.getId(), r.getId()));
+//        });
+//
+//        userRoleRepository.saveAll(userRoleEntity);
+//        return ResponseEntity.ok(new GenericResponse("Sign Up Successfully!"));
+//    }
 }
