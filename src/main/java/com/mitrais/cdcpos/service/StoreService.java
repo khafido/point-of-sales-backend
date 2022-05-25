@@ -20,6 +20,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -172,10 +173,10 @@ public class StoreService {
 
         if(paginated){
             paging = PageRequest.of(page,size,sort);
-            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id,search);
+            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id,search,start,end);
             return storeExpiredItems.map(IncomingItemResponseDto::toDto);
         }else{
-            var list = incomingItemRepository.findAllExpired(sort,id,search);
+            var list = incomingItemRepository.findAllExpired(sort,id,search,start,end);
             var result =  list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
             return new PageImpl<>(result);
         }

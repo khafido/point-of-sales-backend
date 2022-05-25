@@ -11,11 +11,13 @@ import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import com.mitrais.cdcpos.dto.*;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -156,8 +158,8 @@ public class StoreController {
                                                                   @RequestParam(defaultValue = "") String search,
                                                                   @RequestParam(defaultValue = "item") String sortBy,
                                                                   @RequestParam(defaultValue = "ASC") String sortDirection,
-                                                                  @RequestParam(required = false) LocalDateTime start,
-                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") LocalDateTime end){
+                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().minusYears(50)}")  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end){
         try{
             Page<IncomingItemResponseDto> expiredItem = storeService.storeListOfExpiredItems(id,isPaginated,page,size,search,sortBy,sortDirection,start,end);
             PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
