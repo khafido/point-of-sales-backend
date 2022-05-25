@@ -25,4 +25,8 @@ public interface StoreRepository extends JpaRepository<StoreEntity, UUID> {
 
     Optional<StoreEntity> findByIdEqualsAndDeletedAtIsNull(UUID id);
 
+    @Query("select s from StoreEntity s where s.manager.id = ?1")
+    StoreEntity findByManager_Id(UUID id);
+
+
 }

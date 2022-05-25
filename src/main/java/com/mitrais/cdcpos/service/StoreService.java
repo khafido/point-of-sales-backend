@@ -116,35 +116,38 @@ public class StoreService {
         return null;
     }
 
-    public StoreListOfItemsResponseDto addItemToStore(UUID id, StoreAddItemRequestDto request) {
+    public List<StoreListOfItemsResponseDto> addItemToStore(UUID id, StoreAddItemRequestDto request) {
         var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
-        var optionalItem = itemRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getItemId()));
+        var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+        var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
 
-        if(optionalStore.isPresent() && optionalItem.isPresent()) {
-            var store = optionalStore.get();
-            var item = optionalItem.get();
+        List<StoreListOfItemsResponseDto> addedStoreItem = new ArrayList<>();
+        for(String itemId : request.getItemIdList()) {
+            var optionalItem = itemRepository.findByIdAndDeletedAtIsNull(UUID.fromString(itemId));
 
-            var optionalStoreItem = storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId());
+            if(optionalStore.isPresent() && optionalItem.isPresent()) {
+                var store = optionalStore.get();
+                var item = optionalItem.get();
 
-            StoreItemEntity storeItem;
-            if(optionalStoreItem.isPresent()) {
-                storeItem = optionalStoreItem.get();
-                storeItem.setDeletedAt(null);
-            } else {
-                storeItem = new StoreItemEntity();
-                storeItem.setStore(store);
-                storeItem.setItem(item);
-                storeItem.setStock(0);
-                storeItem.setFixedPrice(new BigDecimal(0));
-                storeItem.setPriceMode(StoreItemEntity.PriceMode.BY_SYSTEM);
+                var optionalStoreItem = storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId());
+
+                StoreItemEntity storeItem;
+                if(optionalStoreItem.isPresent()) {
+                    storeItem = optionalStoreItem.get();
+                    storeItem.setDeletedAt(null);
+                } else {
+                    storeItem = new StoreItemEntity();
+                    storeItem.setStore(store);
+                    storeItem.setItem(item);
+                    storeItem.setStock(0);
+                    storeItem.setFixedPrice(new BigDecimal(0));
+                    storeItem.setPriceMode(StoreItemEntity.PriceMode.BY_SYSTEM);
+                }
+                storeItemRepository.save(storeItem);
+                addedStoreItem.add(convertAndCalculateStoreItem(storeItem, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue())));
             }
-            storeItemRepository.save(storeItem);
-
-            var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
-            var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
-            return convertAndCalculateStoreItem(storeItem, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()));
         }
-        return null;
+        return addedStoreItem;
     }
 
     public Page<IncomingItemResponseDto> storeListOfExpiredItems(UUID id, boolean paginated, int page, int size,

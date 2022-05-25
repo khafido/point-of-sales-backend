@@ -46,10 +46,11 @@ public class ItemController {
                                                   @RequestParam(defaultValue = "10") int size,
                                                   @RequestParam(defaultValue = "") String searchValue,
                                                   @RequestParam(defaultValue = "name") String sortBy,
-                                                  @RequestParam(defaultValue = "ASC") String sortDirection)
+                                                  @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                  @RequestParam(defaultValue = "true") boolean fullInformation)
     {
         try {
-            PaginatedDto<ItemResponseDto> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
+            PaginatedDto<ItemResponseDto> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection, fullInformation);
             return new ResponseEntity<>(new GenericResponse(result, "Get All Items Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {

@@ -24,12 +24,8 @@ insert into suppliers values
     ('e0f271a7-5a48-43c9-8531-0fd035029f89', now(), null, now(), 'address 1', 'makanan supp', 'makanan@gmail.com', 'supplier makanan', '03819203'),
     ('1990d052-9c52-42eb-85b7-7652ad7a3f4a', now(), null, now(), 'minuman 1', 'minuman supp', 'minuman@gmail.com', 'supplier minuman', '213123123');
 
-insert into store values
-    ('21433690-da31-4332-a6f6-8022b509ab78', now(), null, now(), 'loc 1', 'Store 1', null),
-    ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', null);
-
 --Generate User (Password: hippos)
-INSERT INTO users
+INSERT INTO public.users
 (id, address, birth_date, email, first_name, last_name, gender, password, phone, username, created_at, last_modified_at, deleted_at)
 VALUES
 ('559bd388-954f-4869-9eda-b185da5092c2'::uuid, 'Jl. Sidobali No. Admin', '2022-04-19', 'admina@email.com', 'Admin', 'A', 'Female', '$2a$10$8ERgXm8KdBhF4Tt0DwUQxe//4zsSpCwCvN2rrHv1O7gIri9.XD7v.', '08583247866', 'admina', now(), now(), null),
@@ -55,18 +51,18 @@ VALUES
 (1, '559bd388-954f-4869-9eda-b185da5092c2'::uuid),
 (1, '57c92aab-0e6d-46a9-91fe-8e95d1b228b7'::uuid),
 (1, 'e8a83fa0-9edd-4ad0-b716-5bae4bb048b0'::uuid),
-(2, '138f1b7a-816f-408f-a967-e4565631a55b'::uuid),
-(2, '4eb23058-7f82-4b6d-a81d-4640e6837a7f'::uuid),
-(2, '99de318e-dea8-42da-b4f4-0ff4a3854185'::uuid),
-(3, 'f6c5476f-3fc2-425f-b2db-2ab8737e226a'::uuid),
-(3, '31835e4e-5d06-42e8-9ab6-b3f06ef80b30'::uuid),
-(3, 'c25dacc7-8931-46fe-bf93-ae49a183f786'::uuid),
-(4, '51f1e18c-e020-405c-9fc4-f8647aef3c99'::uuid),
-(4, 'c52db44f-38b1-4aa6-97d9-1afa19b6d99b'::uuid),
-(4, '7e8f7f33-e644-4e09-9f1c-d2149317577b'::uuid),
-(5, '2b7a30f6-3e4b-4fe4-a65d-06e9e91736f2'::uuid),
-(5, '72397d5c-7e9d-4588-8589-74a7e15c0417'::uuid),
-(5, 'bcacc9f0-f255-453d-8bf7-bfd18e2941d0'::uuid),
+(5, '138f1b7a-816f-408f-a967-e4565631a55b'::uuid),
+(5, '4eb23058-7f82-4b6d-a81d-4640e6837a7f'::uuid),
+(5, '99de318e-dea8-42da-b4f4-0ff4a3854185'::uuid),
+(4, 'f6c5476f-3fc2-425f-b2db-2ab8737e226a'::uuid),
+(4, '31835e4e-5d06-42e8-9ab6-b3f06ef80b30'::uuid),
+(4, 'c25dacc7-8931-46fe-bf93-ae49a183f786'::uuid),
+(3, '51f1e18c-e020-405c-9fc4-f8647aef3c99'::uuid),
+(3, 'c52db44f-38b1-4aa6-97d9-1afa19b6d99b'::uuid),
+(3, '7e8f7f33-e644-4e09-9f1c-d2149317577b'::uuid),
+(2, '2b7a30f6-3e4b-4fe4-a65d-06e9e91736f2'::uuid),
+(2, '72397d5c-7e9d-4588-8589-74a7e15c0417'::uuid),
+(2, 'bcacc9f0-f255-453d-8bf7-bfd18e2941d0'::uuid),
 (6, '559bd388-954f-4869-9eda-b185da5092c2'::uuid),
 (6, '57c92aab-0e6d-46a9-91fe-8e95d1b228b7'::uuid),
 (6, 'e8a83fa0-9edd-4ad0-b716-5bae4bb048b0'::uuid),
@@ -83,3 +79,14 @@ VALUES
 (6, '72397d5c-7e9d-4588-8589-74a7e15c0417'::uuid),
 (6, 'bcacc9f0-f255-453d-8bf7-bfd18e2941d0'::uuid);
 
+insert into store values
+    ('21433690-da31-4332-a6f6-8022b509ab78', now(), null, now(), 'loc 1', 'Store 1', '51f1e18c-e020-405c-9fc4-f8647aef3c99'),
+    ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', 'c52db44f-38b1-4aa6-97d9-1afa19b6d99b');
+
+INSERT INTO public.store_item (id,created_at,deleted_at,last_modified_at,fixed_price,price_mode,stock,item_id,store_id) VALUES
+	 ('490c44e3-0a48-4281-9810-e83df76b0476',now(),NULL,now(),0.00,'BY_SYSTEM',0,'f33836af-ef69-489a-845e-5043c8fae64e','21433690-da31-4332-a6f6-8022b509ab78'),
+	 ('ab2f493c-e6e4-4788-bcd1-662c709f6e09',now(),NULL,now(),0.00,'BY_SYSTEM',0,'a2dcdddc-a906-469a-8847-504171e1f171','21433690-da31-4332-a6f6-8022b509ab78');
+
+INSERT INTO public.store_employee (id,created_at,deleted_at,last_modified_at,store_id,user_id) VALUES
+	 ('4ae2d837-1d5a-420d-ae35-3bdc99268cae','2022-05-24 10:45:43.486',NULL,'2022-05-24 10:45:43.486','21433690-da31-4332-a6f6-8022b509ab78','f6c5476f-3fc2-425f-b2db-2ab8737e226a'),
+	 ('74e6437f-bbfd-4b39-9c80-5298930803ba','2022-05-24 10:46:01.393',NULL,'2022-05-24 10:46:01.393','21433690-da31-4332-a6f6-8022b509ab78','138f1b7a-816f-408f-a967-e4565631a55b');
