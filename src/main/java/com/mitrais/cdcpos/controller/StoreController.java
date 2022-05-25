@@ -191,7 +191,7 @@ public class StoreController {
     }
 
     @GetMapping("/{id}/employee")
-    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id, @RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
+    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id, @RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "user.firstName") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
