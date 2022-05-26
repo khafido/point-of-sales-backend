@@ -45,7 +45,9 @@ public class StoreController {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
-                var genericResponse = new GenericResponse(StoreDto.toDto(store.get()), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
+                var result = storeService.getStoreEmployee(id, false, 0, 10, "", "id", "DESC");
+                var totalEmployee = result.getSize();
+                var genericResponse = new GenericResponse(StoreDto.toDtoWithTotalEmployee(store.get(), totalEmployee), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
