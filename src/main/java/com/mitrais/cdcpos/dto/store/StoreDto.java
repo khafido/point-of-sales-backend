@@ -21,6 +21,18 @@ public class StoreDto {
 
     private UserDto manager;
 
+    private int totalEmployee;
+
+    public static StoreDto toDtoWithTotalEmployee(StoreEntity entity, int totalEmployee) {
+        StoreDto dto = new StoreDto();
+        dto.setId(entity.getId().toString());
+        dto.setName(entity.getName());
+        dto.setLocation(entity.getLocation());
+        dto.setTotalEmployee(totalEmployee);
+        dto.setManager(entity.getManager()!=null? UserDto.toDtoMain(entity.getManager()) : null);
+        return dto;
+    }
+
     public static StoreDto toDto(StoreEntity entity) {
         StoreDto dto = new StoreDto();
         dto.setId(entity.getId().toString());
