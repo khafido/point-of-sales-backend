@@ -83,6 +83,7 @@ class StoreServiceTest {
     private static final List<CategoryEntity> categoryList = new ArrayList<>();
     private static final List<StoreItemEntity> storeItemList = new ArrayList<>();
     private static final List<IncomingItemEntity> incomingItemList = new ArrayList<>();
+    private static final List<SupplierEntity> supplierList = new ArrayList<>();
 
 
     @BeforeAll
@@ -94,6 +95,8 @@ class StoreServiceTest {
             storeEntity.setManager(null);
             storeList.add(storeEntity);
         }
+        supplierList.add(new SupplierEntity(UUID.randomUUID(),"sup 1", "sup 1", "0812138132","sup@gmail.com",
+                "jalan raya"));
 
         parameterList.add(new ParameterEntity(UUID.randomUUID(), "tax_percentage", "10"));
         parameterList.add(new ParameterEntity(UUID.randomUUID(), "profit_percentage", "12"));
