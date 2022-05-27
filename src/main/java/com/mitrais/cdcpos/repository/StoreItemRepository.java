@@ -21,7 +21,7 @@ public interface StoreItemRepository extends JpaRepository<StoreItemEntity, UUID
     Optional<StoreItemEntity> findByStoreIdAndItemId(@Param("storeId") UUID storeId, @Param("itemId") UUID itemId);
 
     @Query(value = "SELECT si FROM StoreItemEntity si " +
-            "WHERE si.store.id = :storeId AND (" +
+            "WHERE si.store.id = :storeId AND si.deletedAt IS NULL AND (" +
             "LOWER(si.priceMode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(si.item.barcode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(si.item.category.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -30,7 +30,7 @@ public interface StoreItemRepository extends JpaRepository<StoreItemEntity, UUID
     Page<StoreItemEntity> findByStoreIdWithSearch(Pageable pageable, @Param("storeId") UUID storeId, @Param("search") String searchVal);
 
     @Query(value = "SELECT si FROM StoreItemEntity si " +
-            "WHERE si.store.id = :storeId AND (" +
+            "WHERE si.store.id = :storeId AND si.deletedAt IS NULL AND (" +
             "LOWER(si.priceMode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(si.item.barcode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(si.item.category.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
