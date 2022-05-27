@@ -12,10 +12,11 @@ import org.apache.tomcat.jni.Local;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.time.LocalDateTime;
-import java.util.List;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +26,7 @@ public class IncomingItemService {
     private final SupplierRepository supplierRepository;
     private final StoreItemRepository storeItemRepository;
 
+
     public IncomingItemEntity add(IncomingItemDto req){
         var incomingItem = new IncomingItemEntity();
         var storeItem = storeItemRepository.findById(req.getStoreItemId())
@@ -32,7 +34,7 @@ public class IncomingItemService {
         
         var supplier= supplierRepository.findByIdAndDeletedAtIsNull(req.getSupplierId())
                 .orElseThrow(()-> new ResourceNotFoundException("Supplier", "id", req.getSupplierId()));
-        
+
         storeItem.setStock((int) (storeItem.getStock()+req.getQty()));
         storeItemRepository.save(storeItem);
 
@@ -55,6 +57,12 @@ public class IncomingItemService {
         Pageable paging;
         Page<IncomingItemEntity> incomingItemEntities;
 
+        if(sortBy.equalsIgnoreCase("supplier")){
+            sortBy = sortBy.concat(".name");
+        }else{
+            sortBy = "storeItem.item.name";
+        }
+
         if("DESC".equalsIgnoreCase(sortDirection)) {
             sort = Sort.by(sortBy).descending();
         } else {
@@ -64,11 +72,11 @@ public class IncomingItemService {
         if(paginated){
             paging = PageRequest.of(page, size,sort);
             incomingItemEntities = incomingItemRepository.findAllSearch(paging, search, start,end);
-            var result = incomingItemEntities.map(e -> IncomingItemResponseDto.toDto(e));
+            var result = incomingItemEntities.map(IncomingItemResponseDto::toDto);
             return result;
         }else{
             var list = incomingItemRepository.findAllSearch(sort,search,start,end);
-            var result = list.stream().map(e -> IncomingItemResponseDto.toDto(e)).collect(Collectors.toList());
+            var result = list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
             return new PageImpl<>(result);
         }
 
