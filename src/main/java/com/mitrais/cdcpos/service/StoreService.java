@@ -15,13 +15,12 @@ import com.mitrais.cdcpos.repository.*;
 import com.mitrais.cdcpos.repository.StoreEmployeeRepository;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
+import com.mitrais.cdcpos.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -220,21 +219,21 @@ public class StoreService {
     }
 
     private StoreListOfItemsResponseDto convertAndCalculateStoreItem(StoreItemEntity entity, int taxPercent, int profitPercent) {
-        List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("buyDate").descending()), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> incomingItemByEarliestExpired = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("expiryDate").ascending()), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> incomingItemByLatestExpired = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("expiryDate").descending()), entity.getStore().getId(), entity.getItem().getId());
 
         BigDecimal bySystemPrice;
-        // bySystemPrice Formula: f(pricePerItem + (profit% * pricePerItem)) + (f() * tax%)
         if (latestIncomingItem.size() > 0) {
-            BigDecimal pricePerItem = latestIncomingItem.get(0).getPricePerItem();
-            BigDecimal profitValue = pricePerItem.multiply(new BigDecimal((double) taxPercent / 100));
-            BigDecimal buyPlusProfit = pricePerItem.add(profitValue);
-            bySystemPrice = buyPlusProfit.add(buyPlusProfit.multiply(new BigDecimal((double) profitPercent / 100)));
-            bySystemPrice = bySystemPrice.setScale(3, RoundingMode.HALF_UP);
+             bySystemPrice = Utils.calculateItemBySystemPrice(taxPercent, profitPercent, latestIncomingItem.get(0).getPricePerItem());
         } else {
             bySystemPrice = new BigDecimal(0);
         }
 
-        return StoreListOfItemsResponseDto.toDto(entity, bySystemPrice);
+        if(incomingItemByEarliestExpired.size()>0 && incomingItemByLatestExpired.size()>0) {
+            return StoreListOfItemsResponseDto.toDto(entity, bySystemPrice, incomingItemByEarliestExpired.get(0).getExpiryDate(), incomingItemByLatestExpired.get(0).getExpiryDate());
+        }
+        return StoreListOfItemsResponseDto.toDto(entity, bySystemPrice, null, null);
     }
 
     public Page<StoreEmployeeEntity> getStoreEmployee(UUID storeId, boolean paginated, int page, int size, String searchValue, String sortBy, String sortDirection) {
