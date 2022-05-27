@@ -1,13 +1,17 @@
 package com.mitrais.cdcpos.service;
 
-import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
-import com.mitrais.cdcpos.dto.store.StoreDto;
+import com.mitrais.cdcpos.dto.store.*;
+import com.mitrais.cdcpos.entity.CategoryEntity;
+import com.mitrais.cdcpos.entity.ParameterEntity;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
+import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
+import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
-import com.mitrais.cdcpos.repository.StoreRepository;
-import com.mitrais.cdcpos.repository.UserRepository;
+import com.mitrais.cdcpos.entity.store.StoreItemEntity;
+import com.mitrais.cdcpos.repository.*;
+import io.swagger.v3.core.util.Json;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,10 +19,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -33,10 +36,27 @@ class StoreServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private ParameterRepository parameterRepository;
+
+    @Mock
+    private StoreItemRepository storeItemRepository;
+
+    @Mock
+    private IncomingItemRepository incomingItemRepository;
+
+    @Mock
+    private ItemRepository itemRepository;
+
     @InjectMocks
     private StoreService storeService;
 
     private static final List<StoreEntity> storeList = new ArrayList<>();
+    private static final List<ItemEntity> itemList = new ArrayList<>();
+    private static final List<ParameterEntity> parameterList = new ArrayList<>();
+    private static final List<CategoryEntity> categoryList = new ArrayList<>();
+    private static final List<StoreItemEntity> storeItemList = new ArrayList<>();
+    private static final List<IncomingItemEntity> incomingItemList = new ArrayList<>();
 
     @BeforeAll
     static void beforeAll() {
@@ -47,6 +67,35 @@ class StoreServiceTest {
             storeEntity.setManager(null);
             storeList.add(storeEntity);
         }
+
+        parameterList.add(new ParameterEntity(UUID.randomUUID(), "tax_percentage", "10"));
+        parameterList.add(new ParameterEntity(UUID.randomUUID(), "profit_percentage", "12"));
+
+        categoryList.add(new CategoryEntity(UUID.randomUUID(), "Makanan"));
+        categoryList.add(new CategoryEntity(UUID.randomUUID(), "Minuman"));
+
+        ItemEntity itemEntity = new ItemEntity();
+        itemEntity.setName("Makanan R");
+        itemEntity.setImage("aaaaa");
+        itemEntity.setBarcode("3802183");
+        itemEntity.setCategory(categoryList.get(0));
+        itemEntity.setPackaging("Plastic");
+        itemList.add(itemEntity);
+
+        StoreItemEntity storeItem = new StoreItemEntity();
+        storeItem.setStore(storeList.get(0));
+        storeItem.setItem(itemList.get(0));
+        storeItem.setStock(20);
+        storeItem.setFixedPrice(new BigDecimal(20000));
+        storeItem.setPriceMode(StoreItemEntity.PriceMode.BY_SYSTEM);
+        storeItemList.add(storeItem);
+
+        IncomingItemEntity incomingItem = new IncomingItemEntity();
+        incomingItem.setStoreItem(storeItem);
+        incomingItem.setPricePerItem(new BigDecimal(15000));
+        incomingItemList.add(incomingItem);
+
+
     }
 
     @Test
@@ -186,6 +235,92 @@ class StoreServiceTest {
         verify(userRepository, times(1)).findByIdAndDeletedAtIsNull(user.getId());
         verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(store.getId());
         verify(storeRepository, times(1)).save(store);
+    }
+
+    @Test
+    public void storeListOfItems() {
+        var tax = parameterList.get(0);
+        var profit = parameterList.get(1);
+        var store = storeList.get(0);
+        var item = itemList.get(0);
+        var storeItem = storeItemList.get(0);
+        var incomingItem = incomingItemList.get(0);
+
+        when(parameterRepository.findByNameIgnoreCase("tax_percentage")).thenReturn(Optional.of(tax));
+        when(parameterRepository.findByNameIgnoreCase("profit_percentage")).thenReturn(Optional.of(profit));
+        when(storeItemRepository.findByStoreIdWithSearch((Pageable) any(), any(UUID.class), anyString())).thenReturn(new PageImpl<>(List.of(storeItem)));
+        when(storeItemRepository.findByStoreIdWithSearch((Sort) any(), any(UUID.class), anyString())).thenReturn(List.of(storeItem));
+        when(incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of(incomingItem));
+
+        Page<StoreListOfItemsResponseDto> resultPaginated = storeService.storeListOfItems(store.getId(), true, 0, 10, "", "name", "ASC");
+        Page<StoreListOfItemsResponseDto> resultNonPaginated = storeService.storeListOfItems(store.getId(), false, 0, 10, "", "name", "ASC");
+
+        Json.prettyPrint(resultPaginated);
+        Json.prettyPrint(resultNonPaginated);
+
+        assertTrue(resultPaginated.equals(resultNonPaginated));
+
+        assertEquals(1, resultNonPaginated.getContent().size());
+
+        //test the formula: f(pricePerItem + (profit% * pricePerItem)) + (f() * tax%)
+        assertTrue(resultNonPaginated.getContent().get(0).getBySystemPrice().compareTo(new BigDecimal(18480))==0);
+
+        assertEquals("Makanan R", resultNonPaginated.getContent().get(0).getName());
+    }
+
+    @Test
+    public void addItemToStore() {
+        var tax = parameterList.get(0);
+        var profit = parameterList.get(1);
+        var store = storeList.get(0);
+        var item = itemList.get(0);
+        var storeItem = storeItemList.get(0);
+
+        when(parameterRepository.findByNameIgnoreCase("tax_percentage")).thenReturn(Optional.of(tax));
+        when(parameterRepository.findByNameIgnoreCase("profit_percentage")).thenReturn(Optional.of(profit));
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(store.getId())).thenReturn(Optional.of(store));
+        when(itemRepository.findByIdAndDeletedAtIsNull(item.getId())).thenReturn(Optional.of(item));
+        when(storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId())).thenReturn(Optional.empty());
+        when(storeItemRepository.save(any())).thenReturn(storeItem);
+        when(incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of());
+
+        StoreAddItemRequestDto requestDto = new StoreAddItemRequestDto();
+        requestDto.setItemIdList(List.of(item.getId().toString()));
+        List<StoreListOfItemsResponseDto> result = storeService.addItemToStore(store.getId(), requestDto);
+
+        Json.prettyPrint(result);
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0).getBySystemPrice().compareTo(new BigDecimal(0))==0);
+        assertEquals("Makanan R", result.get(0).getName());
+
+    }
+
+    @SneakyThrows
+    @Test
+    public void updateStoreItemPrice() {
+        var tax = parameterList.get(0);
+        var profit = parameterList.get(1);
+        var store = storeList.get(0);
+        var item = itemList.get(0);
+        var storeItem = storeItemList.get(0);
+
+        when(parameterRepository.findByNameIgnoreCase("tax_percentage")).thenReturn(Optional.of(tax));
+        when(parameterRepository.findByNameIgnoreCase("profit_percentage")).thenReturn(Optional.of(profit));
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(store.getId())).thenReturn(Optional.of(store));
+        when(itemRepository.findByIdAndDeletedAtIsNull(item.getId())).thenReturn(Optional.of(item));
+        when(storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId())).thenReturn(Optional.of(storeItem));
+        when(storeItemRepository.save(any())).thenReturn(storeItem);
+
+        StoreUpdateItemPriceRequestDto requestDto = new StoreUpdateItemPriceRequestDto(StoreItemEntity.PriceMode.FIXED.toString(), new BigDecimal(10000));
+
+        StoreListOfItemsResponseDto result = storeService.updateStoreItemPrice(store.getId(), item.getId(), requestDto);
+
+        Json.prettyPrint(result);
+
+        assertTrue(result.getBySystemPrice().compareTo(new BigDecimal(0))==0);
+        assertTrue(result.getFixedPrice().compareTo(new BigDecimal(10000))==0);
+        assertEquals(StoreItemEntity.PriceMode.FIXED.toString(), result.getPriceMode());
     }
 }
 
