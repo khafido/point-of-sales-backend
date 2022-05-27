@@ -90,3 +90,7 @@ INSERT INTO public.store_item (id,created_at,deleted_at,last_modified_at,fixed_p
 INSERT INTO public.store_employee (id,created_at,deleted_at,last_modified_at,store_id,user_id) VALUES
 	 ('4ae2d837-1d5a-420d-ae35-3bdc99268cae','2022-05-24 10:45:43.486',NULL,'2022-05-24 10:45:43.486','21433690-da31-4332-a6f6-8022b509ab78','f6c5476f-3fc2-425f-b2db-2ab8737e226a'),
 	 ('74e6437f-bbfd-4b39-9c80-5298930803ba','2022-05-24 10:46:01.393',NULL,'2022-05-24 10:46:01.393','21433690-da31-4332-a6f6-8022b509ab78','138f1b7a-816f-408f-a967-e4565631a55b');
+
+insert into voucher (id, created_at,deleted_at,last_modified_at,name,code,description,end_date,minimum_purchase,start_date,value) values
+    ('2041cf07-1772-4e3b-8016-366f680680c0', now(), null, now(), 'Voucher 1','93512fbf-d382-4a76-86a5-0bf12fac0b36', 'desc voucher 1', current_date, 10000.00,current_date, 2000.00),
+    ('4621f304-8548-4e2d-86f6-4a3237f781b5', now(), null, now(), 'Voucher 2','dd93f270-3b91-41a9-884f-fbd0d0a2ac8b', 'desc voucher 2', current_date, 20000.00,current_date, 2000.00);
