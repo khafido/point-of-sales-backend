@@ -44,4 +44,8 @@ public class ParameterService {
                 .orElseThrow(() -> new ResourceNotFoundException("Parameter", "name", name));
     }
 
+    public boolean isParameterExist(String name){
+        return parameterRepository.existsByName(name);
+    }
+
 }

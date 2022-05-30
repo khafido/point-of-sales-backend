@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
@@ -119,6 +120,19 @@ public class CategoryServiceTest {
         assertNotNull(deletedCategory.getDeletedAt());
         verify(repo).findById(categoryList.get(0).getId());
         verify(repo).save(any(CategoryEntity.class));
+    }
+
+    @Test
+    public void checkCategoryExists(){
+        when(repo.existsByName(anyString())).thenReturn(true);
+        var resultTrue = service.isCategoryExist(categoryList.get(0).getName());
+        assertTrue(resultTrue);
+
+        when(repo.existsByName(anyString())).thenReturn(false);
+        var resultFalse = service.isCategoryExist("notExist");
+        assertFalse(resultFalse);
+
+        verify(repo, Mockito.times(2)).existsByName(anyString());
     }
 
 }
