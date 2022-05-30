@@ -2,6 +2,7 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.ItemRequestDto;
 import com.mitrais.cdcpos.dto.ItemResponseDto;
+import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
 import com.mitrais.cdcpos.repository.CategoryRepository;
@@ -50,14 +51,19 @@ class ItemServiceTest {
         categoryService = new CategoryService(categoryRepository);
         itemService = new ItemService(itemRepository, categoryService);
 
+        categoryList = Arrays.asList(
+                new CategoryEntity(UUID.randomUUID(), "makanan"),
+                new CategoryEntity(UUID.randomUUID(), "minuman")
+        );
+
         itemListDto = Arrays.asList(
                 Mockito.mock(ItemResponseDto.class),
                 Mockito.mock(ItemResponseDto.class)
         );
 
         itemListEntity = Arrays.asList(
-                Mockito.mock(ItemEntity.class),
-                Mockito.mock(ItemEntity.class)
+                new ItemEntity(UUID.randomUUID(), "makanan 1", "aaa", "1233455", categoryList.get(0), "plastic", null),
+                new ItemEntity(UUID.randomUUID(), "minuman 1", "bbb", "3213211", categoryList.get(1), "plastic", null)
         );
 
     }
@@ -71,11 +77,11 @@ class ItemServiceTest {
         Mockito.when(itemRepository.findAllSearch(sortAsc, "")).thenReturn(itemListEntity);
         Mockito.when(itemRepository.findAllSearch(sortDesc, "")).thenReturn(itemListEntity);
 
-        Page<ItemEntity> resultAsc = itemService.getAllToPage(false, 0, 10, "", "name", "ASC");
-        Page<ItemEntity> resultDesc = itemService.getAllToPage(false, 0, 10, "", "name", "DESC");
+        PaginatedDto<ItemResponseDto> resultAsc = itemService.getAll(false, 0, 10, "", "name", "ASC", false);
+        PaginatedDto<ItemResponseDto> resultDesc = itemService.getAll(false, 0, 10, "", "name", "DESC", true);
 
-        assertArrayEquals(itemListEntity.toArray(), resultAsc.getContent().toArray());
-        assertArrayEquals(itemListEntity.toArray(), resultDesc.getContent().toArray());
+        assertEquals(itemListEntity.size(), resultAsc.getCurrentPageContent().size());
+        assertEquals(itemListEntity.size(), resultDesc.getCurrentPageContent().size());
         Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortAsc, "");
         Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(sortDesc, "");
     }
@@ -92,11 +98,11 @@ class ItemServiceTest {
         Mockito.when(itemRepository.findAllSearch(pagingAsc, "xyz")).thenReturn(pageItemAsc);
         Mockito.when(itemRepository.findAllSearch(pagingDesc, "xyz")).thenReturn(pageItemDesc);
 
-        Page<ItemEntity> resultAsc = itemService.getAllToPage(true, 0, 10, "xyz", "name", "asc");
-        Page<ItemEntity> resultDesc = itemService.getAllToPage(true, 0, 10, "xyz", "name", "desc");
+        PaginatedDto<ItemResponseDto> resultAsc = itemService.getAll(true, 0, 10, "xyz", "name", "asc", false);
+        PaginatedDto<ItemResponseDto> resultDesc = itemService.getAll(true, 0, 10, "xyz", "name", "desc", true);
 
-        assertArrayEquals(itemListEntity.toArray(), resultAsc.getContent().toArray());
-        assertArrayEquals(itemListEntity.toArray(), resultDesc.getContent().toArray());
+        assertEquals(itemListEntity.size(), resultAsc.getCurrentPageContent().size());
+        assertEquals(itemListEntity.size(), resultDesc.getCurrentPageContent().size());
         Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingAsc, "xyz");
         Mockito.verify(itemRepository, Mockito.times(1)).findAllSearch(pagingDesc, "xyz");
     }

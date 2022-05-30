@@ -132,6 +132,22 @@ public class StoreController {
         }
     }
 
+    @DeleteMapping("/{id}/item/{itemId}")
+    public ResponseEntity<GenericResponse> deleteStoreItem(@PathVariable UUID id, @PathVariable UUID itemId) {
+        try {
+            var result = storeService.deleteStoreItem(id, itemId);
+            if(result!=null) {
+                return new ResponseEntity<>(new GenericResponse(result, "Delete Store Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/{id}/item")
     public ResponseEntity<GenericResponse> storeListOfItems(
             @PathVariable UUID id,
