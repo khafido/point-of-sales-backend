@@ -38,8 +38,12 @@ public class AuthController {
     @PutMapping("/change-password")
     public ResponseEntity<GenericResponse> changePassword(@Valid @RequestBody ChangePasswordDto req) {
         try {
-            ResponseEntity<GenericResponse> status = authService.changePassword(req);
-            return status;
+            boolean status = authService.changePassword(req);
+            if (status) {
+                return ResponseEntity.ok(new GenericResponse("Password changed successfully"));
+            } else {
+                return ResponseEntity.badRequest().body(new GenericResponse("Old Password is wrong"));
+            }
         } catch (Exception e){
             return new ResponseEntity<>
                     (new GenericResponse("Change Password Failed!"),HttpStatus.INTERNAL_SERVER_ERROR);
