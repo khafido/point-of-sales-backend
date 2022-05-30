@@ -83,6 +83,7 @@ class StoreServiceTest {
     private static final List<CategoryEntity> categoryList = new ArrayList<>();
     private static final List<StoreItemEntity> storeItemList = new ArrayList<>();
     private static final List<IncomingItemEntity> incomingItemList = new ArrayList<>();
+    private static final List<SupplierEntity> supplierList = new ArrayList<>();
 
 
     @BeforeAll

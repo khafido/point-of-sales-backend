@@ -88,6 +88,9 @@ public class IncomingItemServiceTest {
         incomingItem.setBuyDate(LocalDateTime.now());
         incomingItem.setExpiryDate(LocalDate.now().plusYears(3));
         incomingItemList.add(incomingItem);
+
+        supplierList.add(new SupplierEntity(UUID.randomUUID(),"sup 1", "sup 1", "0812138132","sup@gmail.com",
+                "jalan raya"));
     }
 
     @Test
@@ -106,9 +109,7 @@ public class IncomingItemServiceTest {
         verify(supplierRepository).findByIdAndDeletedAtIsNull(supplierList.get(0).getId());
         verify(storeItemRepository).save(any(StoreItemEntity.class));
         verify(incomingItemRepository).save(any(IncomingItemEntity.class));
-
     }
-    
 
     @Test
     public void getIncomingItem(){
@@ -121,7 +122,6 @@ public class IncomingItemServiceTest {
                 false,0,3,"","storeItem.item.name", "asc", LocalDateTime.now().minusYears(10), LocalDateTime.now());
         Page<IncomingItemResponseDto> resultPaged = incomingItemService.getAll(
                 true,0,3,"","storeItem.item.name", "asc", LocalDateTime.now().minusYears(10), LocalDateTime.now());
-
 
         List<IncomingItemResponseDto> items = incomingItemList.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
         assertTrue(resultPaged.equals(result));

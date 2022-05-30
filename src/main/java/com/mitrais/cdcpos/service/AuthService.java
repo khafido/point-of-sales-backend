@@ -99,15 +99,15 @@ public class AuthService {
 //                roles);
     }
 
-    public ResponseEntity<GenericResponse> changePassword(ChangePasswordDto req) {
+    public boolean changePassword(ChangePasswordDto req) {
         UserEntity user = userRepository.findByUsername(getLoggedUsername());
 
         if (encoder.matches(req.getOldPassword(), user.getPassword())) {
             user.setPassword(encoder.encode(req.getNewPassword()));
             userRepository.save(user);
-            return ResponseEntity.ok(new GenericResponse("Password changed successfully"));
+            return true;
         } else {
-            return ResponseEntity.badRequest().body(new GenericResponse("Old Password is wrong"));
+            return false;
         }
     }
 
