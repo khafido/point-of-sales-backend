@@ -3,7 +3,6 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
 import com.mitrais.cdcpos.dto.store.*;
-import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.ParameterEntity;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
@@ -14,7 +13,13 @@ import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
+
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
+
+import com.mitrais.cdcpos.repository.IncomingItemRepository;
+import com.mitrais.cdcpos.repository.StoreRepository;
+import com.mitrais.cdcpos.repository.UserRepository;
+
 import com.mitrais.cdcpos.repository.*;
 import io.swagger.v3.core.util.Json;
 import lombok.SneakyThrows;
@@ -25,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -264,6 +270,7 @@ class StoreServiceTest {
         verify(incomingItemRepository).findAllExpired((Sort) any(), any(), anyString(), any(), any());
     }
 
+    @Test
     public void storeListOfItems() {
         var tax = parameterList.get(0);
         var profit = parameterList.get(1);
@@ -274,9 +281,9 @@ class StoreServiceTest {
 
         when(parameterRepository.findByNameIgnoreCase("tax_percentage")).thenReturn(Optional.of(tax));
         when(parameterRepository.findByNameIgnoreCase("profit_percentage")).thenReturn(Optional.of(profit));
-        when(storeItemRepository.findByStoreIdWithSearch((Pageable) any(), any(UUID.class), anyString())).thenReturn(new PageImpl<>(List.of(storeItem)));
+        when(storeItemRepository.findByStoreIdWithSearch(any(Pageable.class), any(UUID.class), anyString())).thenReturn(new PageImpl<>(List.of(storeItem)));
         when(storeItemRepository.findByStoreIdWithSearch((Sort) any(), any(UUID.class), anyString())).thenReturn(List.of(storeItem));
-        when(incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of(incomingItem));
+        when(incomingItemRepository.findByStoreIdAndItemId(any(), any(UUID.class), any(UUID.class))).thenReturn(List.of(incomingItem));
 
         Page<StoreListOfItemsResponseDto> resultPaginated = storeService.storeListOfItems(store.getId(), true, 0, 10, "", "name", "ASC");
         Page<StoreListOfItemsResponseDto> resultNonPaginated = storeService.storeListOfItems(store.getId(), false, 0, 10, "", "name", "ASC");
@@ -374,7 +381,7 @@ class StoreServiceTest {
         when(itemRepository.findByIdAndDeletedAtIsNull(item.getId())).thenReturn(Optional.of(item));
         when(storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId())).thenReturn(Optional.empty());
         when(storeItemRepository.save(any())).thenReturn(storeItem);
-        when(incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of());
+        when(incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of());
 
         StoreAddItemRequestDto requestDto = new StoreAddItemRequestDto();
         requestDto.setItemIdList(List.of(item.getId().toString()));

@@ -59,7 +59,12 @@ public class IncomingItemService {
 
         if(sortBy.equalsIgnoreCase("supplier")){
             sortBy = sortBy.concat(".name");
-        }else{
+        }else if(sortBy.equalsIgnoreCase("buyDate")){
+            sortBy = "buyDate";
+        }else if(sortBy.equalsIgnoreCase("expiryDate")){
+            sortBy = "expiryDate";
+        }
+        else{
             sortBy = "storeItem.item.name";
         }
 
