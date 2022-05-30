@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {RoleService.class})
 @ExtendWith(SpringExtension.class)
 class RoleServiceTest {
+
     @MockBean
     private RoleRepository roleRepository;
 
@@ -31,7 +32,7 @@ class RoleServiceTest {
     private RoleService roleService;
 
     @Test
-    void testGetAll() {
+    void getAll() {
         ArrayList<RoleEntity> roleEntityList = new ArrayList<>();
         when(this.roleRepository.findAll()).thenReturn(roleEntityList);
         List<RoleEntity> actualAll = this.roleService.getAll();
@@ -41,7 +42,7 @@ class RoleServiceTest {
     }
 
     @Test
-    void testGetRoleById() {
+    void getRoleById() {
         RoleEntity roleEntity = new RoleEntity();
         roleEntity.setId(1);
         roleEntity.setName(ERole.ROLE_ADMIN);
