@@ -266,12 +266,12 @@ public class StoreService {
         return result;
     }
 
-    public StoreEmployeeEntity addEmployee(AddEmployeeDto request) throws ManualValidationFailException {
-        var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
-        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(UUID.fromString(request.getStoreId()));
+    public StoreEmployeeEntity addEmployee(UUID userId, UUID storeId) throws ManualValidationFailException {
+        var user = userRepository.findByIdAndDeletedAtIsNull(userId);
+        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(storeId);
 
         if (user != null && optionalStore.isPresent()) {
-            var isWorkingAtStore = storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(UUID.fromString(request.getUserId()), UUID.fromString(request.getStoreId()));
+            var isWorkingAtStore = storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(userId, storeId);
             if(isWorkingAtStore) {
                 throw new ManualValidationFailException(user.getFirstName() + " Is Already Working In A Store");
 //                return null;
