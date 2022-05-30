@@ -243,7 +243,7 @@ public class StoreController {
     @PostMapping("/add-employee")
     public ResponseEntity<GenericResponse> addEmployee(@RequestBody @Valid AddEmployeeDto request) {
         try {
-            var result = storeService.addEmployee(request);
+            var result = storeService.addEmployee(UUID.fromString(request.getUserId()), UUID.fromString(request.getStoreId()));
             if (result != null) {
                 var resultDto = StoreEmployeeDto.toDto(result);
                 return new ResponseEntity<>(new GenericResponse(resultDto, "Add Store Employee Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);

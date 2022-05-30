@@ -2,28 +2,19 @@ package com.mitrais.cdcpos.service;
 
 
 import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
-import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
-import com.mitrais.cdcpos.dto.store.StoreDto;
-import com.mitrais.cdcpos.entity.CategoryEntity;
-
 import com.mitrais.cdcpos.dto.store.*;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.ParameterEntity;
-
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
 import com.mitrais.cdcpos.entity.auth.UserEntity;
 import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
-
 import com.mitrais.cdcpos.entity.item.SupplierEntity;
+import com.mitrais.cdcpos.entity.store.StoreEmployeeEntity;
 import com.mitrais.cdcpos.entity.store.StoreEntity;
 import com.mitrais.cdcpos.entity.store.StoreItemEntity;
-import com.mitrais.cdcpos.repository.IncomingItemRepository;
-import com.mitrais.cdcpos.repository.StoreRepository;
-import com.mitrais.cdcpos.repository.UserRepository;
-import com.mitrais.cdcpos.entity.store.StoreEntity;
-import com.mitrais.cdcpos.entity.store.StoreItemEntity;
+import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.repository.*;
 import io.swagger.v3.core.util.Json;
 import lombok.SneakyThrows;
@@ -33,18 +24,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import org.springframework.data.domain.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,37 +37,29 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
-    @Mock
-    private StoreRepository storeRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private ParameterRepository parameterRepository;
-
-    @Mock
-    private StoreItemRepository storeItemRepository;
-
-    @Mock
-    private IncomingItemRepository incomingItemRepository;
-
-    @Mock
-    private ItemRepository itemRepository;
-
-
-    @InjectMocks
-    private StoreService storeService;
-
     private static final List<StoreEntity> storeList = new ArrayList<>();
     private static final List<ItemEntity> itemList = new ArrayList<>();
-
     private static final List<ParameterEntity> parameterList = new ArrayList<>();
     private static final List<CategoryEntity> categoryList = new ArrayList<>();
     private static final List<StoreItemEntity> storeItemList = new ArrayList<>();
     private static final List<IncomingItemEntity> incomingItemList = new ArrayList<>();
     private static final List<SupplierEntity> supplierList = new ArrayList<>();
-
+    @Mock
+    private StoreEmployeeRepository storeEmployeeRepository;
+    @Mock
+    private StoreRepository storeRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private ParameterRepository parameterRepository;
+    @Mock
+    private StoreItemRepository storeItemRepository;
+    @Mock
+    private IncomingItemRepository incomingItemRepository;
+    @Mock
+    private ItemRepository itemRepository;
+    @InjectMocks
+    private StoreService storeService;
 
     @BeforeAll
     static void beforeAll() {
@@ -95,8 +70,7 @@ class StoreServiceTest {
             storeEntity.setManager(null);
             storeList.add(storeEntity);
         }
-        supplierList.add(new SupplierEntity(UUID.randomUUID(),"sup 1", "sup 1", "0812138132","sup@gmail.com",
-                "jalan raya"));
+        supplierList.add(new SupplierEntity(UUID.randomUUID(), "sup 1", "sup 1", "0812138132", "sup@gmail.com", "jalan raya"));
 
         parameterList.add(new ParameterEntity(UUID.randomUUID(), "tax_percentage", "10"));
         parameterList.add(new ParameterEntity(UUID.randomUUID(), "profit_percentage", "12"));
@@ -136,7 +110,7 @@ class StoreServiceTest {
     }
 
     @Test
-    public void getById(){
+    public void getById() {
         StoreEntity storeEntity = new StoreEntity();
         storeEntity.setName("Store");
         storeEntity.setLocation("Loc");
@@ -144,10 +118,10 @@ class StoreServiceTest {
         Optional<StoreEntity> optionalResult = Optional.of(storeEntity);
 
         UUID id = UUID.randomUUID();
-        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalResult);
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(any())).thenReturn(optionalResult);
 
-        assertSame(storeEntity,storeService.getById(id).get());
-        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+        assertSame(storeEntity, storeService.getById(id).get());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(any());
     }
 
     @Test
@@ -199,7 +173,7 @@ class StoreServiceTest {
     }
 
     @Test
-    public void update(){
+    public void update() {
 
         StoreEntity oldStore = new StoreEntity();
         oldStore.setLocation("Yogya");
@@ -212,20 +186,20 @@ class StoreServiceTest {
         updatedStore.setName("Jakarta Store");
         updatedStore.setManager(null);
 
-        when(storeRepository.save((StoreEntity) any())).thenReturn(updatedStore);
-        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalOldStore);
+        when(storeRepository.save(any())).thenReturn(updatedStore);
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(any())).thenReturn(optionalOldStore);
         UUID id = UUID.randomUUID();
 
         StoreDto storeDto = new StoreDto();
         storeDto.setLocation("Jakarta");
         storeDto.setName("Jakarta Store");
         assertSame(updatedStore, storeService.update(id, storeDto));
-        verify(storeRepository, times(1)).save((StoreEntity) any());
-        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+        verify(storeRepository, times(1)).save(any());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(any());
     }
 
     @Test
-    public void delete(){
+    public void delete() {
         StoreEntity store = new StoreEntity();
         store.setLocation("Yogya");
         store.setManager(null);
@@ -239,12 +213,12 @@ class StoreServiceTest {
         deletedStore.setDeletedAt(LocalDateTime.now());
 
         UUID id = UUID.randomUUID();
-        when(storeRepository.findByIdEqualsAndDeletedAtIsNull((UUID) any())).thenReturn(optionalStore);
-        when(storeRepository.save((StoreEntity) any())).thenReturn(deletedStore);
+        when(storeRepository.findByIdEqualsAndDeletedAtIsNull(any())).thenReturn(optionalStore);
+        when(storeRepository.save(any())).thenReturn(deletedStore);
 
         assertSame(deletedStore, storeService.delete(id));
-        verify(storeRepository, times(1)).save((StoreEntity) any());
-        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull((UUID) any());
+        verify(storeRepository, times(1)).save(any());
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(any());
     }
 
     @SneakyThrows
@@ -275,21 +249,19 @@ class StoreServiceTest {
     }
 
     @Test
-    public void getAllExpiredStoreItem(){
-        when(incomingItemRepository.findAllExpired((Pageable) any(),  any(), anyString(),any(),any())).thenReturn(new PageImpl<>(incomingItemList));
-        when(incomingItemRepository.findAllExpired((Sort) any(),  any(), anyString(),any(),any())).thenReturn(incomingItemList);
+    public void getAllExpiredStoreItem() {
+        when(incomingItemRepository.findAllExpired((Pageable) any(), any(), anyString(), any(), any())).thenReturn(new PageImpl<>(incomingItemList));
+        when(incomingItemRepository.findAllExpired((Sort) any(), any(), anyString(), any(), any())).thenReturn(incomingItemList);
 
-        Page<IncomingItemResponseDto> result = storeService.storeListOfExpiredItems(storeList.get(0).getId(),false,0,3,"",
-                "supplier","asc",LocalDateTime.now().minusYears(10),LocalDateTime.now());
-        Page<IncomingItemResponseDto> resultPaged = storeService.storeListOfExpiredItems(storeList.get(0).getId(),true,0,3,"",
-                "supplier","asc",LocalDateTime.now().minusYears(10),LocalDateTime.now());
+        Page<IncomingItemResponseDto> result = storeService.storeListOfExpiredItems(storeList.get(0).getId(), false, 0, 3, "", "supplier", "asc", LocalDateTime.now().minusYears(10), LocalDateTime.now());
+        Page<IncomingItemResponseDto> resultPaged = storeService.storeListOfExpiredItems(storeList.get(0).getId(), true, 0, 3, "", "supplier", "asc", LocalDateTime.now().minusYears(10), LocalDateTime.now());
 
         List<IncomingItemResponseDto> items = incomingItemList.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
         assertTrue(resultPaged.equals(result));
         assertEquals(items.get(0), result.getContent().get(0));
 
-        verify(incomingItemRepository).findAllExpired((Pageable) any(),  any(), anyString(),any(),any());
-        verify(incomingItemRepository).findAllExpired((Sort) any(),  any(), anyString(),any(),any());
+        verify(incomingItemRepository).findAllExpired((Pageable) any(), any(), anyString(), any(), any());
+        verify(incomingItemRepository).findAllExpired((Sort) any(), any(), anyString(), any(), any());
     }
 
     public void storeListOfItems() {
@@ -317,9 +289,75 @@ class StoreServiceTest {
         assertEquals(1, resultNonPaginated.getContent().size());
 
         //test the formula: f(pricePerItem + (profit% * pricePerItem)) + (f() * tax%)
-        assertTrue(resultNonPaginated.getContent().get(0).getBySystemPrice().compareTo(new BigDecimal(18480))==0);
+        assertTrue(resultNonPaginated.getContent().get(0).getBySystemPrice().compareTo(new BigDecimal(18480)) == 0);
 
         assertEquals("Makanan R", resultNonPaginated.getContent().get(0).getName());
+    }
+
+    @Test
+    public void getStoreEmployee() {
+        RoleEntity roleCashier = new RoleEntity();
+        roleCashier.setName(ERole.ROLE_CASHIER);
+        RoleEntity roleStockist = new RoleEntity();
+        roleStockist.setName(ERole.ROLE_STOCKIST);
+
+        UserEntity cashier = new UserEntity();
+        cashier.setRoles(Set.of(roleCashier));
+
+        UserEntity stockist = new UserEntity();
+        stockist.setRoles(Set.of(roleStockist));
+
+        StoreEntity store = new StoreEntity();
+
+        StoreEmployeeEntity storeEmployee = new StoreEmployeeEntity();
+        storeEmployee.setStore(store);
+        storeEmployee.setUser(cashier);
+
+        StoreEmployeeEntity storeEmployee1 = new StoreEmployeeEntity();
+        storeEmployee.setStore(store);
+        storeEmployee.setUser(stockist);
+
+        Optional<StoreEntity> optionalStore = Optional.of(store);
+        when(this.storeRepository.findByIdEqualsAndDeletedAtIsNull(any())).thenReturn(optionalStore);
+
+        PageImpl<StoreEmployeeEntity> pageImpl = new PageImpl<>(List.of(storeEmployee1, storeEmployee1));
+        when(this.storeEmployeeRepository.search(any(), any(), (Pageable) any())).thenReturn(pageImpl);
+
+        Page<StoreEmployeeEntity> actualStoreEmployee = this.storeService.getStoreEmployee(UUID.randomUUID(), true, 1, 3, "", "id", "ASC");
+
+        assertSame(pageImpl, actualStoreEmployee);
+        verify(this.storeRepository).findByIdEqualsAndDeletedAtIsNull(any());
+        verify(this.storeEmployeeRepository).search(any(), any(), (Pageable) any());
+    }
+
+    @Test
+    public void addEmployeeToStoreTest() throws ManualValidationFailException {
+        RoleEntity roleCashier = new RoleEntity();
+        roleCashier.setName(ERole.ROLE_CASHIER);
+
+        UserEntity cashier = new UserEntity();
+        cashier.setRoles(Set.of(roleCashier));
+
+        StoreEntity store = new StoreEntity();
+        StoreEmployeeEntity storeEmployee = new StoreEmployeeEntity();
+        storeEmployee.setStore(store);
+        storeEmployee.setUser(cashier);
+
+        Optional<StoreEntity> optionalStore = Optional.of(store);
+        when(this.storeRepository.findByIdEqualsAndDeletedAtIsNull(any())).thenReturn(optionalStore);
+        when(this.userRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(cashier);
+        when(this.storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(any(), any())).thenReturn(false);
+//        when(this.storeEmployeeRepository.save(storeEmployee)).thenReturn(storeEmployee);
+        doReturn(storeEmployee).when(this.storeEmployeeRepository).save(any());
+
+
+        StoreEmployeeEntity res = this.storeService.addEmployee(UUID.randomUUID(), UUID.randomUUID());
+        assertSame(storeEmployee.getStore(), res.getStore());
+
+        verify(storeRepository, times(1)).findByIdEqualsAndDeletedAtIsNull(any());
+        verify(userRepository, times(1)).findByIdAndDeletedAtIsNull(any());
+        verify(storeEmployeeRepository, times(1)).existsByUser_IdEqualsAndStore_IdEquals(any(), any());
+        verify(storeEmployeeRepository, times(1)).save(any());
     }
 
     @Test
@@ -345,7 +383,7 @@ class StoreServiceTest {
         Json.prettyPrint(result);
 
         assertEquals(1, result.size());
-        assertTrue(result.get(0).getBySystemPrice().compareTo(new BigDecimal(0))==0);
+        assertTrue(result.get(0).getBySystemPrice().compareTo(new BigDecimal(0)) == 0);
         assertEquals("Makanan R", result.get(0).getName());
 
     }
@@ -372,8 +410,8 @@ class StoreServiceTest {
 
         Json.prettyPrint(result);
 
-        assertTrue(result.getBySystemPrice().compareTo(new BigDecimal(0))==0);
-        assertTrue(result.getFixedPrice().compareTo(new BigDecimal(10000))==0);
+        assertTrue(result.getBySystemPrice().compareTo(new BigDecimal(0)) == 0);
+        assertTrue(result.getFixedPrice().compareTo(new BigDecimal(10000)) == 0);
         assertEquals(StoreItemEntity.PriceMode.FIXED.toString(), result.getPriceMode());
     }
 }
