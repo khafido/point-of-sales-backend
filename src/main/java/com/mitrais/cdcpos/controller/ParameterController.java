@@ -68,5 +68,10 @@ public class ParameterController {
 
     }
 
+    @GetMapping("/check-parameter/{parameter}")
+    public boolean checkParameter(@PathVariable("parameter") String parameter){
+        return parameterService.isParameterExist(parameter);
+    }
+
 
 }

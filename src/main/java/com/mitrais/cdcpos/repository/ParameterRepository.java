@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface ParameterRepository extends JpaRepository<ParameterEntity, UUID> {
 
     Optional<ParameterEntity> findByNameIgnoreCase(String name);
+
+    boolean existsByName(String name);
 }
