@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.UUID;
@@ -18,7 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "voucher", schema = "public")
+@Table(name = "voucher", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
 public class VoucherEntity extends EntityAudit {
 
     @Id
