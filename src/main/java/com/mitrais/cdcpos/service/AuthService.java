@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.entity.auth.UserRoleEntity;
 import com.mitrais.cdcpos.repository.*;
 import com.mitrais.cdcpos.security.jwt.JwtUtils;
 import com.mitrais.cdcpos.security.services.UserDetailsImpl;
+import lombok.AllArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

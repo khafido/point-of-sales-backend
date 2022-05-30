@@ -100,4 +100,17 @@ public class ParameterServiceTest {
         verify(parameterRepository).save(any(ParameterEntity.class));
     }
 
+    @Test
+    public void checkParameterExists(){
+        when(parameterRepository.existsByName(anyString())).thenReturn(true);
+        var resultTrue = parameterService.isParameterExist(parameterList.get(0).getName());
+        assertTrue(resultTrue);
+
+        when(parameterRepository.existsByName(anyString())).thenReturn(false);
+        var resultFalse = parameterService.isParameterExist("notExist");
+        assertFalse(resultFalse);
+
+        verify(parameterRepository,Mockito.times(2)).existsByName(anyString());
+    }
+
 }
