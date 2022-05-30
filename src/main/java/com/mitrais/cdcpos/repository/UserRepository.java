@@ -35,7 +35,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
             "LOWER(u.address) LIKE %:search%)")
     List<UserEntity> findAllSearch(Sort sort, @Param("search") String searchVal);
 
-    UserEntity findByUsername(String username);
+    UserDto findByUsername(String username);
 
     @Query("select u from UserEntity u where u.username = ?1 and u.deletedAt is null")
     UserEntity findByUsernameAndDeletedAtIsNull(String username);
