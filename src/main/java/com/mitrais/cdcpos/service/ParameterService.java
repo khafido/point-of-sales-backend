@@ -16,12 +16,12 @@ import java.util.UUID;
 public class ParameterService {
     private final ParameterRepository parameterRepository;
 
-    public ParameterEntity add(ParameterDto req){
-        ParameterEntity parameter = new ParameterEntity();
-        parameter.setName(req.getName().toLowerCase(Locale.ROOT));
-        parameter.setValue(req.getValue());
-        return parameterRepository.save(parameter);
-    }
+//    public ParameterEntity add(ParameterDto req){
+//        ParameterEntity parameter = new ParameterEntity();
+//        //parameter.setName(req.getName().toLowerCase(Locale.ROOT));
+//        parameter.setValue(req.getValue());
+//        return parameterRepository.save(parameter);
+//    }
 
     public List<ParameterEntity> get(){
         return parameterRepository.findAll();
@@ -34,7 +34,6 @@ public class ParameterService {
 
     public ParameterEntity update(UUID id, ParameterDto req){
         var parameter = getById(id);
-        parameter.setName(req.getName());
         parameter.setValue(req.getValue());
         return parameterRepository.save(parameter);
     }
