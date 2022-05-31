@@ -324,4 +324,18 @@ public class StoreService {
         }
         return null;
     }
+
+    public StoreListOfItemsResponseDto deleteStoreItem(UUID id, UUID itemId) {
+        var storeItem = storeItemRepository.findByStoreIdAndItemId(id, itemId);
+        if(storeItem.isPresent()) {
+            var entity = storeItem.get();
+            entity.setDeletedAt(LocalDateTime.now());
+            storeItemRepository.save(entity);
+
+            var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+            var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
+            return convertAndCalculateStoreItem(entity, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()));
+        }
+        return null;
+    }
 }

@@ -40,13 +40,14 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public Page<ItemEntity> getAllToPage(
+    public PaginatedDto<ItemResponseDto> getAll(
             boolean isPaginated,
             int page,
             int size,
             String searchValue,
             String sortBy,
-            String sortDirection) {
+            String sortDirection,
+            boolean fullInformation) {
 
         Sort sort;
         Pageable paging;
@@ -67,22 +68,7 @@ public class ItemService {
             items = new PageImpl<>(itemEntityList);
         }
 
-        return items;
-    }
-
-    public PaginatedDto<ItemResponseDto> getAll(
-            boolean isPaginated,
-            int page,
-            int size,
-            String searchValue,
-            String sortBy,
-            String sortDirection,
-            boolean fullInformation) {
-
-        Page<ItemEntity> items = getAllToPage(isPaginated, page, size ,searchValue, sortBy, sortDirection);
-
         List<ItemResponseDto> itemDtoList;
-
         if(fullInformation) {
             itemDtoList = items.stream()
                     .map(ItemResponseDto::toDto)

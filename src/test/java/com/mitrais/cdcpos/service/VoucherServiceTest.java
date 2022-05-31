@@ -3,6 +3,7 @@ package com.mitrais.cdcpos.service;
 import com.mitrais.cdcpos.dto.VoucherDto;
 import com.mitrais.cdcpos.entity.VoucherEntity;
 import com.mitrais.cdcpos.repository.VoucherRepository;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +37,7 @@ public class VoucherServiceTest {
     @BeforeEach
     public void init(){
         VoucherEntity voucher1 = new VoucherEntity(UUID.randomUUID(),"voucher 1", UUID.randomUUID().toString(),
-                new BigDecimal(10000),new Date(38214132),new Date(40214132),
+                new BigDecimal(10000), LocalDateTime.now(),LocalDateTime.now(),
                 new BigDecimal(250000),"description");
         VoucherEntity voucher2 = mock(VoucherEntity.class);
         VoucherEntity voucher3 = mock(VoucherEntity.class);
@@ -73,8 +75,8 @@ public class VoucherServiceTest {
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
         dto.setMinimumPurchase(new BigDecimal(150000));
-        dto.setEnd(new Date(2121291223));
-        dto.setStart(new Date(2121291123));
+        dto.setEndDate(LocalDateTime.now().plusDays(1));
+        dto.setStartDate(LocalDateTime.now().plusDays(20));
         dto.setDescription("description");
         var result = voucherService.add(dto);
         assertNotNull(result.getCreatedAt());
@@ -91,8 +93,8 @@ public class VoucherServiceTest {
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
         dto.setMinimumPurchase(new BigDecimal(150000));
-        dto.setEnd(new Date(2121291223));
-        dto.setStart(new Date(2121291123));
+        dto.setEndDate(LocalDateTime.now().plusDays(1));
+        dto.setStartDate(LocalDateTime.now().plusDays(20));
         dto.setDescription("description");
         var result = voucherService.update(voucherList.get(0).getId(),dto);
 

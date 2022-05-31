@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,8 +15,8 @@ public class VoucherDto {
     String name;
     String code;
     BigDecimal value;
-    Date start;
-    Date end;
+    LocalDateTime startDate;
+    LocalDateTime endDate;
     BigDecimal minimumPurchase;
     String description;
 }

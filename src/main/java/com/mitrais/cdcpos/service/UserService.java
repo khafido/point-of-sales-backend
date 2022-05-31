@@ -147,43 +147,6 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-
-
-
-
-
-    public List<UserEntity> generateUsers() {
-        List<UserEntity> users = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
-            UserEntity user = new UserEntity("newuser" + i, "User", i+"", "user" + i + "@email.com", "08564823648"+i, LocalDate.now());
-            user.setPassword(encoder.encode("user" + i));
-            user.setAddress("Jl. Ahmad Yani No. " + i);
-            if (i % 2 == 0) {
-                user.setGender("Male");
-            } else {
-                user.setGender("Female");
-            }
-            Set<RoleEntity> roles = new HashSet<>();
-            roles.add(roleRepository.findByName(ERole.ROLE_EMPLOYEE).orElse(null));
-            user.setRoles(roles);
-
-            users.add(user);
-        }
-        userRepository.saveAll(users);
-        return users;
-    }
-
-    public List<RoleEntity> generateRole() {
-        List<RoleEntity> roles = new ArrayList<>();
-        roles.add(new RoleEntity(ERole.ROLE_EMPLOYEE));
-        roles.add(new RoleEntity(ERole.ROLE_ADMIN));
-        roles.add(new RoleEntity(ERole.ROLE_MANAGER));
-        roles.add(new RoleEntity(ERole.ROLE_OWNER));
-        roles.add(new RoleEntity(ERole.ROLE_CASHIER));
-        roles.add(new RoleEntity(ERole.ROLE_STOCKIST));
-        return roleRepository.saveAll(roles);
-    }
-
     public UserEntity getByUsername(String username) {
         UserEntity user = userRepository.findByUsername(username);
         if (user != null) {

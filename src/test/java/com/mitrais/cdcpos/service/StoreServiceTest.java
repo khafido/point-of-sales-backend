@@ -3,6 +3,7 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
 import com.mitrais.cdcpos.dto.store.*;
+import com.mitrais.cdcpos.dto.store.StoreListOfItemsResponseDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.ParameterEntity;
 import com.mitrais.cdcpos.entity.auth.ERole;
@@ -18,11 +19,21 @@ import com.mitrais.cdcpos.entity.store.StoreItemEntity;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 
 import com.mitrais.cdcpos.repository.IncomingItemRepository;
+import com.mitrais.cdcpos.repository.ItemRepository;
+import com.mitrais.cdcpos.repository.ParameterRepository;
+import com.mitrais.cdcpos.repository.StoreEmployeeRepository;
+import com.mitrais.cdcpos.repository.StoreItemRepository;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
 
 import com.mitrais.cdcpos.repository.*;
 import io.swagger.v3.core.util.Json;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
+
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -30,6 +41,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 
 
@@ -39,9 +52,19 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ContextConfiguration(classes = {StoreService.class})
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
     private static final List<StoreEntity> storeList = new ArrayList<>();
@@ -382,7 +405,7 @@ class StoreServiceTest {
         when(itemRepository.findByIdAndDeletedAtIsNull(item.getId())).thenReturn(Optional.of(item));
         when(storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId())).thenReturn(Optional.empty());
         when(storeItemRepository.save(any())).thenReturn(storeItem);
-        when(incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of());
+        when(incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("buyDate").descending()), store.getId(), item.getId())).thenReturn(List.of());
 
         StoreAddItemRequestDto requestDto = new StoreAddItemRequestDto();
         requestDto.setItemIdList(List.of(item.getId().toString()));
@@ -422,5 +445,23 @@ class StoreServiceTest {
         assertTrue(result.getFixedPrice().compareTo(new BigDecimal(10000)) == 0);
         assertEquals(StoreItemEntity.PriceMode.FIXED.toString(), result.getPriceMode());
     }
+
+    @Test
+    public void deleteStoreItem() {
+        var tax = parameterList.get(0);
+        var profit = parameterList.get(1);
+        var storeItem = storeItemList.get(0);
+
+        when(storeItemRepository.findByStoreIdAndItemId(storeItem.getStore().getId(), storeItem.getItem().getId())).thenReturn(Optional.of(storeItem));
+        when(storeItemRepository.save(any(StoreItemEntity.class))).thenReturn(storeItem);
+        when(parameterRepository.findByNameIgnoreCase("tax_percentage")).thenReturn(Optional.of(tax));
+        when(parameterRepository.findByNameIgnoreCase("profit_percentage")).thenReturn(Optional.of(profit));
+
+        var result = storeService.deleteStoreItem(storeItem.getStore().getId(), storeItem.getItem().getId());
+
+        assertEquals(result.getStoreItemId(), storeItem.getId());
+        assertEquals(result.getName(), storeItem.getItem().getName());
+    }
+
 }
 
