@@ -405,7 +405,7 @@ class StoreServiceTest {
         when(itemRepository.findByIdAndDeletedAtIsNull(item.getId())).thenReturn(Optional.of(item));
         when(storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId())).thenReturn(Optional.empty());
         when(storeItemRepository.save(any())).thenReturn(storeItem);
-        when(incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1), store.getId(), item.getId())).thenReturn(List.of());
+        when(incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("buyDate").descending()), store.getId(), item.getId())).thenReturn(List.of());
 
         StoreAddItemRequestDto requestDto = new StoreAddItemRequestDto();
         requestDto.setItemIdList(List.of(item.getId().toString()));
