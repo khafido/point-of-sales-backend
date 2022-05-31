@@ -2,53 +2,36 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.JwtDto;
 import com.mitrais.cdcpos.dto.LoginDto;
-import com.mitrais.cdcpos.dto.UserDto;
-import com.mitrais.cdcpos.entity.auth.UserEntity;
-import com.mitrais.cdcpos.repository.UserRepository;
-import com.mitrais.cdcpos.security.jwt.JwtUtils;
-import com.mitrais.cdcpos.security.services.UserDetailsImpl;
+import io.swagger.v3.core.util.Json;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class AuthServiceTest {
-    @Mock
-    UserRepository userRepository;
-
-    @InjectMocks
-    private AuthService authService;
-
-    LoginDto loginDto;
-    UserDto userDto;
+    @Autowired
+    AuthService authService;
 
     @BeforeEach
     void init() {
-        loginDto = new LoginDto();
-        loginDto.setUsername("managera");
-        loginDto.setPassword("hippos");
-
-        userDto = new UserDto();
-        userDto.setUsername("managera");
-        userDto.setPassword("hippos");
-        userDto.setFirstName("Manager");
-        userDto.setLastName("A");
 
     }
 
     @Test
     void login() {
-        when(userRepository.findByUsername("managera")).thenReturn(userDto);
-        UserDto result = authService.login(loginDto).getUser();
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUsername("managera");
+        loginDto.setPassword("hippos");
+
+        JwtDto result = authService.login(loginDto);
+        Json.pretty(result);
+        assertNotNull(result);
+        assertEquals(loginDto.getUsername(), result.getUser().getUsername());
     }
 
     @Test

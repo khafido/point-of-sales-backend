@@ -101,7 +101,7 @@ public class AuthService {
     }
 
     public boolean changePassword(ChangePasswordDto req) {
-        UserDto user = userRepository.findByUsername(getLoggedUsername());
+        UserEntity user = userRepository.findByUsername(getLoggedUsername());
 
         if (encoder.matches(req.getOldPassword(), user.getPassword())) {
             user.setPassword(encoder.encode(req.getNewPassword()));

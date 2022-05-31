@@ -184,8 +184,8 @@ public class UserService {
         return roleRepository.saveAll(roles);
     }
 
-    public UserDto getByUsername(String username) {
-        UserDto user = userRepository.findByUsername(username);
+    public UserEntity getByUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username);
         if (user != null) {
             return user;
         }
@@ -193,7 +193,7 @@ public class UserService {
     }
 
     public Boolean checkPassword(String username, String password) {
-        UserDto user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(username);
         if (user != null) {
             if (encoder.matches(password, user.getPassword()) == true) {
                 logger.info("" + user.getUsername() + " Password is correct");

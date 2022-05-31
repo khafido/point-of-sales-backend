@@ -3,6 +3,7 @@ package com.mitrais.cdcpos.service;
 
 import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
 import com.mitrais.cdcpos.dto.store.*;
+import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.ParameterEntity;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.auth.RoleEntity;
