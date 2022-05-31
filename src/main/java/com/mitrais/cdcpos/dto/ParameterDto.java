@@ -11,8 +11,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor
 public class ParameterDto {
     @NotEmpty
-    String name;
-    @NotEmpty
     String value;
 
 }
