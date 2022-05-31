@@ -75,8 +75,8 @@ public class VoucherServiceTest {
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
         dto.setMinimumPurchase(new BigDecimal(150000));
-        dto.setEnd(LocalDateTime.now().plusDays(1));
-        dto.setStart(LocalDateTime.now().plusDays(20));
+        dto.setEndDate(LocalDateTime.now().plusDays(1));
+        dto.setStartDate(LocalDateTime.now().plusDays(20));
         dto.setDescription("description");
         var result = voucherService.add(dto);
         assertNotNull(result.getCreatedAt());
@@ -93,8 +93,8 @@ public class VoucherServiceTest {
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
         dto.setMinimumPurchase(new BigDecimal(150000));
-        dto.setEnd(LocalDateTime.now().plusDays(1));
-        dto.setStart(LocalDateTime.now().plusDays(20));
+        dto.setEndDate(LocalDateTime.now().plusDays(1));
+        dto.setStartDate(LocalDateTime.now().plusDays(20));
         dto.setDescription("description");
         var result = voucherService.update(voucherList.get(0).getId(),dto);
 
