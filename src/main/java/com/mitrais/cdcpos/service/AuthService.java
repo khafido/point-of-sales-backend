@@ -116,6 +116,22 @@ public class AuthService {
         }
     }
 
+    public boolean changePassword(ChangePasswordDto req, String username) {
+        UserEntity user = userRepository.findByUsername(username);
+
+        if (encoder.matches(req.getOldPassword(), user.getPassword())) {
+            user.setPassword(encoder.encode(req.getNewPassword()));
+            UserEntity userEntity = new UserEntity();
+            userEntity.setId(user.getId());
+            userEntity.setPassword(user.getPassword());
+
+            userRepository.save(userEntity);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 //    public ResponseEntity<GenericResponse> register(SignUpDto signUpRequest) {
 //        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 //            return ResponseEntity
