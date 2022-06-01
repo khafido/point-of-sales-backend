@@ -84,8 +84,8 @@ insert into store values
     ('2ccd86d8-91c9-4295-b4c0-a40dc8b190a4', now(), null, now(), 'loc 2', 'Store 2', 'c52db44f-38b1-4aa6-97d9-1afa19b6d99b');
 
 INSERT INTO public.store_item (id,created_at,deleted_at,last_modified_at,fixed_price,price_mode,stock,item_id,store_id) VALUES
-	 ('490c44e3-0a48-4281-9810-e83df76b0476',now(),NULL,now(),0.00,'BY_SYSTEM',0,'f33836af-ef69-489a-845e-5043c8fae64e','21433690-da31-4332-a6f6-8022b509ab78'),
-	 ('ab2f493c-e6e4-4788-bcd1-662c709f6e09',now(),NULL,now(),0.00,'BY_SYSTEM',0,'a2dcdddc-a906-469a-8847-504171e1f171','21433690-da31-4332-a6f6-8022b509ab78');
+	 ('490c44e3-0a48-4281-9810-e83df76b0476',now(),NULL,now(),0.00,'BY_SYSTEM',6000,'f33836af-ef69-489a-845e-5043c8fae64e','21433690-da31-4332-a6f6-8022b509ab78'),
+	 ('ab2f493c-e6e4-4788-bcd1-662c709f6e09',now(),NULL,now(),0.00,'BY_SYSTEM',6000,'a2dcdddc-a906-469a-8847-504171e1f171','21433690-da31-4332-a6f6-8022b509ab78');
 
 INSERT INTO public.store_employee (id,created_at,deleted_at,last_modified_at,store_id,user_id) VALUES
 	 ('4ae2d837-1d5a-420d-ae35-3bdc99268cae','2022-05-24 10:45:43.486',NULL,'2022-05-24 10:45:43.486','21433690-da31-4332-a6f6-8022b509ab78','f6c5476f-3fc2-425f-b2db-2ab8737e226a'),
@@ -94,3 +94,11 @@ INSERT INTO public.store_employee (id,created_at,deleted_at,last_modified_at,sto
 insert into voucher (id, created_at,deleted_at,last_modified_at,name,code,description,end_date,minimum_purchase,start_date,value) values
     ('2041cf07-1772-4e3b-8016-366f680680c0', now(), null, now(), 'Voucher 1','93512fbf-d382-4a76-86a5-0bf12fac0b36', 'desc voucher 1', current_date, 10000.00,current_date, 2000.00),
     ('4621f304-8548-4e2d-86f6-4a3237f781b5', now(), null, now(), 'Voucher 2','dd93f270-3b91-41a9-884f-fbd0d0a2ac8b', 'desc voucher 2', current_date, 20000.00,current_date, 2000.00);
+
+INSERT INTO public.incoming_item
+(id, created_at, deleted_at, last_modified_at, buy_date, buy_price, buy_qty, expiry_date, price_per_item, store_item_id, supplier_id)
+VALUES
+    ('7d99b46f-416e-4adf-881e-b6547a40a0d2'::uuid, '2022-06-01 23:58:56.512', NULL, '2022-06-01 23:58:56.512', '2022-06-01 16:58:53.390', 1000000.00, 5000, '2022-06-30', 100000.00, '490c44e3-0a48-4281-9810-e83df76b0476'::uuid, 'e0f271a7-5a48-43c9-8531-0fd035029f89'::uuid),
+    ('3fed2c16-f636-47db-ae63-2e7d52cfaa59'::uuid, '2022-04-01 23:59:12.429', NULL, '2022-04-01 23:59:12.429', '2022-04-01 16:59:08.835', 100000.00, 1000, '2022-04-30', 100.00, '490c44e3-0a48-4281-9810-e83df76b0476'::uuid, 'e0f271a7-5a48-43c9-8531-0fd035029f89'::uuid),
+    ('0b498f6d-ffc8-4ae2-9f74-74f17e90408b'::uuid, '2022-06-01 23:59:34.782', NULL, '2022-06-01 23:59:34.782', '2022-06-01 16:59:31.808', 500000.00, 1000, '2022-07-30', 500.00, 'ab2f493c-e6e4-4788-bcd1-662c709f6e09'::uuid, '1990d052-9c52-42eb-85b7-7652ad7a3f4a'::uuid),
+    ('498710ab-fba9-47df-a480-ab7e1d06ec7d'::uuid, '2022-05-01 23:59:51.569', NULL, '2022-05-01 23:59:51.569', '2022-05-01 16:59:47.235', 100000000.00, 5000, '2022-05-30', 20000.00, 'ab2f493c-e6e4-4788-bcd1-662c709f6e09'::uuid, '1990d052-9c52-42eb-85b7-7652ad7a3f4a'::uuid);
