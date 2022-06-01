@@ -61,7 +61,7 @@ class AuthServiceTest {
         boolean result = authService.changePassword(changePasswordDto);
         assertEquals(true, result);
 
-        changePasswordDto.setOldPassword("wrongpassword");
+        changePasswordDto.setOldPassword("wrongoldpassword");
         result = authService.changePassword(changePasswordDto);
         assertEquals(false, result);
     }

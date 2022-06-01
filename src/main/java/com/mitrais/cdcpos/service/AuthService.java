@@ -8,6 +8,7 @@ import com.mitrais.cdcpos.entity.auth.UserRoleEntity;
 import com.mitrais.cdcpos.repository.*;
 import com.mitrais.cdcpos.security.jwt.JwtUtils;
 import com.mitrais.cdcpos.security.services.UserDetailsImpl;
+import io.swagger.v3.core.util.Json;
 import lombok.AllArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,11 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         UserDto user = userService.getActiveUserById(userDetails.getId());
+
+//        List<String> roles = user.getRoles().stream()
+//                .map(item -> item.getName())
+//                .collect(Collectors.toList());
+
         UUID storeIdEmployee = null;
         UUID storeIdManager = null;
 
@@ -89,24 +95,20 @@ public class AuthService {
     }
 
     public boolean changePassword(ChangePasswordDto req) {
-        String username = "hippos";
+        UUID userid = UUID.randomUUID();
         try {
             UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            username = user.getUsername();
+            userid = user.getId();
         } catch (ClassCastException err) {
             logger.error("No Authorization / User does not exist!");
         }
 
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByIdAndDeletedAtIsNull(userid);
 
         if (encoder.matches(req.getOldPassword(), user.getPassword())) {
-            UserEntity userEntity = new UserEntity();
-            userEntity.setId(user.getId());
-            userEntity.setEmail(user.getEmail());
-            userEntity.setUsername(user.getUsername());
-            userEntity.setPassword(encoder.encode(req.getNewPassword()));
+            user.setPassword(encoder.encode(req.getNewPassword()));
 
-            userRepository.save(userEntity);
+            userRepository.save(user);
             return true;
         } else {
             return false;
