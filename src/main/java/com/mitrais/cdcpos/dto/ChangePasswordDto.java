@@ -16,6 +16,6 @@ public class ChangePasswordDto {
     private String oldPassword;
     @JsonProperty("new")
     private String newPassword;
-    @JsonProperty("confirmation")
-    private String confirmPassword;
+//    @JsonProperty("confirmation")
+//    private String confirmPassword;
 }

@@ -148,32 +148,32 @@ public class UserService {
     }
 
     public UserEntity getByUsername(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username);
-        if (userEntity != null) {
-            return userEntity;
+        UserEntity user = userRepository.findByUsername(username);
+        if (user != null) {
+            return user;
         }
         return null;
     }
 
     public Boolean checkPassword(String username, String password) {
-        UserEntity userEntity = userRepository.findByUsername(username);
-        if (userEntity != null) {
-            if (encoder.matches(password, userEntity.getPassword()) == true) {
-                logger.info("" + userEntity.getUsername() + " Password is correct");
+        UserEntity user = userRepository.findByUsername(username);
+        if (user != null) {
+            if (encoder.matches(password, user.getPassword()) == true) {
+                logger.info("" + user.getUsername() + " Password is correct");
                 return true;
             } else {
-                logger.info("" + userEntity.getUsername() + " Password is incorrect");
+                logger.info("" + user.getUsername() + " Password is incorrect");
                 return false;
             }
         }
         return false;
     }
 
-    public UserEntity changePassword(String username, String newPassword) {
-        UserEntity user = getByUsername(username);
-        user.setPassword(encoder.encode(newPassword));
-        return userRepository.save(user);
-    }
+//    public UserEntity changePassword(String username, String newPassword) {
+//        UserEntity user = getByUsername(username);
+//        user.setPassword(encoder.encode(newPassword));
+//        return userRepository.save(user);
+//    }
 
     public UserEntity addRoles(UUID id, AddRoleDto req){
         UserEntity user = getById(id);

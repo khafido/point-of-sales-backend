@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
