@@ -55,18 +55,6 @@ public class AuthService {
 
     Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    public String getLoggedUsername() {
-        String username = "hippos";
-        try {
-            UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            username = user.getUsername();
-        } catch (ClassCastException err) {
-            logger.error("No Authorization / User does not exist!");
-        }
-
-        return username;
-    }
-
     public JwtDto login(LoginDto loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -101,29 +89,22 @@ public class AuthService {
     }
 
     public boolean changePassword(ChangePasswordDto req) {
-        UserEntity user = userRepository.findByUsername(getLoggedUsername());
-
-        if (encoder.matches(req.getOldPassword(), user.getPassword())) {
-            user.setPassword(encoder.encode(req.getNewPassword()));
-            UserEntity userEntity = new UserEntity();
-            userEntity.setId(user.getId());
-            userEntity.setPassword(user.getPassword());
-
-            userRepository.save(userEntity);
-            return true;
-        } else {
-            return false;
+        String username = "hippos";
+        try {
+            UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            username = user.getUsername();
+        } catch (ClassCastException err) {
+            logger.error("No Authorization / User does not exist!");
         }
-    }
 
-    public boolean changePassword(ChangePasswordDto req, String username) {
         UserEntity user = userRepository.findByUsername(username);
 
         if (encoder.matches(req.getOldPassword(), user.getPassword())) {
-            user.setPassword(encoder.encode(req.getNewPassword()));
             UserEntity userEntity = new UserEntity();
             userEntity.setId(user.getId());
-            userEntity.setPassword(user.getPassword());
+            userEntity.setEmail(user.getEmail());
+            userEntity.setUsername(user.getUsername());
+            userEntity.setPassword(encoder.encode(req.getNewPassword()));
 
             userRepository.save(userEntity);
             return true;
