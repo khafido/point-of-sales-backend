@@ -24,6 +24,7 @@ public class VoucherService {
         voucherEntity.setName(req.getName());
         voucherEntity.setCode(req.getCode());
         voucherEntity.setValue(req.getValue());
+        voucherEntity.setQuota(req.getQuota());
         voucherEntity.setStartDate(req.getStartDate());
         voucherEntity.setEndDate(req.getEndDate());
         voucherEntity.setMinimumPurchase(req.getMinimumPurchase());
@@ -57,6 +58,7 @@ public class VoucherService {
         var voucherEntity = voucherRepository.getById(id);
         voucherEntity.setName(req.getName());
         voucherEntity.setValue(req.getValue());
+        voucherEntity.setQuota(req.getQuota());
         voucherEntity.setStartDate(req.getStartDate());
         voucherEntity.setEndDate(req.getEndDate());
         voucherEntity.setMinimumPurchase(req.getMinimumPurchase());

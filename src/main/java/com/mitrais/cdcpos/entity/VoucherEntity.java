@@ -33,6 +33,9 @@ public class VoucherEntity extends EntityAudit {
     @Column(name = "value")
     private BigDecimal value;
 
+    @Column(name = "quota")
+    private long quota;
+
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
