@@ -52,7 +52,12 @@ public class UserService {
             String sortDirection
     ) {
 //        searchValue = searchValue.toLowerCase();
-        Sort sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
+        Sort sort;
+        if (sortDirection.equalsIgnoreCase("asc")) {
+            sort = Sort.by("firstName").ascending().and(Sort.by("lastName").ascending());
+        } else {
+            sort = Sort.by("firstName").descending().and(Sort.by("lastName").descending());
+        }
 
         Pageable paging = null;
         Page<UserEntity> result = null;
