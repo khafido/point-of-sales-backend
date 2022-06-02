@@ -15,6 +15,7 @@ public class VoucherDto {
     String name;
     String code;
     BigDecimal value;
+    long quota;
     LocalDateTime startDate;
     LocalDateTime endDate;
     BigDecimal minimumPurchase;

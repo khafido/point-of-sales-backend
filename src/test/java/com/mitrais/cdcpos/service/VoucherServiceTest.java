@@ -37,7 +37,7 @@ public class VoucherServiceTest {
     @BeforeEach
     public void init(){
         VoucherEntity voucher1 = new VoucherEntity(UUID.randomUUID(),"voucher 1", UUID.randomUUID().toString(),
-                new BigDecimal(10000), LocalDateTime.now(),LocalDateTime.now(),
+                new BigDecimal(10000), 10,LocalDateTime.now(),LocalDateTime.now(),
                 new BigDecimal(250000),"description");
         VoucherEntity voucher2 = mock(VoucherEntity.class);
         VoucherEntity voucher3 = mock(VoucherEntity.class);
@@ -74,6 +74,7 @@ public class VoucherServiceTest {
         dto.setName("voucher 1");
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
+        dto.setQuota(10);
         dto.setMinimumPurchase(new BigDecimal(150000));
         dto.setEndDate(LocalDateTime.now().plusDays(1));
         dto.setStartDate(LocalDateTime.now().plusDays(20));
@@ -92,6 +93,7 @@ public class VoucherServiceTest {
         dto.setName("voucher 1");
         dto.setCode(UUID.randomUUID().toString());
         dto.setValue(new BigDecimal(50000));
+        dto.setQuota(20);
         dto.setMinimumPurchase(new BigDecimal(150000));
         dto.setEndDate(LocalDateTime.now().plusDays(1));
         dto.setStartDate(LocalDateTime.now().plusDays(20));
