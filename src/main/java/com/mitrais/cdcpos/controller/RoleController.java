@@ -18,11 +18,6 @@ import java.util.List;
 public class RoleController {
     private final RoleService roleService;
 
-    @GetMapping("/generate")
-    public List<RoleEntity> addRoles(){
-        return roleService.generateRole();
-    }
-
     @GetMapping("")
     public ResponseEntity<GenericResponse> getAll(){
         try{

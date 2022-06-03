@@ -4,13 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.tomcat.jni.Local;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -18,7 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "voucher", schema = "public")
+@Table(name = "voucher", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "code"))
 public class VoucherEntity extends EntityAudit {
 
     @Id
@@ -34,11 +33,14 @@ public class VoucherEntity extends EntityAudit {
     @Column(name = "value")
     private BigDecimal value;
 
+    @Column(name = "quota")
+    private long quota;
+
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDateTime endDate;
 
     @Column(name = "minimum_purchase")
     private BigDecimal minimumPurchase;

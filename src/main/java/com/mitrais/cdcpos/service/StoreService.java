@@ -1,10 +1,8 @@
 package com.mitrais.cdcpos.service;
 
 
-import com.mitrais.cdcpos.dto.store.StoreAddItemRequestDto;
-import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
-import com.mitrais.cdcpos.dto.store.StoreDto;
-import com.mitrais.cdcpos.dto.store.StoreListOfItemsResponseDto;
+import com.mitrais.cdcpos.dto.IncomingItemResponseDto;
+import com.mitrais.cdcpos.dto.store.*;
 import com.mitrais.cdcpos.entity.auth.ERole;
 import com.mitrais.cdcpos.entity.item.IncomingItemEntity;
 import com.mitrais.cdcpos.dto.AddEmployeeDto;
@@ -17,16 +15,14 @@ import com.mitrais.cdcpos.repository.*;
 import com.mitrais.cdcpos.repository.StoreEmployeeRepository;
 import com.mitrais.cdcpos.repository.StoreRepository;
 import com.mitrais.cdcpos.repository.UserRepository;
+import com.mitrais.cdcpos.util.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,35 +117,86 @@ public class StoreService {
         return null;
     }
 
-    public StoreItemEntity addItemToStore(UUID id, StoreAddItemRequestDto request) {
+    public List<StoreListOfItemsResponseDto> addItemToStore(UUID id, StoreAddItemRequestDto request) {
         var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
-        var optionalItem = itemRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getItemId()));
+        var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+        var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
 
-        if(optionalStore.isPresent() && optionalItem.isPresent()) {
-            var store = optionalStore.get();
-            var item = optionalItem.get();
+        List<StoreListOfItemsResponseDto> addedStoreItem = new ArrayList<>();
+        for(String itemId : request.getItemIdList()) {
+            var optionalItem = itemRepository.findByIdAndDeletedAtIsNull(UUID.fromString(itemId));
 
-            var optionalStoreItem = storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId());
+            if(optionalStore.isPresent() && optionalItem.isPresent()) {
+                var store = optionalStore.get();
+                var item = optionalItem.get();
 
-            StoreItemEntity storeItem;
-            if(optionalStoreItem.isPresent()) {
-                storeItem = optionalStoreItem.get();
-                storeItem.setDeletedAt(null);
-            } else {
-                storeItem = new StoreItemEntity();
-                storeItem.setStore(store);
-                storeItem.setItem(item);
-                storeItem.setStock(0);
+                var optionalStoreItem = storeItemRepository.findByStoreIdAndItemId(store.getId(), item.getId());
+
+                StoreItemEntity storeItem;
+                if(optionalStoreItem.isPresent()) {
+                    storeItem = optionalStoreItem.get();
+                    storeItem.setDeletedAt(null);
+                } else {
+                    storeItem = new StoreItemEntity();
+                    storeItem.setStore(store);
+                    storeItem.setItem(item);
+                    storeItem.setStock(0);
+                    storeItem.setFixedPrice(new BigDecimal(0));
+                    storeItem.setPriceMode(StoreItemEntity.PriceMode.BY_SYSTEM);
+                }
+                storeItemRepository.save(storeItem);
+                addedStoreItem.add(convertAndCalculateStoreItem(storeItem, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue())));
             }
-            return storeItemRepository.save(storeItem);
         }
-        return null;
+        return addedStoreItem;
+    }
+
+    public Page<IncomingItemResponseDto> storeListOfExpiredItems(UUID id, boolean paginated, int page, int size,
+                                                                 String search, String sortBy, String sortDirection,
+                                                                 LocalDateTime start, LocalDateTime end){
+
+        Sort sort;
+        Pageable paging;
+        Page<IncomingItemEntity> storeExpiredItems;
+
+        if(sortBy.equalsIgnoreCase("supplier")){
+            sortBy = sortBy.concat(".name");
+        }else if(sortBy.equalsIgnoreCase("buyDate")){
+            sortBy = "buyDate";
+        }else if(sortBy.equalsIgnoreCase("expiryDate")){
+            sortBy = "expiryDate";
+        }
+        else{
+            sortBy = "storeItem.item.name";
+        }
+
+        if("DESC".equalsIgnoreCase(sortDirection)) {
+            sort = Sort.by(sortBy).descending();
+        } else {
+            sort = Sort.by(sortBy).ascending();
+        }
+
+        if(paginated){
+            paging = PageRequest.of(page,size,sort);
+            storeExpiredItems = incomingItemRepository.findAllExpired(paging,id,search,start,end);
+            return storeExpiredItems.map(IncomingItemResponseDto::toDto);
+        }else{
+            var list = incomingItemRepository.findAllExpired(sort,id,search,start,end);
+            var result =  list.stream().map(IncomingItemResponseDto::toDto).collect(Collectors.toList());
+            return new PageImpl<>(result);
+        }
+
     }
 
     public Page<StoreListOfItemsResponseDto> storeListOfItems(UUID id, Boolean paginated, Integer page, Integer size, String searchValue, String sortBy, String sortDirection) {
         Sort sort;
         Pageable paging;
         Page<StoreItemEntity> storeItemEntities;
+
+        String[] itemColumns = {"name", "category", "packaging"};
+        if(Arrays.stream(itemColumns).anyMatch(sortBy::equalsIgnoreCase)) {
+            sortBy = "item.".concat(sortBy);
+        }
 
         if ("DESC".equalsIgnoreCase(sortDirection)) {
             sort = Sort.by(sortBy).descending();
@@ -164,9 +211,8 @@ public class StoreService {
             paging = PageRequest.of(page, size, sort);
             storeItemEntities = storeItemRepository.findByStoreIdWithSearch(paging, id, searchValue);
 
-            Page<StoreListOfItemsResponseDto> result = storeItemEntities.map(entity ->
+            return storeItemEntities.map(entity ->
                     convertAndCalculateStoreItem(entity, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue())));
-            return result;
         } else {
             List<StoreItemEntity> storeEntities = storeItemRepository.findByStoreIdWithSearch(sort, id, searchValue);
             List<StoreListOfItemsResponseDto> result = storeEntities.stream().map(entity ->
@@ -178,21 +224,21 @@ public class StoreService {
     }
 
     private StoreListOfItemsResponseDto convertAndCalculateStoreItem(StoreItemEntity entity, int taxPercent, int profitPercent) {
-        List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.latestIncomingByStoreIdAndItemId(PageRequest.of(0, 1), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> latestIncomingItem = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("buyDate").descending()), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> incomingItemByEarliestExpired = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("expiryDate").ascending()), entity.getStore().getId(), entity.getItem().getId());
+        List<IncomingItemEntity> incomingItemByLatestExpired = incomingItemRepository.findByStoreIdAndItemId(PageRequest.of(0, 1, Sort.by("expiryDate").descending()), entity.getStore().getId(), entity.getItem().getId());
 
         BigDecimal bySystemPrice;
-        // bySystemPrice Formula: f(buyPrice + (profit% * buyPrice)) + (f() * tax%)
         if (latestIncomingItem.size() > 0) {
-            BigDecimal buyPrice = latestIncomingItem.get(0).getBuyPrice();
-            BigDecimal profitValue = buyPrice.multiply(new BigDecimal(taxPercent / 100));
-            BigDecimal buyPlusProfit = buyPrice.add(profitValue);
-            bySystemPrice = buyPlusProfit.add(buyPlusProfit.multiply(new BigDecimal(profitPercent / 100)));
+             bySystemPrice = Utils.calculateItemBySystemPrice(taxPercent, profitPercent, latestIncomingItem.get(0).getPricePerItem());
         } else {
             bySystemPrice = new BigDecimal(0);
         }
 
-        StoreListOfItemsResponseDto dto = StoreListOfItemsResponseDto.toDto(entity, bySystemPrice);
-        return dto;
+        if(incomingItemByEarliestExpired.size()>0 && incomingItemByLatestExpired.size()>0) {
+            return StoreListOfItemsResponseDto.toDto(entity, bySystemPrice, incomingItemByEarliestExpired.get(0).getExpiryDate(), incomingItemByLatestExpired.get(0).getExpiryDate());
+        }
+        return StoreListOfItemsResponseDto.toDto(entity, bySystemPrice, null, null);
     }
 
     public Page<StoreEmployeeEntity> getStoreEmployee(UUID storeId, boolean paginated, int page, int size, String searchValue, String sortBy, String sortDirection) {
@@ -220,12 +266,12 @@ public class StoreService {
         return result;
     }
 
-    public StoreEmployeeEntity addEmployee(AddEmployeeDto request) throws ManualValidationFailException {
-        var user = userRepository.findByIdAndDeletedAtIsNull(UUID.fromString(request.getUserId()));
-        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(UUID.fromString(request.getStoreId()));
+    public StoreEmployeeEntity addEmployee(UUID userId, UUID storeId) throws ManualValidationFailException {
+        var user = userRepository.findByIdAndDeletedAtIsNull(userId);
+        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(storeId);
 
         if (user != null && optionalStore.isPresent()) {
-            var isWorkingAtStore = storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(UUID.fromString(request.getUserId()), UUID.fromString(request.getStoreId()));
+            var isWorkingAtStore = storeEmployeeRepository.existsByUser_IdEqualsAndStore_IdEquals(userId, storeId);
             if(isWorkingAtStore) {
                 throw new ManualValidationFailException(user.getFirstName() + " Is Already Working In A Store");
 //                return null;
@@ -247,6 +293,48 @@ public class StoreService {
             } else {
                 throw new ManualValidationFailException(user.getFirstName() + " Is Neither A Cashier Nor Stockist");
             }
+        }
+        return null;
+    }
+
+    public StoreListOfItemsResponseDto updateStoreItemPrice(UUID id, UUID itemId, StoreUpdateItemPriceRequestDto request) throws ManualValidationFailException {
+        Optional<StoreItemEntity.PriceMode> optionalPriceMode =
+                Arrays.stream(StoreItemEntity.PriceMode.values())
+                        .filter(priceMode -> priceMode.toString().equalsIgnoreCase(request.getPriceMode()))
+                        .findAny();
+
+        if(optionalPriceMode.isEmpty()) {
+            throw new ManualValidationFailException("Invalid Price Mode");
+        }
+
+        var optionalStore = storeRepository.findByIdEqualsAndDeletedAtIsNull(id);
+        var optionalItem = itemRepository.findByIdAndDeletedAtIsNull(itemId);
+        var optionalStoreItem = storeItemRepository.findByStoreIdAndItemId(id, itemId);
+
+        if(optionalStore.isPresent() && optionalItem.isPresent() && optionalStoreItem.isPresent()) {
+            var storeItem = optionalStoreItem.get();
+            storeItem.setFixedPrice(request.getFixedPrice());
+            storeItem.setPriceMode(optionalPriceMode.get());
+
+            storeItemRepository.save(storeItem);
+
+            var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+            var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
+            return convertAndCalculateStoreItem(storeItem, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()));
+        }
+        return null;
+    }
+
+    public StoreListOfItemsResponseDto deleteStoreItem(UUID id, UUID itemId) {
+        var storeItem = storeItemRepository.findByStoreIdAndItemId(id, itemId);
+        if(storeItem.isPresent()) {
+            var entity = storeItem.get();
+            entity.setDeletedAt(LocalDateTime.now());
+            storeItemRepository.save(entity);
+
+            var taxParameter = parameterRepository.findByNameIgnoreCase("tax_percentage").get();
+            var profitParameter = parameterRepository.findByNameIgnoreCase("profit_percentage").get();
+            return convertAndCalculateStoreItem(entity, Integer.parseInt(taxParameter.getValue()), Integer.parseInt(profitParameter.getValue()));
         }
         return null;
     }

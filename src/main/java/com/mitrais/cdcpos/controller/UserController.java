@@ -122,16 +122,6 @@ public class UserController {
         return userService.isEmailExist(email);
     }
 
-//    @GetMapping("/generate-role")
-//    public List<RoleEntity> generateRole() {
-//        return userService.generateRole();
-//    }
-//
-    @GetMapping("/generate")
-    public List<UserEntity> generateAllUsers() {
-        return userService.generateUsers();
-    }
-
 
     @PatchMapping("{id}/add-roles")
     public ResponseEntity<GenericResponse> addRoles(@PathVariable("id") UUID id, @RequestBody AddRoleDto req){

@@ -21,20 +21,20 @@ import java.util.UUID;
 public class ParameterController {
     private final ParameterService parameterService;
 
-    @PostMapping("")
-    public ResponseEntity<GenericResponse> add(@RequestBody ParameterDto req){
-        ParameterEntity parameter;
-        try{
-            parameter = parameterService.add(req);
-            return new ResponseEntity<>
-                    (new GenericResponse(parameter, "Parameter created", GenericResponse.Status.CREATED),
-                            HttpStatus.CREATED);
-        } catch (DataIntegrityViolationException e){
-            return new ResponseEntity<>
-                    (new GenericResponse(req, "Paramaeter already exists", GenericResponse.Status.ERROR_INPUT),
-                            HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PostMapping("")
+//    public ResponseEntity<GenericResponse> add(@RequestBody ParameterDto req){
+//        ParameterEntity parameter;
+//        try{
+//            parameter = parameterService.add(req);
+//            return new ResponseEntity<>
+//                    (new GenericResponse(parameter, "Parameter created", GenericResponse.Status.CREATED),
+//                            HttpStatus.CREATED);
+//        } catch (DataIntegrityViolationException e){
+//            return new ResponseEntity<>
+//                    (new GenericResponse(req, "Parameter already exists", GenericResponse.Status.ERROR_INPUT),
+//                            HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> getAll(){
@@ -66,6 +66,11 @@ public class ParameterController {
                             HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @GetMapping("/check-parameter/{parameter}")
+    public boolean checkParameter(@PathVariable("parameter") String parameter){
+        return parameterService.isParameterExist(parameter);
     }
 
 

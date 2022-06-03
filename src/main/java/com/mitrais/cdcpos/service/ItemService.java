@@ -5,12 +5,8 @@ import com.mitrais.cdcpos.dto.ItemResponseDto;
 import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.entity.CategoryEntity;
 import com.mitrais.cdcpos.entity.item.ItemEntity;
-import com.mitrais.cdcpos.entity.item.SupplierEntity;
 import com.mitrais.cdcpos.exception.ResourceNotFoundException;
-import com.mitrais.cdcpos.repository.CategoryRepository;
-import com.mitrais.cdcpos.repository.IncomingItemRepository;
 import com.mitrais.cdcpos.repository.ItemRepository;
-import com.mitrais.cdcpos.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +40,14 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public Page<ItemEntity> getAllToPage(
+    public PaginatedDto<ItemResponseDto> getAll(
             boolean isPaginated,
             int page,
             int size,
             String searchValue,
             String sortBy,
-            String sortDirection) {
+            String sortDirection,
+            boolean fullInformation) {
 
         Sort sort;
         Pageable paging;
@@ -71,33 +68,18 @@ public class ItemService {
             items = new PageImpl<>(itemEntityList);
         }
 
-        return items;
-    }
+        List<ItemResponseDto> itemDtoList;
+        if(fullInformation) {
+            itemDtoList = items.stream()
+                    .map(ItemResponseDto::toDto)
+                    .collect(Collectors.toList());
+        } else {
+            itemDtoList = items.stream()
+                    .map(ItemResponseDto::toDtoLite)
+                    .collect(Collectors.toList());
+        }
 
-    public PaginatedDto<ItemResponseDto> getAll(
-            boolean isPaginated,
-            int page,
-            int size,
-            String searchValue,
-            String sortBy,
-            String sortDirection) {
-
-        Page<ItemEntity> items = getAllToPage(isPaginated, page, size ,searchValue, sortBy, sortDirection);
-
-        List<ItemResponseDto> itemDtoList = items.stream()
-                .map(i -> new ItemResponseDto(i.getId(),
-                        i.getName(),
-                        i.getImage(),
-                        i.getBarcode(),
-                        i.getCategory().getName(),
-                        i.getPackaging(),
-                        i.getDeletedAt()))
-                .collect(Collectors.toList());
-
-
-        PaginatedDto<ItemResponseDto> result = new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
-
-        return result;
+        return new PaginatedDto<>(itemDtoList, items.getNumber(), items.getTotalPages());
     }
 
     public ItemEntity getById(UUID id){

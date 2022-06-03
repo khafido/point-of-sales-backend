@@ -126,8 +126,8 @@ class UserServiceTest {
         boolean resultFalse = userService.isUsernameExist("unitTest");
         assertFalse(resultFalse);
 
-        Mockito.when(userRepository.existsByUsername("khafido")).thenReturn(true);
-        boolean resultTrue = userService.isUsernameExist("khafido");
+        Mockito.when(userRepository.existsByUsername("managera")).thenReturn(true);
+        boolean resultTrue = userService.isUsernameExist("managera");
         assertTrue(resultTrue);
     }
 

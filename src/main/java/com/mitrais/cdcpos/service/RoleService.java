@@ -17,17 +17,6 @@ import java.util.UUID;
 public class RoleService {
     private final RoleRepository roleRepository;
 
-    public List<RoleEntity> generateRole() {
-        List<RoleEntity> roles = new ArrayList<>();
-        roles.add(new RoleEntity(ERole.ROLE_EMPLOYEE));
-        roles.add(new RoleEntity(ERole.ROLE_ADMIN));
-        roles.add(new RoleEntity(ERole.ROLE_MANAGER));
-        roles.add(new RoleEntity(ERole.ROLE_OWNER));
-        roles.add(new RoleEntity(ERole.ROLE_CASHIER));
-        roles.add(new RoleEntity(ERole.ROLE_STOCKIST));
-        return roleRepository.saveAll(roles);
-    }
-
     public List<RoleEntity> getAll(){
         return roleRepository.findAll();
     }

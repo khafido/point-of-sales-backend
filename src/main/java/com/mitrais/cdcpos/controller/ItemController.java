@@ -8,11 +8,14 @@ import com.mitrais.cdcpos.service.IncomingItemService;
 import com.mitrais.cdcpos.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,10 +47,11 @@ public class ItemController {
                                                   @RequestParam(defaultValue = "10") int size,
                                                   @RequestParam(defaultValue = "") String searchValue,
                                                   @RequestParam(defaultValue = "name") String sortBy,
-                                                  @RequestParam(defaultValue = "ASC") String sortDirection)
+                                                  @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                  @RequestParam(defaultValue = "true") boolean fullInformation)
     {
         try {
-            PaginatedDto<ItemResponseDto> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection);
+            PaginatedDto<ItemResponseDto> result = itemService.getAll(isPaginated, page, size, searchValue, sortBy, sortDirection, fullInformation);
             return new ResponseEntity<>(new GenericResponse(result, "Get All Items Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
         }
         catch(Exception e) {
@@ -127,10 +131,30 @@ public class ItemController {
     }
 
     @GetMapping("stock")
-    public ResponseEntity<GenericResponse> getAll(){
-        List<IncomingItemEntity> items = incomingItemService.getAll();
-        return new ResponseEntity<>
-                (new GenericResponse(items, "success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+    public ResponseEntity<GenericResponse> getAllIncomingItem(@RequestParam(defaultValue = "false") boolean isPaginated,
+                                                              @RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "10") int size,
+                                                              @RequestParam(defaultValue = "") String search,
+                                                              @RequestParam(defaultValue = "item") String sortBy,
+                                                              @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                              @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().minusYears(50)}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+                                                              @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}")
+                                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end){
+
+        try{
+            Page<IncomingItemResponseDto> incomingItem = incomingItemService.getAll(isPaginated,page, size,search,sortBy,sortDirection,start,end);
+            PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
+                    incomingItem.getContent(),
+                    incomingItem.getNumber(),
+                    incomingItem.getTotalPages()
+            );
+            return new ResponseEntity<>
+                    (new GenericResponse(result, "Get incoming item success", GenericResponse.Status.SUCCESS),
+                            HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>
+                    (new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

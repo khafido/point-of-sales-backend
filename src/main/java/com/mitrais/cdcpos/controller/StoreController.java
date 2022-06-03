@@ -5,15 +5,20 @@ import com.mitrais.cdcpos.dto.PaginatedDto;
 import com.mitrais.cdcpos.dto.store.StoreAddItemRequestDto;
 import com.mitrais.cdcpos.dto.store.StoreAssignManagerRequestDto;
 import com.mitrais.cdcpos.dto.store.StoreDto;
+import com.mitrais.cdcpos.dto.store.StoreUpdateItemPriceRequestDto;
 import com.mitrais.cdcpos.exception.ManualValidationFailException;
 import com.mitrais.cdcpos.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import com.mitrais.cdcpos.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -44,7 +49,9 @@ public class StoreController {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
-                var genericResponse = new GenericResponse(StoreDto.toDto(store.get()), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
+                var result = storeService.getStoreEmployee(id, false, 0, 10, "", "id", "DESC");
+                var totalEmployee = result.getSize();
+                var genericResponse = new GenericResponse(StoreDto.toDtoWithTotalEmployee(store.get(), totalEmployee), "Successfully get Store Data", GenericResponse.Status.SUCCESS);
                 return new ResponseEntity<>(genericResponse, HttpStatus.OK);
             } else {
                 var genericResponse = new GenericResponse(null, "Store Data doesn't exist", GenericResponse.Status.ERROR_NOT_FOUND);
@@ -113,9 +120,24 @@ public class StoreController {
     public ResponseEntity<GenericResponse> addItemToStore(@PathVariable UUID id, @RequestBody @Valid StoreAddItemRequestDto request) {
         try {
             var result = storeService.addItemToStore(id ,request);
+            if(result.size()>0) {
+                return new ResponseEntity<>(new GenericResponse(result, "Add Item to Store Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}/item/{itemId}")
+    public ResponseEntity<GenericResponse> deleteStoreItem(@PathVariable UUID id, @PathVariable UUID itemId) {
+        try {
+            var result = storeService.deleteStoreItem(id, itemId);
             if(result!=null) {
-                var resultDto = StoreDto.toDto(result.getStore());
-                return new ResponseEntity<>(new GenericResponse(resultDto, "Add Item to Store Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+                return new ResponseEntity<>(new GenericResponse(result, "Delete Store Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(new GenericResponse(null, "Store/Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
             }
@@ -146,6 +168,53 @@ public class StoreController {
         }
     }
 
+    @GetMapping("{id}/expired-item")
+    public ResponseEntity<GenericResponse> storeListOfExpiredItem(@PathVariable("id") UUID id,
+                                                                  @RequestParam(defaultValue = "false") boolean isPaginated,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "10") int size,
+                                                                  @RequestParam(defaultValue = "") String search,
+                                                                  @RequestParam(defaultValue = "item") String sortBy,
+                                                                  @RequestParam(defaultValue = "ASC") String sortDirection,
+                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().minusYears(50)}")  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+                                                                  @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now()}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end){
+        try{
+            Page<IncomingItemResponseDto> expiredItem = storeService.storeListOfExpiredItems(id,isPaginated,page,size,search,sortBy,sortDirection,start,end);
+            PaginatedDto<IncomingItemResponseDto> result = new PaginatedDto<>(
+                    expiredItem.getContent(),
+                    expiredItem.getNumber(),
+                    expiredItem.getTotalPages()
+            );
+            return new ResponseEntity<>(new GenericResponse(result, "Get expired item success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(new GenericResponse(null, e.getMessage(),GenericResponse.Status.ERROR_INTERNAL), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PatchMapping("/{id}/item/{itemId}")
+    public ResponseEntity<GenericResponse> updateStoreItemPrice(
+            @PathVariable UUID id,
+            @PathVariable UUID itemId,
+            @RequestBody @Valid StoreUpdateItemPriceRequestDto request) {
+        try {
+            var result = storeService.updateStoreItemPrice(id, itemId, request);
+            if(result!=null) {
+                return new ResponseEntity<>(new GenericResponse(result, "Update Store Item Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new GenericResponse(null, "Store Item Not Found", GenericResponse.Status.ERROR_NOT_FOUND), HttpStatus.NOT_FOUND);
+            }
+        } catch (ManualValidationFailException e) {
+            e.printStackTrace();
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INPUT);
+            return new ResponseEntity<>(genericResponse, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            var genericResponse = new GenericResponse(null, e.getMessage(), GenericResponse.Status.ERROR_INTERNAL);
+            return new ResponseEntity<>(genericResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/{id}/manager")
     public ResponseEntity<GenericResponse> assignManager(@PathVariable UUID id, @RequestBody @Valid StoreAssignManagerRequestDto request) {
         try {
@@ -168,7 +237,7 @@ public class StoreController {
     }
 
     @GetMapping("/{id}/employee")
-    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id, @RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
+    public ResponseEntity<GenericResponse> getStoreEmployee(@PathVariable UUID id, @RequestParam(defaultValue = "false") Boolean isPaginated, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size, @RequestParam(defaultValue = "") String searchValue, @RequestParam(defaultValue = "user.firstName") String sortBy, @RequestParam(defaultValue = "DESC") String sortDirection) {
         try {
             var store = storeService.getById(id);
             if (store.isPresent()) {
@@ -190,7 +259,7 @@ public class StoreController {
     @PostMapping("/add-employee")
     public ResponseEntity<GenericResponse> addEmployee(@RequestBody @Valid AddEmployeeDto request) {
         try {
-            var result = storeService.addEmployee(request);
+            var result = storeService.addEmployee(UUID.fromString(request.getUserId()), UUID.fromString(request.getStoreId()));
             if (result != null) {
                 var resultDto = StoreEmployeeDto.toDto(result);
                 return new ResponseEntity<>(new GenericResponse(resultDto, "Add Store Employee Success", GenericResponse.Status.SUCCESS), HttpStatus.OK);
